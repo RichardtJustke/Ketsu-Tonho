@@ -260,9 +260,8 @@ npm run dev
 
 ## 🏢 Sobre a Ketsu
 
-<div align="center">
-  <img src="https://img.shields.io/badge/KETSU-Desenvolvimento%20Web-FF5F1F?style=for-the-badge&logo=react&logoColor=white" alt="Ketsu Badge"/>
-</div>
+...
+site em breve
 
 ### 🚀 Nosso Primeiro Projeto
 
@@ -334,7 +333,7 @@ Este projeto está sob a licença MIT. Consulte o arquivo [LICENSE](LICENSE) par
     </a>
   </p>
   
-  <p>© 2025 Tonho Locação - Todos os direitos reservados</p>
+  <p>© 2026 Tonho Locação - Todos os direitos reservados</p>
   <p><sub>Projeto desenvolvido pela <strong>Ketsu</strong> 🚀</sub></p>
   
 </div>
