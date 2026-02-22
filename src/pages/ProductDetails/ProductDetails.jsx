@@ -11,6 +11,7 @@ import ProductActions from './components/ProductActions'
 import RelatedProducts from './components/RelatedProducts'
 import ContactSection from './components/ContactSection'
 import { getProductById } from '../../data/products'
+import { getProductImages } from '../../utils/imagens'
 
 /**
  * ProductDetails - Página principal de detalhes do produto
@@ -78,9 +79,13 @@ const ProductDetails = () => {
         onCheckAvailability={handleCheckAvailability}
       />
       
-      {/* 3. Imagem Principal do Produto */}
+      {/* 3. Imagem(ns) do Produto - pórtico: só pasta portico_de_entrada; demais: pasta ou product.image */}
       <ProductImage 
-        image={product.image}
+        images={
+          product.id === 'portico_de_entrada'
+            ? getProductImages(product.id)
+            : (getProductImages(product.id).length > 0 ? getProductImages(product.id) : [product.image])
+        }
         name={product.name}
       />
       

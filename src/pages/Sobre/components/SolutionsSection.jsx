@@ -1,4 +1,9 @@
+import { getCasesImages } from '../../../utils/imagens'
+
 const SolutionsSection = () => {
+  const casesImages = getCasesImages()
+  // Usa primeira imagem de cases, ou fallback se não houver
+  const imageUrl = casesImages.length > 0 ? casesImages[0] : 'https://images.unsplash.com/photo-1478147427282-58a87a120781?q=80&w=2070&auto=format&fit=crop'
   const checkItems = [
     'Orçamentos personalizados',
     'Consultoria de espaço',
@@ -41,7 +46,7 @@ const SolutionsSection = () => {
           <div className="lg:w-1/2">
             <div className="rounded-2xl overflow-hidden">
               <img 
-                src="https://images.unsplash.com/photo-1478147427282-58a87a120781?q=80&w=2070&auto=format&fit=crop" 
+                src={imageUrl}
                 alt="Soluções inteligentes"
                 className="w-full h-[400px] object-cover"
               />

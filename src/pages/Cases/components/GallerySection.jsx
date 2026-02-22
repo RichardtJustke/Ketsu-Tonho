@@ -1,5 +1,10 @@
+import { getCasesImages } from '../../../utils/imagens'
+
 const GallerySection = () => {
-  const galleryImages = [
+  const casesImages = getCasesImages()
+  
+  // Se houver imagens na pasta cases, usa elas. Senão, usa imagens padrão.
+  const defaultImages = [
     {
       id: 1,
       src: 'https://images.unsplash.com/photo-1621905252507-b35492cc74b4?q=80&w=2069&auto=format&fit=crop',
@@ -91,6 +96,16 @@ const GallerySection = () => {
       size: 'medium'
     }
   ]
+
+  // Se existem imagens da pasta cases, converte para o formato esperado
+  const galleryImages = casesImages && casesImages.length > 0
+    ? casesImages.map((src, index) => ({
+        id: index + 1,
+        src,
+        alt: `Case ${index + 1}`,
+        size: index % 3 === 0 ? 'large' : index % 2 === 0 ? 'medium' : 'small'
+      }))
+    : defaultImages
 
   return (
     <section className="bg-white py-16 md:py-24 px-6">

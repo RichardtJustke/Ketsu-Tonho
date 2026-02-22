@@ -1,4 +1,7 @@
+import { getLogoImage } from '../../utils/imagens'
+
 const Footer = () => {
+  const logoUrl = getLogoImage()
   const footerLinks = [
     { label: 'Home', href: '/' },
     { label: 'Serviços', href: '#servicos' },
@@ -15,8 +18,12 @@ const Footer = () => {
         <div className="bg-black rounded-3xl p-8 md:p-12 lg:p-16">
           <div className="flex flex-col lg:flex-row justify-between gap-12 pb-12 border-b border-white/20">
             <div className="lg:w-1/2">
-              <a href="#" className="text-white text-xl font-semibold inline-block mb-6">
-                Logo
+              <a href="/" className="text-white text-xl font-semibold inline-block mb-6">
+                {logoUrl ? (
+                  <img src={logoUrl} alt="Logo" className="h-8 object-contain" />
+                ) : (
+                  'Logo'
+                )}
               </a>
               <p className="text-[#F7F7F8] opacity-70 text-sm leading-relaxed max-w-md">
                 Há mais de 10 anos realizando eventos com estrutura completa, qualidade e compromisso. Seu evento acontece. A gente cuida do resto.

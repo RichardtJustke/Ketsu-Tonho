@@ -1,6 +1,32 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { getProductFirstImage, getProductImages } from '../../../utils/imagens'
+import { getProductById } from '../../../data/products'
 
 const BoxCard = ({ box, hasAnsweredForm, onAction }) => {
+  const product = getProductById(box.id)
+  const isPortico = box.id === 'portico_de_entrada'
+  const folderImages = getProductImages(box.id)
+
+  const primaryUrl = isPortico
+    ? (folderImages[0] || '')
+    : (getProductFirstImage(box.id, product?.image) || product?.image || '')
+  const [imageUrl, setImageUrl] = useState(primaryUrl)
+  const [imageIndex, setImageIndex] = useState(0)
+  const fallbackUrl = isPortico
+    ? (folderImages[1] || folderImages[0] || '')
+    : (product?.image || 'https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=800&auto=format&fit=crop')
+
+  const handleImageError = () => {
+    if (isPortico && folderImages.length > imageIndex + 1) {
+      const next = imageIndex + 1
+      setImageIndex(next)
+      setImageUrl(folderImages[next])
+    } else if (!isPortico) {
+      setImageUrl(fallbackUrl)
+    }
+  }
+
   const handleClick = () => {
     if (hasAnsweredForm) {
       // Envia apenas o ID do produto para o carrinho (futura integração)
@@ -14,14 +40,18 @@ const BoxCard = ({ box, hasAnsweredForm, onAction }) => {
   return (
     <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
       <div className="flex flex-col sm:flex-row">
-        {/* Imagem */}
-        <div className="sm:w-1/2">
-          <div 
-            className="h-72 sm:h-full min-h-[300px] bg-cover bg-center bg-no-repeat"
-            style={{
-              backgroundImage: `url('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')`
-            }}
-          />
+        {/* Imagem - pórtico: só pasta portico_de_entrada; demais: pasta + fallback externo */}
+        <div className="sm:w-1/2 min-h-[300px] h-72 sm:h-full bg-gray-100">
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={box.nome}
+              className="w-full h-full object-cover"
+              onError={handleImageError}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">Imagem do produto</div>
+          )}
         </div>
         
         {/* Conteúdo */}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { getLogoImage } from '../../utils/imagens'
 
 const Navbar = () => {
   const location = useLocation()
@@ -30,8 +31,12 @@ const Navbar = () => {
       }`}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <Link to="/" className="text-white text-xl font-semibold">
-          Logo
+        <Link to="/" className="text-white text-xl font-semibold flex items-center gap-2">
+          {getLogoImage() ? (
+            <img src={getLogoImage()} alt="Logo" className="h-8 md:h-9 object-contain" />
+          ) : (
+            'Logo'
+          )}
         </Link>
 
         <div className="hidden md:flex items-center gap-8">

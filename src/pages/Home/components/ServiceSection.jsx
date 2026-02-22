@@ -1,31 +1,26 @@
+import { getProductFirstImage, getProductImages } from '../../../utils/imagens'
+import { getProductById } from '../../../data/products'
+
 const ServiceSection = () => {
   const products = [
-    {
-      image: 'https://images.unsplash.com/photo-1478146896981-b80fe463b330?q=80&w=2070&auto=format&fit=crop',
-      title: 'Tenda Cristal 10x10m',
-      discount: '20%',
-      price: 'R$300,00'
-    },
-    {
-      image: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2069&auto=format&fit=crop',
-      title: 'Pórtico 6m x 4,6m',
-      discount: '5%',
-      price: 'R$600,00'
-    },
-    {
-      image: 'https://images.unsplash.com/photo-1470753937643-efeb931202a9?q=80&w=2070&auto=format&fit=crop',
-      title: 'Tenda Pai D\'egua',
-      discount: '5%',
-      price: 'R$300,00',
-      buttonText: 'Ver disponibilidade'
-    },
-    {
-      image: 'https://images.unsplash.com/photo-1503602642458-232111445657?q=80&w=1974&auto=format&fit=crop',
-      title: 'Climatizador Joape 110v',
-      discount: '12%',
-      price: 'R$300,00'
+    { id: 'tenda_cristal_10x10', title: 'Tenda Cristal 10x10m', discount: '20%', price: 'R$300,00' },
+    { id: 'portico_de_entrada', title: 'Pórtico 6m x 4,6m', discount: '5%', price: 'R$600,00' },
+    { id: 'tenda_pe_dagua', title: 'Tenda Pai D\'egua', discount: '5%', price: 'R$300,00', buttonText: 'Ver disponibilidade' },
+    { id: 'climatizador_juapi_110v', title: 'Climatizador Joape 110v', discount: '12%', price: 'R$300,00' }
+  ].map((p) => {
+    const product = getProductById(p.id)
+    const isPortico = p.id === 'portico_de_entrada'
+    const folderImages = getProductImages(p.id)
+    const imageOnlyFromFolder = isPortico ? (folderImages[0] || '') : (getProductFirstImage(p.id, product?.image) || product?.image || '')
+    const fallbackUrl = isPortico
+      ? (folderImages[1] || folderImages[0] || '')
+      : (product?.image || 'https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=800&auto=format&fit=crop')
+    return {
+      ...p,
+      image: imageOnlyFromFolder || fallbackUrl,
+      fallbackUrl
     }
-  ]
+  })
 
   return (
     <section className="bg-white py-16 md:py-24 px-6">
@@ -45,11 +40,12 @@ const ServiceSection = () => {
                 key={index} 
                 className="bg-white rounded-2xl overflow-hidden border-2 border-black/10"
               >
-                <div className="aspect-[4/3] overflow-hidden">
-                  <img 
-                    src={product.image} 
+                <div className="aspect-[4/3] overflow-hidden bg-gray-100">
+                  <img
+                    src={product.image || product.fallbackUrl}
                     alt={product.title}
                     className="w-full h-full object-cover"
+                    onError={(e) => { e.target.onerror = null; e.target.src = product.fallbackUrl }}
                   />
                 </div>
                 

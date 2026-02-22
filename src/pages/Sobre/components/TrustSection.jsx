@@ -1,4 +1,9 @@
+import { getCasesImages } from '../../../utils/imagens'
+
 const TrustSection = () => {
+  const casesImages = getCasesImages()
+  // Usa segunda imagem de cases (ou primeira se só houver uma), ou fallback se não houver
+  const imageUrl = casesImages.length > 1 ? casesImages[1] : (casesImages.length > 0 ? casesImages[0] : 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=2069&auto=format&fit=crop')
   const checkItems = [
     'Equipamentos certificados e inspecionados',
     'Equipe treinada, uniformizada e identificada',
@@ -26,7 +31,7 @@ const TrustSection = () => {
           <div className="lg:w-1/2">
             <div className="rounded-2xl overflow-hidden">
               <img 
-                src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=2069&auto=format&fit=crop" 
+                src={imageUrl}
                 alt="Serviço de confiança"
                 className="w-full h-[400px] object-cover"
               />

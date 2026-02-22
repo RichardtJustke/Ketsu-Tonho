@@ -1,12 +1,14 @@
+import { getProductFirstImage } from '../../../utils/imagens'
+
 const Hero = () => {
+  const heroImage = getProductFirstImage('portico_de_entrada', null)
+
   return (
     <section className="relative bg-black min-h-[500px] flex items-center">
-      {/* Background Image */}
+      {/* Background Image - somente src/imagens/portico_de_entrada */}
       <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-50"
-        style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')`
-        }}
+        className={`absolute inset-0 opacity-50 ${heroImage ? 'bg-cover bg-center bg-no-repeat' : 'bg-gray-900'}`}
+        style={heroImage ? { backgroundImage: `url('${heroImage}')` } : {}}
       />
       
       {/* Content */}

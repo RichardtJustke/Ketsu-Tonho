@@ -1,6 +1,11 @@
 import { Link } from 'react-router-dom'
+import { getProductFirstImage } from '../../../utils/imagens'
+import { getProductById } from '../../../data/products'
 
 const TendaCard = ({ tenda, hasAnsweredForm, onAction }) => {
+  const product = getProductById(tenda.id)
+  const imageUrl = getProductFirstImage(tenda.id, product?.image) || ''
+
   const handleClick = () => {
     if (hasAnsweredForm) {
       // Envia apenas o ID do produto para o carrinho (futura integração)
@@ -16,12 +21,12 @@ const TendaCard = ({ tenda, hasAnsweredForm, onAction }) => {
       <div className="flex flex-col sm:flex-row">
         {/* Imagem */}
         <div className="sm:w-1/2">
-          <div 
-            className="h-72 sm:h-full min-h-[300px] bg-cover bg-center bg-no-repeat"
-            style={{
-              backgroundImage: `url('https://images.unsplash.com/photo-1478827536114-da961b7f86d2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')`
-            }}
-          />
+          {imageUrl ? (
+            <div
+              className="h-72 sm:h-full min-h-[300px] bg-cover bg-center bg-no-repeat"
+              style={{ backgroundImage: `url('${imageUrl}')` }}
+            />
+          ) : null}
         </div>
         
         {/* Conteúdo */}

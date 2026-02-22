@@ -1,4 +1,8 @@
+import { getEquipeImages } from '../../../utils/imagens'
+
 const HistorySection = () => {
+  const equipeImages = getEquipeImages()
+  const imageUrl = equipeImages.length > 3 ? equipeImages[3] : (equipeImages.length > 0 ? equipeImages[equipeImages.length - 1] : 'https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=2069&auto=format&fit=crop')
   const stats = [
     { value: '4.9/5', label: 'Avaliação média dos clientes' },
     { value: '1000+', label: 'Eventos realizados' }
@@ -48,7 +52,7 @@ const HistorySection = () => {
           <div className="lg:w-1/2">
             <div className="rounded-2xl overflow-hidden">
               <img 
-                src="https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=2069&auto=format&fit=crop" 
+                src={imageUrl}
                 alt="Nossa história"
                 className="w-full h-[400px] md:h-[500px] object-cover"
               />

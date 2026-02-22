@@ -1,4 +1,8 @@
+import { getEquipeImages } from '../../../utils/imagens'
+
 const ExperienceSection = () => {
+  const equipeImages = getEquipeImages()
+  const imageUrl = equipeImages.length > 2 ? equipeImages[2] : (equipeImages.length > 0 ? equipeImages[0] : 'https://images.unsplash.com/photo-1505236858219-8359eb29e329?q=80&w=2062&auto=format&fit=crop')
   const checkItems = [
     {
       title: 'Equipe certificada e treinada',
@@ -26,7 +30,7 @@ const ExperienceSection = () => {
           <div className="lg:w-1/2 order-2 lg:order-1">
             <div className="rounded-2xl overflow-hidden">
               <img 
-                src="https://images.unsplash.com/photo-1505236858219-8359eb29e329?q=80&w=2062&auto=format&fit=crop" 
+                src={imageUrl}
                 alt="Experiência"
                 className="w-full h-[400px] md:h-[500px] object-cover"
               />
