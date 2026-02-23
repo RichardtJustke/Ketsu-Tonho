@@ -5,7 +5,7 @@
  */
 
 // Suporta múltiplos formatos de imagem incluindo HEIC para compatibilidade
-const modules = import.meta.glob('../imagens/**/*.{png,jpg,jpeg,webp,svg,gif,bmp,heic,HEIC}', { as: 'url', eager: true })
+const modules = import.meta.glob('../imagens/**/*.{png,jpg,jpeg,webp,svg,gif,bmp,heic,HEIC,JPG,JPEG,WEBP,SVG,GIF,BMP}', { as: 'url', eager: true })
 
 /**
  * Agrupa módulos por nome da pasta (primeiro nível dentro de imagens).

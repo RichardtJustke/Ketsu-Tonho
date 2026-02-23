@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Navbar from '../../shared/components/Navbar'
 import Footer from '../../shared/components/Footer'
+import AnimateIn from '../../shared/components/AnimateIn'
 import Hero from './components/Hero'
 import AboutSection from './components/AboutSection'
 import ProcessSection from './components/ProcessSection'
@@ -44,37 +45,57 @@ const Home = () => {
       
       {/* 1. Hero Section */}
       <Hero onOpenFilterModal={handleOpenFilterModal} />
-      
+
       {/* 2. Seção "Tudo o que você precisa para realizar seu evento" */}
-      <AboutSection />
-      
+      <AnimateIn animation="fade-in-up">
+        <AboutSection />
+      </AnimateIn>
+
       {/* 3. Seção "Realizar seu evento com a Tonho é muito simples e rápido" */}
-      <ProcessSection />
-      
+      <AnimateIn animation="fade-in-up">
+        <ProcessSection />
+      </AnimateIn>
+
       {/* 4. Seção "Veja o que temos" (cards com produtos/serviços) */}
-      <ServiceSection />
-      
+      <AnimateIn animation="fade-in-up">
+        <ServiceSection />
+      </AnimateIn>
+
       {/* 5. Seção "Por que escolher a Tonho" */}
-      <WhyChooseSection />
-      
+      <AnimateIn animation="fade-in-up">
+        <WhyChooseSection />
+      </AnimateIn>
+
       {/* 6. Seção "Quem confia na Tonho" */}
-      <TrustSection />
-      
+      <AnimateIn animation="fade-in-up">
+        <TrustSection />
+      </AnimateIn>
+
       {/* 7. Seção "Que tipo de evento você vai realizar" (accordion) */}
-      <EventTypeSection />
-      
+      <AnimateIn animation="fade-in-up">
+        <EventTypeSection />
+      </AnimateIn>
+
       {/* 8. Seção "Veja os itens que vão fazer o seu evento acontecer" */}
-      <ItemsSection />
-      
+      <AnimateIn animation="fade-in-up">
+        <ItemsSection />
+      </AnimateIn>
+
       {/* 9. Seção "Monte seu evento em dois minutos" (CTA) */}
-      <CtaSection onOpenFilterModal={handleOpenFilterModal} />
-      
+      <AnimateIn animation="scale-in">
+        <CtaSection onOpenFilterModal={handleOpenFilterModal} />
+      </AnimateIn>
+
       {/* 10. Seção "O que os clientes dizem" */}
-      <TestimonialSection />
-      
+      <AnimateIn animation="fade-in-up">
+        <TestimonialSection />
+      </AnimateIn>
+
       {/* 11. Seção de Contato */}
-      <ContactSection />
-      
+      <AnimateIn animation="fade-in-up">
+        <ContactSection />
+      </AnimateIn>
+
       {/* 12. Footer */}
       <Footer />
     </main>

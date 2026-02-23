@@ -1,4 +1,10 @@
+import { getProductImages } from '../../../utils/imagens'
+
 const ProcessSection = () => {
+  // Busca imagem específica "Img 4.jpeg" da pasta tenda_branca_5x5
+  const tenda5x5Images = getProductImages('tenda_branca_5x5')
+  const processImage = tenda5x5Images.find(url => url.includes('Img 4')) || tenda5x5Images[0] || 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?q=80&w=2070&auto=format&fit=crop'
+
   const processCards = [
     {
       icon: (
@@ -89,8 +95,8 @@ const ProcessSection = () => {
             
             <div className="rounded-2xl overflow-hidden aspect-video bg-[#F7F7F8]">
               <img 
-                src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?q=80&w=2070&auto=format&fit=crop" 
-                alt="Evento decorado"
+                src={processImage}
+                alt="Realizar seu evento"
                 className="w-full h-full object-cover"
               />
             </div>

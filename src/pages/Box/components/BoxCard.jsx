@@ -38,7 +38,7 @@ const BoxCard = ({ box, hasAnsweredForm, onAction }) => {
   }
 
   return (
-    <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+    <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover-lift">
       <div className="flex flex-col sm:flex-row">
         {/* Imagem - pórtico: só pasta portico_de_entrada; demais: pasta + fallback externo */}
         <div className="sm:w-1/2 min-h-[300px] h-72 sm:h-full bg-gray-100">

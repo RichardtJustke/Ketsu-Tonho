@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from '../../shared/components/Navbar'
 import Footer from '../../shared/components/Footer'
+import AnimateIn from '../../shared/components/AnimateIn'
 import Hero from './components/Hero'
 import CartItems from './components/CartItems'
 import OrderSummary from './components/OrderSummary'
@@ -86,9 +87,9 @@ const Cart = () => {
         </Link>
       </div>
 
-      {/* Main Content */}
-      <section className="max-w-7xl mx-auto px-6 pb-16">
-        <div className="flex flex-col lg:flex-row gap-8">
+      <AnimateIn animation="fade-in-up">
+        <section className="max-w-7xl mx-auto px-6 pb-16">
+          <div className="flex flex-col lg:flex-row gap-8">
           {/* Left Column - Cart Items + Instructions */}
           <div className="lg:w-2/3 space-y-6">
             {/* Cart Items */}
@@ -115,11 +116,13 @@ const Cart = () => {
               />
             </div>
           </div>
-        </div>
-      </section>
+          </div>
+        </section>
+      </AnimateIn>
 
-      {/* Contact Section */}
-      <ContactSection />
+      <AnimateIn animation="fade-in-up">
+        <ContactSection />
+      </AnimateIn>
 
       {/* Footer */}
       <Footer />

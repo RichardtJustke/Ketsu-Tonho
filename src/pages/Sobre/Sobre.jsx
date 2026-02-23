@@ -1,5 +1,6 @@
 import Navbar from '../../shared/components/Navbar'
 import Footer from '../../shared/components/Footer'
+import AnimateIn from '../../shared/components/AnimateIn'
 import Hero from './components/Hero'
 import HistorySection from './components/HistorySection'
 import ValuesSection from './components/ValuesSection'
@@ -15,14 +16,14 @@ const Sobre = () => {
     <div className="min-h-screen bg-white font-['Figtree']">
       <Navbar />
       <Hero />
-      <HistorySection />
-      <ValuesSection />
-      <ExperienceSection />
-      <MetricsSection />
-      <TrustSection />
-      <SolutionsSection />
-      <TestimonialsSection />
-      <ContactSection />
+      <AnimateIn animation="fade-in-up"><HistorySection /></AnimateIn>
+      <AnimateIn animation="fade-in-up"><ValuesSection /></AnimateIn>
+      <AnimateIn animation="fade-in-up"><ExperienceSection /></AnimateIn>
+      <AnimateIn animation="scale-in"><MetricsSection /></AnimateIn>
+      <AnimateIn animation="fade-in-up"><TrustSection /></AnimateIn>
+      <AnimateIn animation="fade-in-up"><SolutionsSection /></AnimateIn>
+      <AnimateIn animation="fade-in-up"><TestimonialsSection /></AnimateIn>
+      <AnimateIn animation="fade-in-up"><ContactSection /></AnimateIn>
       <Footer />
     </div>
   )

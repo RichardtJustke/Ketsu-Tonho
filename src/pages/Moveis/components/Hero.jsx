@@ -1,11 +1,18 @@
+import { getProductFirstImage } from '../../../utils/imagens'
+
 const Hero = () => {
+  const heroImage = getProductFirstImage(
+    'climatizador_juapi_110v',
+    'https://images.unsplash.com/photo-1585771724684-38269d6639fd?q=80&w=2070&auto=format&fit=crop'
+  )
+
   return (
     <section className="relative bg-black min-h-[500px] flex items-center">
       {/* Background Image */}
-      <div 
+      <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-50"
         style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1585771724684-38269d6639fd?q=80&w=2070&auto=format&fit=crop')`
+          backgroundImage: heroImage ? `url('${heroImage}')` : undefined
         }}
       />
       

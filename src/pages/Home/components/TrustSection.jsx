@@ -1,10 +1,13 @@
+import videoTrust from '../../../imagens/vdd/n1g7HMEESROCOjXXSeiL_IMG_0116-v.mp4'
+
 const TrustSection = () => {
   const trustCards = [
     {
       icon: (
         <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M24 24C28.42 24 32 20.42 32 16C32 11.58 28.42 8 24 8C19.58 8 16 11.58 16 16C16 20.42 19.58 24 24 24Z" stroke="#333" strokeWidth="2"/>
-          <path d="M8 40V36C8 31.58 11.58 28 16 28H32C36.42 28 40 31.58 40 36V40" stroke="#333" strokeWidth="2" strokeLinecap="round"/>
+          <circle cx="24" cy="18" r="8" fill="#FF5F1F" stroke="#FF5F1F" strokeWidth="1.5"/>
+          <path d="M12 36V32C12 28.7 14.7 26 18 26H30C33.3 26 36 28.7 36 32V36" stroke="#FF5F1F" strokeWidth="1.5" strokeLinecap="round"/>
+          <circle cx="24" cy="18" r="4" fill="white" opacity="0.3"/>
         </svg>
       ),
       title: 'Clientes pessoa física',
@@ -13,10 +16,11 @@ const TrustSection = () => {
     {
       icon: (
         <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="8" y="12" width="32" height="28" rx="2" stroke="#333" strokeWidth="2"/>
-          <path d="M16 12V8" stroke="#333" strokeWidth="2" strokeLinecap="round"/>
-          <path d="M32 12V8" stroke="#333" strokeWidth="2" strokeLinecap="round"/>
-          <path d="M8 20H40" stroke="#333" strokeWidth="2"/>
+          <rect x="10" y="14" width="28" height="24" rx="2" fill="#FF5F1F" stroke="#FF5F1F" strokeWidth="1.5"/>
+          <path d="M18 14V10C18 9.4 18.4 9 19 9H29C29.6 9 30 9.4 30 10V14" stroke="#FF5F1F" strokeWidth="1.5"/>
+          <path d="M10 22H38" stroke="white" strokeWidth="1.5"/>
+          <circle cx="20" cy="28" r="1.5" fill="white"/>
+          <circle cx="28" cy="28" r="1.5" fill="white"/>
         </svg>
       ),
       title: 'Empresas e corporações',
@@ -25,8 +29,9 @@ const TrustSection = () => {
     {
       icon: (
         <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M20 8L8 16V40H20V28H28V40H40V16L28 8" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M20 8H28L40 16" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M24 10L12 18V38H20V28H28V38H36V18L24 10Z" fill="#FF5F1F" stroke="#FF5F1F" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M24 10V18H36" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          <rect x="20" y="24" width="8" height="6" rx="1" fill="white" opacity="0.3"/>
         </svg>
       ),
       title: 'Produtores e organizadores',
@@ -35,9 +40,11 @@ const TrustSection = () => {
     {
       icon: (
         <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M40 20H8V38C8 39.1 8.9 40 10 40H38C39.1 40 40 39.1 40 38V20Z" stroke="#333" strokeWidth="2"/>
-          <path d="M40 20V14C40 12.9 39.1 12 38 12H30L28 8H20L18 12H10C8.9 12 8 12.9 8 14V20" stroke="#333" strokeWidth="2"/>
-          <circle cx="24" cy="30" r="6" stroke="#333" strokeWidth="2"/>
+          <rect x="10" y="16" width="28" height="20" rx="2" fill="#FF5F1F" stroke="#FF5F1F" strokeWidth="1.5"/>
+          <path d="M38 16V12C38 10.9 37.1 10 36 10H30L28 6H20L18 10H12C10.9 10 10 10.9 10 12V16" stroke="#FF5F1F" strokeWidth="1.5"/>
+          <circle cx="24" cy="26" r="5" fill="white" opacity="0.3"/>
+          <circle cx="24" cy="26" r="3" stroke="white" strokeWidth="1.5"/>
+          <circle cx="24" cy="26" r="1.5" fill="white"/>
         </svg>
       ),
       title: 'Instituições públicas e privadas',
@@ -49,14 +56,18 @@ const TrustSection = () => {
     <section className="bg-[#F7F7F8] py-16 md:py-24 px-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row gap-12">
-          {/* Image */}
+          {/* Video */}
           <div className="lg:w-5/12">
             <div className="rounded-2xl overflow-hidden h-full min-h-[300px]">
-              <img 
-                src="https://images.unsplash.com/photo-1529636798458-92182e662485?q=80&w=2069&auto=format&fit=crop" 
-                alt="Evento com pessoas"
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
                 className="w-full h-full object-cover"
-              />
+              >
+                <source src={videoTrust} type="video/mp4" />
+              </video>
             </div>
           </div>
 

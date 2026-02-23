@@ -1,4 +1,9 @@
+import { getProductImages } from '../../../utils/imagens'
+
 const AboutSection = () => {
+  // Busca imagem específica "IMG-20231030-WA0059.jpg" da pasta tenda_branca_5x5
+  const tenda5x5Images = getProductImages('tenda_branca_5x5')
+  const aboutImage = tenda5x5Images.find(url => url.includes('IMG-20231030-WA0059')) || tenda5x5Images[0] || 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=2069&auto=format&fit=crop'
   return (
     <section className="bg-[#F7F7F8] py-16 md:py-24 px-6">
       <div className="max-w-7xl mx-auto">
@@ -7,8 +12,8 @@ const AboutSection = () => {
           <div className="w-full lg:w-1/2">
             <div className="relative rounded-2xl overflow-hidden aspect-[4/3]">
               <img 
-                src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=2069&auto=format&fit=crop" 
-                alt="Evento corporativo"
+                src={aboutImage}
+                alt="Tudo o que você precisa para realizar o seu evento"
                 className="w-full h-full object-cover"
               />
             </div>

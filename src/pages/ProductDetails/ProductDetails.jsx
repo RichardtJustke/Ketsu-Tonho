@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useParams, Navigate } from 'react-router-dom'
 import Navbar from '../../shared/components/Navbar'
 import Footer from '../../shared/components/Footer'
+import AnimateIn from '../../shared/components/AnimateIn'
 import ProductHero from './components/ProductHero'
 import ProductImage from './components/ProductImage'
 import ProductAbout from './components/ProductAbout'
@@ -79,44 +80,45 @@ const ProductDetails = () => {
         onCheckAvailability={handleCheckAvailability}
       />
       
-      {/* 3. Imagem(ns) do Produto - pórtico: só pasta portico_de_entrada; demais: pasta ou product.image */}
-      <ProductImage 
-        images={
-          product.id === 'portico_de_entrada'
-            ? getProductImages(product.id)
-            : (getProductImages(product.id).length > 0 ? getProductImages(product.id) : [product.image])
-        }
-        name={product.name}
-      />
-      
-      {/* 4. Seção "Sobre este Produto" */}
-      <ProductAbout 
-        description={product.fullDescription}
-      />
-      
-      {/* 5. Seção "O que oferecemos" */}
-      <ProductBenefits 
-        benefits={product.benefits}
-      />
-      
-      {/* 6. Seção "Especificações Técnicas" */}
-      <ProductSpecs 
-        specs={product.specs}
-      />
-      
-      {/* 7. Área de Ações - Botões Voltar e Ver disponibilidade/Adicionar ao carrinho */}
-      <ProductActions 
-        productId={product.id}
-        hasAnsweredForm={hasAnsweredForm}
-        onCheckAvailability={handleCheckAvailability}
-        onAddToCart={handleAddToCart}
-      />
-      
-      {/* 8. Seção "Veja outros tipos de produtos" */}
-      <RelatedProducts />
-      
-      {/* 9. Seção de Contato */}
-      <ContactSection />
+      <AnimateIn animation="fade-in-up">
+        <ProductImage
+          images={
+            product.id === 'portico_de_entrada'
+              ? getProductImages(product.id)
+              : (getProductImages(product.id).length > 0 ? getProductImages(product.id) : [product.image])
+          }
+          name={product.name}
+        />
+      </AnimateIn>
+
+      <AnimateIn animation="fade-in-up">
+        <ProductAbout description={product.fullDescription} />
+      </AnimateIn>
+
+      <AnimateIn animation="fade-in-up">
+        <ProductBenefits benefits={product.benefits} />
+      </AnimateIn>
+
+      <AnimateIn animation="scale-in">
+        <ProductSpecs specs={product.specs} />
+      </AnimateIn>
+
+      <AnimateIn animation="fade-in-up">
+        <ProductActions
+          productId={product.id}
+          hasAnsweredForm={hasAnsweredForm}
+          onCheckAvailability={handleCheckAvailability}
+          onAddToCart={handleAddToCart}
+        />
+      </AnimateIn>
+
+      <AnimateIn animation="fade-in-up">
+        <RelatedProducts />
+      </AnimateIn>
+
+      <AnimateIn animation="fade-in-up">
+        <ContactSection />
+      </AnimateIn>
       
       {/* 10. Footer - Mesmo footer do restante do site */}
       <Footer />

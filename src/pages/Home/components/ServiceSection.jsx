@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+import AnimateIn from '../../../shared/components/AnimateIn'
 import { getProductFirstImage, getProductImages } from '../../../utils/imagens'
 import { getProductById } from '../../../data/products'
 
@@ -36,10 +38,8 @@ const ServiceSection = () => {
           {/* Products Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {products.map((product, index) => (
-              <div 
-                key={index} 
-                className="bg-white rounded-2xl overflow-hidden border-2 border-black/10"
-              >
+              <AnimateIn key={index} animation="scale-in" delay={index * 100}>
+                <div className="bg-white rounded-2xl overflow-hidden border-2 border-black/10 hover-lift">
                 <div className="aspect-[4/3] overflow-hidden bg-gray-100">
                   <img
                     src={product.image || product.fallbackUrl}
@@ -65,16 +65,20 @@ const ServiceSection = () => {
                     Valor diária: {product.price}
                   </p>
                   
-                  <button className="w-full py-2.5 px-4 rounded-full border border-black/40 text-sm font-medium text-[#333333] flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors">
+                  <Link 
+                    to={`/produto/${product.id}`}
+                    className="w-full py-2.5 px-4 rounded-full border border-black/40 text-sm font-medium text-[#333333] flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors"
+                  >
                     {product.buttonText || 'Saiba mais'}
                     <span className="w-5 h-5 rounded-full bg-[#FF5F1F] flex items-center justify-center">
                       <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M2.5 6H9.5M9.5 6L6.5 3M9.5 6L6.5 9" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     </span>
-                  </button>
+                  </Link>
                 </div>
               </div>
+              </AnimateIn>
             ))}
           </div>
         </div>

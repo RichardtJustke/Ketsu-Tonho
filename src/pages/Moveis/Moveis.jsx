@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Navbar from '../../shared/components/Navbar'
 import Footer from '../../shared/components/Footer'
+import AnimateIn from '../../shared/components/AnimateIn'
 import Hero from './components/Hero'
 import MoveisGrid from './components/MoveisGrid'
 import ContactSection from './components/ContactSection'
@@ -17,11 +18,13 @@ const Moveis = () => {
       {/* 1. Hero Section */}
       <Hero />
       
-      {/* 2. Grid de Móveis e Equipamentos */}
-      <MoveisGrid hasAnsweredForm={hasAnsweredForm} />
-      
-      {/* 3. Seção de Contato */}
-      <ContactSection />
+      <AnimateIn animation="fade-in-up">
+        <MoveisGrid hasAnsweredForm={hasAnsweredForm} />
+      </AnimateIn>
+
+      <AnimateIn animation="fade-in-up">
+        <ContactSection />
+      </AnimateIn>
       
       {/* 4. Footer */}
       <Footer />
