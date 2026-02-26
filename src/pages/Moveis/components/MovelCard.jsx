@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { getProductFirstImage } from '../../../utils/imagens'
 import { getProductById } from '../../../data/products'
+import { formatBRL } from '../../../utils/formatCurrency'
 
 const MovelCard = ({ item, hasAnsweredForm, onAction }) => {
   const product = getProductById(item.id)
@@ -36,7 +37,7 @@ const MovelCard = ({ item, hasAnsweredForm, onAction }) => {
               {item.nome}
             </h3>
             <p className="text-[#333333]/70 text-sm mb-4">
-              Valor diária a partir de: <span className="font-medium text-black">R${item.valor.toFixed(2).replace('.', ',')}</span>
+              Valor diária a partir de: <span className="font-medium text-black">R${formatBRL(item.valor)}</span>
             </p>
           </div>
           

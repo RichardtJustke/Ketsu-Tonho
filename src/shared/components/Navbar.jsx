@@ -6,6 +6,7 @@ const Navbar = () => {
   const location = useLocation()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isServicosOpen, setIsServicosOpen] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
   
   useEffect(() => {
     const handleScroll = () => {
@@ -135,11 +136,118 @@ const Navbar = () => {
           </Link>
         </div>
 
-        <button className="md:hidden text-white">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M3 12H21M3 6H21M3 18H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
+        <button
+          className="md:hidden text-white"
+          onClick={() => setIsMenuOpen((prev) => !prev)}
+          aria-label="Abrir menu de navegação"
+          aria-expanded={isMenuOpen}
+        >
+          {isMenuOpen ? (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 6L18 18M6 18L18 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          ) : (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 12H21M3 6H21M3 18H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          )}
         </button>
+      </div>
+
+      {/* Mobile menu */}
+      <div
+        className={`md:hidden mt-4 px-2 pb-4 transition-all duration-200 ${
+          isMenuOpen ? 'opacity-100 max-h-96' : 'opacity-0 max-h-0 overflow-hidden'
+        }`}
+      >
+        <div className="bg-[#1a1a1a]/95 backdrop-blur-sm rounded-2xl border border-white/10 py-4 px-4 space-y-2">
+          <Link
+            to="/"
+            className="block text-white text-sm py-2"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Home
+          </Link>
+
+          <details
+            className="group"
+            open={location.pathname.startsWith('/tendas') || location.pathname.startsWith('/box') || location.pathname.startsWith('/moveis')}
+          >
+            <summary className="flex items-center justify-between text-white text-sm py-2 cursor-pointer list-none">
+              <span>Serviços</span>
+              <span className="transition-transform group-open:rotate-180">
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 12 12"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M3 4.5L6 7.5L9 4.5"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
+            </summary>
+            <div className="mt-1 space-y-1 pl-3">
+              {servicosSubmenu.map((item) => (
+                <Link
+                  key={item.label}
+                  to={item.href}
+                  className="block text-sm text-[#F7F7F8] py-1.5 opacity-80 hover:opacity-100"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </details>
+
+          <Link
+            to="/cases"
+            className="block text-white text-sm py-2"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Cases
+          </Link>
+
+          <Link
+            to="/sobre"
+            className="block text-white text-sm py-2"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Sobre
+          </Link>
+
+          <Link
+            to="/contato"
+            className="block text-white text-sm py-2"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Contato
+          </Link>
+
+          <div className="pt-3 flex items-center gap-2">
+            <Link
+              to="/carrinho"
+              className="flex-1 py-2.5 rounded-full border border-white/30 text-sm text-white flex items-center justify-center gap-2"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Carrinho
+            </Link>
+            <Link
+              to="/login"
+              className="flex-1 bg-white text-black text-sm font-medium py-2.5 px-4 rounded-full flex items-center justify-center gap-2"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Login
+            </Link>
+          </div>
+        </div>
       </div>
     </nav>
   )

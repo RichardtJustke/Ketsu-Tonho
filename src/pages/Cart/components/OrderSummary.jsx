@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { formatBRL } from '../../../utils/formatCurrency'
 
 const OrderSummary = ({ subtotal, installationFee = 300, discount = 0, onFinalize }) => {
   const [couponCode, setCouponCode] = useState('')
@@ -52,21 +53,21 @@ const OrderSummary = ({ subtotal, installationFee = 300, discount = 0, onFinaliz
         <div className="space-y-3 pb-4 border-b border-gray-200">
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Subtotal ({subtotal > 0 ? 'itens' : '0 itens'})</span>
-            <span className="font-medium text-[#333333]">R${subtotal.toFixed(2).replace('.', ',')}</span>
+            <span className="font-medium text-[#333333]">R${formatBRL(subtotal)}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Taxa de instalação</span>
-            <span className="font-medium text-[#333333]">R${installationFee.toFixed(2).replace('.', ',')}</span>
+            <span className="font-medium text-[#333333]">R${formatBRL(installationFee)}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Desconto</span>
-            <span className="font-medium text-green-600">R${discount.toFixed(2).replace('.', ',')}</span>
+            <span className="font-medium text-green-600">R${formatBRL(discount)}</span>
           </div>
         </div>
 
         <div className="flex justify-between pt-4 pb-4">
           <span className="font-semibold text-[#333333]">Total</span>
-          <span className="font-bold text-xl text-[#333333]">R${total.toFixed(2).replace('.', ',')}</span>
+          <span className="font-bold text-xl text-[#333333]">R${formatBRL(total)}</span>
         </div>
 
         {/* Finalize Button */}
@@ -93,7 +94,7 @@ const OrderSummary = ({ subtotal, installationFee = 300, discount = 0, onFinaliz
           </div>
           <div>
             <p className="font-medium text-[#333333] text-sm">Entrega gratuita</p>
-            <p className="text-xs text-gray-500">Em pedidos acima de R$200</p>
+            <p className="text-xs text-gray-500">Somente na região metropolitana de Belém</p>
           </div>
         </div>
 

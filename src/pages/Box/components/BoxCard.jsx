@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getProductFirstImage, getProductImages } from '../../../utils/imagens'
 import { getProductById } from '../../../data/products'
+import { formatBRL } from '../../../utils/formatCurrency'
 
 const BoxCard = ({ box, hasAnsweredForm, onAction }) => {
   const product = getProductById(box.id)
@@ -61,7 +62,7 @@ const BoxCard = ({ box, hasAnsweredForm, onAction }) => {
               {box.nome} {box.dimensao !== '-' && box.dimensao}
             </h3>
             <p className="text-[#333333]/70 text-sm mb-4">
-              Valor diária a partir de: <span className="font-medium text-black">R${box.valor.toFixed(2).replace('.', ',')}</span>
+              Valor diária a partir de: <span className="font-medium text-black">R${formatBRL(box.valor)}</span>
             </p>
           </div>
           
