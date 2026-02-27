@@ -3,7 +3,6 @@ import Navbar from '../../shared/components/Navbar'
 import Footer from '../../shared/components/Footer'
 import AnimateIn from '../../shared/components/AnimateIn'
 import Hero from './components/Hero'
-import AboutSection from './components/AboutSection'
 import ProcessSection from './components/ProcessSection'
 import ServiceSection from './components/ServiceSection'
 import WhyChooseSection from './components/WhyChooseSection'
@@ -46,12 +45,7 @@ const Home = () => {
       {/* 1. Hero Section */}
       <Hero onOpenFilterModal={handleOpenFilterModal} />
 
-      {/* 2. Seção "Tudo o que você precisa para realizar seu evento" */}
-      <AnimateIn animation="fade-in-up">
-        <AboutSection />
-      </AnimateIn>
-
-      {/* 3. Seção "Realizar seu evento com a Tonho é muito simples e rápido" */}
+      {/* 2. Seção "Realizar seu evento com a Tonho é muito simples e rápido" */}
       <AnimateIn animation="fade-in-up">
         <ProcessSection />
       </AnimateIn>
