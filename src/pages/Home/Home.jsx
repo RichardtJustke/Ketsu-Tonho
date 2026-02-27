@@ -3,7 +3,6 @@ import Navbar from '../../shared/components/Navbar'
 import Footer from '../../shared/components/Footer'
 import AnimateIn from '../../shared/components/AnimateIn'
 import Hero from './components/Hero'
-import TrustSection from './components/TrustSection'
 import EventTypeSection from './components/EventTypeSection'
 import ItemsSection from './components/ItemsSection'
 import CtaSection from './components/CtaSection'
@@ -42,12 +41,7 @@ const Home = () => {
       {/* 1. Hero Section */}
       <Hero onOpenFilterModal={handleOpenFilterModal} />
 
-      {/* 5. Seção "Quem confia na Tonho" */}
-      <AnimateIn animation="fade-in-up">
-        <TrustSection />
-      </AnimateIn>
-
-      {/* 7. Seção "Que tipo de evento você vai realizar" (accordion) */}
+      {/* 6. Seção "Que tipo de evento você vai realizar" (accordion) */}
       <AnimateIn animation="fade-in-up">
         <EventTypeSection />
       </AnimateIn>
