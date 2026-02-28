@@ -16,11 +16,11 @@ const Hero = () => {
       </video>
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-32">
-        <div className="max-w-xl">
-          <h1 className="text-5xl md:text-6xl font-semibold text-white mb-6">
+        <div className="max-w-2xl">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-white leading-tight mb-6">
             Tendas
           </h1>
-          <p className="text-white/80 text-lg leading-relaxed">
+          <p className="text-white/80 text-lg md:text-xl leading-relaxed max-w-2xl">
             Descubra a liberdade de celebrar ao ar livre com nossas tendas de alta qualidade. Projetadas para resistir aos elementos e proporcionar conforto, nossas tendas são a escolha perfeita para seus eventos ao ar livre.
           </p>
         </div>

@@ -11,11 +11,11 @@ const Hero = () => {
         style={heroImage ? { backgroundImage: `url('${heroImage}')` } : {}}
       />
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-32">
-        <div className="max-w-xl">
-          <h1 className="text-5xl md:text-6xl font-semibold text-white mb-6">
+        <div className="max-w-2xl">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-white leading-tight mb-6">
             Pórticos e Box Truss
           </h1>
-          <p className="text-white/80 text-lg leading-relaxed">
+          <p className="text-white/80 text-lg md:text-xl leading-relaxed max-w-2xl">
             Destaque-se com Pórticos e Box Truss de alta qualidade. Ideais para eventos, feiras e elevações de marca. Resistentes, seguros e sofisticados, elevam a experiência do seu evento com sobriedade e impacto visual.
           </p>
         </div>

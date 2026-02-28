@@ -12,10 +12,10 @@ const Hero = () => {
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-24 w-full">
         <div className="max-w-2xl">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-white mb-4">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-white leading-tight mb-4">
             Finalize seu Pedido
           </h1>
-          <p className="text-white/80 text-base md:text-lg leading-relaxed">
+          <p className="text-white/80 text-lg md:text-xl leading-relaxed max-w-2xl">
             Revise os itens selecionados, adicione observações sobre o seu evento e confirme a locação.<br />
             Nossa equipe entrará em contato para finalizar os detalhes.
           </p>

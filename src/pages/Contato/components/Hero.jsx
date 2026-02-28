@@ -9,7 +9,7 @@ const Hero = () => {
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-white mb-6 leading-tight">
             Pronto para realizar o seu evento?
           </h1>
-          <p className="text-white/70 text-lg">
+          <p className="text-white/80 text-lg md:text-xl max-w-2xl">
             Entre em contato agora e receba um orçamento personalizado sem compromisso
           </p>
         </div>

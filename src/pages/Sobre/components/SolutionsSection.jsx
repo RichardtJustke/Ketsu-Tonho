@@ -1,4 +1,4 @@
-// import { getCasesImages } from '../../../utils/imagens'
+import { getCasesImages } from '../../../utils/imagens'
 
 const SolutionsSection = () => {
   const casesImages = getCasesImages()

@@ -9,11 +9,13 @@ const ItemsSection = () => {
 
   const tendaImage = tendaImages[0] || 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=2069&auto=format&fit=crop'
   const movelImage = climaImages[0] || 'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?q=80&w=2074&auto=format&fit=crop'
+  const climatizadorImage = climaImages[1] || climaImages[0] || 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?q=80&w=2070&auto=format&fit=crop'
   const boxImage = porticoImages[0] || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=2032&auto=format&fit=crop'
 
   const items = [
     { image: tendaImage, title: 'Tendas e Estruturas', link: '/tendas' },
     { image: movelImage, title: 'Mobiliário e Decoração', link: '/moveis' },
+    { image: climatizadorImage, title: 'Climatizadores', link: '/moveis' },
     { image: boxImage, title: 'Estruturas de grande porte', link: '/box' }
   ]
 
@@ -22,22 +24,22 @@ const ItemsSection = () => {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-4">
           <h2 className="text-3xl md:text-4xl font-semibold text-black">
-            Veja os itens que vão fazer seu evento acontecer
+            Confira os itens que vão transformar seu evento em realidade.
           </h2>
         </div>
 
         <div className="text-center mb-12">
           <p className="text-[#333333] text-lg max-w-2xl mx-auto">
-            Conheça os itens recomendados para cada tipo de evento e monte sua estrutura completa sem complicação
+            Conheça as opções ideais para cada tipo de ocasião e monte sua estrutura completa de forma prática e sem complicações.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {items.map((item, index) => (
             <AnimateIn key={index} animation="fade-in-up" delay={index * 120}>
               <Link
                 to={item.link}
-                className="group relative rounded-2xl overflow-hidden aspect-[4/5] block hover-scale"
+                className="group relative rounded-2xl overflow-hidden aspect-[4/6] block hover-scale"
               >
                 <img
                   src={item.image}

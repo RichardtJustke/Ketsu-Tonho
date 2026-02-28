@@ -3,7 +3,6 @@ import Navbar from '../../shared/components/Navbar'
 import Footer from '../../shared/components/Footer'
 import AnimateIn from '../../shared/components/AnimateIn'
 import Hero from './components/Hero'
-import EventTypeSection from './components/EventTypeSection'
 import ItemsSection from './components/ItemsSection'
 import CtaSection from './components/CtaSection'
 import TestimonialSection from './components/TestimonialSection'
@@ -41,12 +40,7 @@ const Home = () => {
       {/* 1. Hero Section */}
       <Hero onOpenFilterModal={handleOpenFilterModal} />
 
-      {/* 6. Seção "Que tipo de evento você vai realizar" (accordion) */}
-      <AnimateIn animation="fade-in-up">
-        <EventTypeSection />
-      </AnimateIn>
-
-      {/* 8. Seção "Veja os itens que vão fazer o seu evento acontecer" */}
+      {/* 2. Seção "Veja os itens que vão fazer o seu evento acontecer" */}
       <AnimateIn animation="fade-in-up">
         <ItemsSection />
       </AnimateIn>

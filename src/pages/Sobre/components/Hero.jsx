@@ -14,7 +14,7 @@ const Hero = () => {
       {/* Content */}
       <div className="relative z-10 text-center max-w-3xl mx-auto pt-20">
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-white leading-tight mb-6">
-          Sobre a <span className="text-[#FF5F1F]">Tonho</span>
+          Sobre a Tonho
         </h1>
         
         <p className="text-white/80 text-lg md:text-xl max-w-2xl mx-auto">

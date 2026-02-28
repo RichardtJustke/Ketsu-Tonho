@@ -11,11 +11,11 @@ const Hero = () => {
         style={{ backgroundImage: `url('${heroImage}')` }}
       />
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-32">
-        <div className="max-w-xl">
-          <h1 className="text-5xl md:text-6xl font-semibold text-white mb-6">
+        <div className="max-w-2xl">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-white leading-tight mb-6">
             Móveis e Equipamentos
           </h1>
-          <p className="text-white/80 text-lg leading-relaxed">
+          <p className="text-white/80 text-lg md:text-xl leading-relaxed max-w-2xl">
             Equipamentos e mobiliário de alta qualidade para o seu evento. Climatizadores, mesas, cadeiras, equipamentos de som e muito mais. Tudo que você precisa para criar o ambiente perfeito.
           </p>
         </div>
