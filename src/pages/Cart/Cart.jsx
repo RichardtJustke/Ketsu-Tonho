@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../../shared/contexts/AuthContext'
+import { Link } from 'react-router-dom'
 import Navbar from '../../shared/components/Navbar'
 import Footer from '../../shared/components/Footer'
 import AnimateIn from '../../shared/components/AnimateIn'
@@ -12,15 +11,6 @@ import ContactSection from './components/ContactSection'
 import { getCartItems, updateCartItemQuantity, removeCartItem } from '../../utils/cart'
 
 const Cart = () => {
-  const { user, loading: authLoading } = useAuth()
-  const navigate = useNavigate()
-
-  useEffect(() => {
-    if (!authLoading && !user) {
-      navigate('/login')
-    }
-  }, [user, authLoading, navigate])
-
   const [cartItems, setCartItems] = useState(() => getCartItems())
 
   const [specialInstructions, setSpecialInstructions] = useState('')
