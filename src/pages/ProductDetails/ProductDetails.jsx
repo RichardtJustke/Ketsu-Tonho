@@ -74,7 +74,7 @@ const ProductDetails = () => {
         />
       </AnimateIn>
       <AnimateIn animation="fade-in-up">
-        <RelatedProducts />
+        <RelatedProducts currentCategory={product.category} />
       </AnimateIn>
       <AnimateIn animation="fade-in-up">
         <ContactSection />

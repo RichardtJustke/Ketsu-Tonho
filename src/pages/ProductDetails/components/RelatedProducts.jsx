@@ -2,23 +2,34 @@ import { Link } from 'react-router-dom'
 
 /**
  * RelatedProducts - Seção "Veja outros tipos de produtos"
- * Cards fixos conforme Figma - apenas navegação
+ * Mostra, para cada produto, as outras categorias disponíveis
  */
-const RelatedProducts = () => {
-  const relatedCategories = [
+const RelatedProducts = ({ currentCategory }) => {
+  const allCategories = [
+    {
+      id: 'tendas',
+      title: 'Tendas e Estruturas',
+      image: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
+      href: '/tendas'
+    },
     {
       id: 'moveis',
-      title: 'Mobiliário e Decoração',
-      image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
+      title: 'Mobiliário e Equipamentos',
+      image: 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
       href: '/moveis'
     },
     {
-      id: 'equipamentos',
-      title: 'Equipamentos e Tech',
+      id: 'box',
+      title: 'Estruturas de grande porte',
       image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
       href: '/box'
     }
   ]
+
+  const normalizedCategory = (currentCategory || '').toLowerCase()
+  const relatedCategories = allCategories.filter(
+    (category) => category.id !== normalizedCategory
+  )
 
   return (
     <section className="bg-[#F7F7F8] py-12 md:py-16 px-6">
