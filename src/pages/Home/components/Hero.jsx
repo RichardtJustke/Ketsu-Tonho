@@ -56,7 +56,7 @@ const Hero = ({ onOpenFilterModal }) => {
           <AnimateIn animation="fade-in-up">
             <div className="max-w-2xl space-y-8">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-white leading-tight">
-                Estrutura completa para o seu evento acontecer sem preocupação
+              Soluções completas para que seu evento aconteça com total tranquilidade
               </h1>
 
               <div className="flex items-start gap-4">
@@ -75,7 +75,7 @@ const Hero = ({ onOpenFilterModal }) => {
                 <div className="flex items-center gap-4">
                   <div className="w-0.5 h-16 bg-white/20" />
                   <p className="text-white text-sm max-w-xs">
-                    Locação de tendas, mobiliário, equipamentos e buffet para eventos sociais e corporativos em Belém
+                    Locação de tendas, mobiliário, equipamentos e serviço de buffet para todos os tipos de eventos.
                   </p>
                 </div>
               </div>
