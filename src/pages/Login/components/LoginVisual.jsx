@@ -1,6 +1,6 @@
 const LoginVisual = () => {
   return (
-    <div className="hidden lg:block w-1/2 h-screen relative">
+    <div className="h-screen relative">
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat rounded-bl-[40px]"
         style={{

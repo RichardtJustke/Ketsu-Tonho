@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { stockStatusBadge } from "@/components/StatusBadge";
-import { stockItems as initialItems, StockItem } from "@/data/mock-data";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card.tsx";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table.tsx";
+import { Input } from "../components/ui/input.tsx";
+import { Button } from "../components/ui/button.tsx";
+import { stockStatusBadge } from "../components/StatusBagde.tsx";
+import { stockItems as initialItems, type StockItem } from "../data/mock-data.ts";
 import { Search, Plus, Minus } from "lucide-react";
 
 export default function TonhoEstoque() {

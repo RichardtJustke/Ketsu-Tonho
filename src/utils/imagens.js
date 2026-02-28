@@ -3,7 +3,8 @@
  * Sync functions return known URLs or empty arrays.
  * For full folder listings, use the useCloudinaryImages hook.
  */
-import { getLogoImage as cloudinaryLogo, getFolderName } from './cloudinary'
+import { getFolderName } from './cloudinary'
+import logoLocal from '../imagens/logo/logo original.png'
 
 /**
  * Returns [] synchronously. Components needing real product image lists
@@ -25,10 +26,10 @@ export function getProductFirstImage(productId, fallbackUrl) {
 }
 
 /**
- * Returns the logo URL from Cloudinary.
+ * Returns the logo URL from the local asset.
  */
 export function getLogoImage() {
-  return cloudinaryLogo()
+  return logoLocal
 }
 
 /**

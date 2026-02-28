@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-import { sales, getClientName, getProductName, formatCurrency, formatDate } from "@/data/mock-data";
+import { Card, CardContent } from "../components/ui/card.tsx";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table.tsx";
+import { Input } from "../components/ui/input.tsx";
+import { sales, getClientName, getProductName, formatCurrency, formatDate } from "../data/mock-data.ts";
 import { Search } from "lucide-react";
 
 export default function TonhoVendas() {

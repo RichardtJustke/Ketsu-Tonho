@@ -1,7 +1,7 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { products, stockItems, formatCurrency } from "@/data/mock-data";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card.tsx";
+import { products, stockItems, formatCurrency } from "../data/mock-data.ts";
 import { Package } from "lucide-react";
-import { stockStatusBadge } from "@/components/StatusBadge";
+import { stockStatusBadge } from "../components/StatusBagde.tsx";
 
 export default function TonhoProdutos() {
   return (

@@ -1,7 +1,7 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { budgetStatusBadge } from "@/components/StatusBadge";
-import { budgets, getClientName, formatCurrency, formatDate } from "@/data/mock-data";
+import { Card, CardContent } from "../components/ui/card.tsx";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table.tsx";
+import { budgetStatusBadge } from "../components/StatusBagde.tsx";
+import { budgets, getClientName, formatCurrency, formatDate } from "../data/mock-data.ts";
 
 export default function TonhoOrcamentos() {
   const tonhoBudgets = budgets.filter((b) => b.empresa === "tonho");

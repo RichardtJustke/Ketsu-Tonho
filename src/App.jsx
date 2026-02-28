@@ -14,6 +14,7 @@ import ProductDetails from './pages/ProductDetails/ProductDetails'
 import ResetPassword from './pages/ResetPassword/ResetPassword'
 import PageTransition from './shared/components/PageTransition'
 import Admin from './pages/Admin/Index.tsx'
+import { AppLayout } from './pages/Admin/components/AppLayout.tsx'
 
 function App() {
   const location = useLocation()
@@ -37,8 +38,7 @@ function App() {
         <Route path="/carrinho" element={<Cart />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/produto/:productId" element={<ProductDetails />} />
-        <Route path="/admin" element={<Admin />} />
-
+        <Route path="/admin/*" element={<AppLayout><Admin /></AppLayout>} />
       </Routes>
     </PageTransition>
   )

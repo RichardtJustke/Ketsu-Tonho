@@ -1,7 +1,7 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { eventStatusBadge } from "@/components/StatusBadge";
-import { events, getClientName, getProductName, formatCurrency, formatDate } from "@/data/mock-data";
+import { Card, CardContent } from "../components/ui/card.tsx";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table.tsx";
+import { eventStatusBadge } from "../components/StatusBagde.tsx";
+import { events, getClientName, getProductName, formatCurrency, formatDate } from "../data/mock-data.ts";
 
 export default function TonhoEventos() {
   const tonhoEvents = events.filter((e) => e.empresa === "tonho");

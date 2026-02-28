@@ -45,7 +45,7 @@ const RegisterForm = () => {
 
   if (success) {
     return (
-      <div className="w-full lg:w-1/2 h-screen flex flex-col justify-center items-center px-6 py-6 lg:px-16 lg:py-8">
+      <div className="w-full h-screen flex flex-col justify-center items-center px-6 py-6 lg:px-16 lg:py-8">
         <div className="max-w-[420px] text-center">
           <h1 className="text-[#2B3674] text-3xl font-bold mb-4">Verifique seu email!</h1>
           <p className="text-[#A3AED0] text-sm mb-6">Enviamos um link de confirmação para <strong className="text-[#2B3674]">{email}</strong>. Clique no link para ativar sua conta.</p>
@@ -58,7 +58,7 @@ const RegisterForm = () => {
   }
 
   return (
-    <div className="w-full lg:w-1/2 h-screen flex flex-col justify-between px-6 py-6 lg:px-16 lg:py-8 overflow-hidden">
+    <div className="w-full h-screen flex flex-col justify-between px-6 py-6 lg:px-16 lg:py-8 overflow-hidden">
       {/* Voltar */}
       <div>
         <Link

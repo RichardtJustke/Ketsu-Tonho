@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { events, sales, formatDate } from "@/data/mock-data";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card.tsx";
+import { Button } from "../components/ui/button.tsx";
+import { events, sales, formatDate } from "../data/mock-data.ts";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const DAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
 export default function TonhoCalendario() {
-  const [currentDate, setCurrentDate] = useState(new Date(2026, 1, 1)); // Feb 2026
+  const [currentDate, setCurrentDate] = useState(new Date(2026, 1, 1));
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -60,7 +60,7 @@ export default function TonhoCalendario() {
                     <div key={e.id} className="mt-1 truncate rounded bg-primary/15 px-1 py-0.5 text-[10px] text-primary">{e.title}</div>
                   ))}
                   {daySales.map((s) => (
-                    <div key={s.id} className="mt-1 truncate rounded bg-success/15 px-1 py-0.5 text-[10px] text-success">Venda</div>
+                    <div key={s.id} className="mt-1 truncate rounded bg-green-500/15 px-1 py-0.5 text-[10px] text-green-600">Venda</div>
                   ))}
                 </div>
               );

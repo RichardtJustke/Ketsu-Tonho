@@ -4,6 +4,7 @@ import { getLogoImage } from '../../utils/imagens'
 import { useAuth } from '../../shared/contexts/AuthContext'
 import { getCartItems, subscribeCart } from '../../utils/cart'
 
+
 const Navbar = () => {
   const location = useLocation()
   const { user, loading, signOut } = useAuth()

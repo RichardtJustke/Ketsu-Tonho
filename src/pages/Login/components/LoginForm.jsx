@@ -51,7 +51,7 @@ const LoginForm = () => {
   }
 
   return (
-    <div className="w-full lg:w-1/2 h-screen flex flex-col justify-between px-6 py-6 lg:px-12 lg:py-6 overflow-hidden">
+    <div className="w-full h-screen flex flex-col justify-between px-6 py-6 lg:px-12 lg:py-6 overflow-hidden">
       {/* Voltar */}
       <div>
         <Link

@@ -1,6 +1,6 @@
-import { MetricCard } from "@/components/MetricCard";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { events, budgets, sales, stockItems, formatCurrency } from "@/data/mock-data";
+import { MetricCard } from "../components/MetricCard.tsx";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card.tsx";
+import { events, budgets, sales, stockItems, formatCurrency } from "../data/mock-data.ts";
 import { ShoppingCart, Package, CalendarDays, AlertTriangle, TrendingUp } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
