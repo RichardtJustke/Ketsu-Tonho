@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import Home from './pages/Home/Home'
 import Sobre from './pages/Sobre/Sobre'
@@ -16,6 +17,10 @@ import Admin from './pages/Admin/Index.tsx'
 
 function App() {
   const location = useLocation()
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [location.pathname])
 
   return (
     <PageTransition>

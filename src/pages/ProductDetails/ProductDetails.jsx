@@ -34,10 +34,11 @@ const ProductDetails = () => {
     console.log('Verificando disponibilidade para:', product.id)
   }
 
-  const handleAddToCart = (id) => {
+  const handleAddToCart = (id, selectedSize) => {
+    const sizeLabel = selectedSize ? ` - ${selectedSize}` : ''
     const item = {
       id,
-      name: product.name,
+      name: `${product.name}${sizeLabel}`,
       price: Number(product.specs?.Valor?.replace(/[^\d,.-]/g, '').replace('.', '').replace(',', '.')) || 0,
       category: product.category || 'produto',
       image: product.image || ''
@@ -68,6 +69,7 @@ const ProductDetails = () => {
       <AnimateIn animation="fade-in-up">
         <ProductActions
           productId={product.id}
+          product={product}
           hasAnsweredForm={hasAnsweredForm}
           onCheckAvailability={handleCheckAvailability}
           onAddToCart={handleAddToCart}
