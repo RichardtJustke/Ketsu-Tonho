@@ -43,12 +43,12 @@ const ProductActions = ({ productId, hasAnsweredForm, onCheckAvailability, onAdd
               </span>
             </button>
           ) : (
-            // Estado 2: Depois do formulário respondido - Adicionar ao carrinho
+            // Estado 2: Depois do formulário respondido - Alugar agora
             <button 
               onClick={() => onAddToCart(productId)}
               className="bg-[#FF5F1F] text-white text-sm font-medium py-3 px-6 rounded-full inline-flex items-center gap-2 hover:opacity-90 transition-all"
             >
-              ADICIONAR O CARRINHO
+              ALUGAR AGORA
               <span className="w-6 h-6 rounded-full bg-white flex items-center justify-center">
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M2.5 6H9.5M9.5 6L6.5 3M9.5 6L6.5 9" stroke="#FF5F1F" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>

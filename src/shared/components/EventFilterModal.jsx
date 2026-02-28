@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { setHasAnsweredForm } from '../../utils/answeredForm'
 
 /**
  * EventFilterModal - Formulário interativo step-by-step para filtrar produtos
@@ -9,14 +11,12 @@ import { useState, useEffect } from 'react'
  * - onComplete: function(filters) - callback com os filtros selecionados
  */
 const EventFilterModal = ({ isOpen, onClose, onComplete }) => {
-  // Estado do step atual (-1 = intro, 0, 1, 2 = perguntas)
+  // Estado do step atual (-1 = intro, 0 = pergunta)
   const [currentStep, setCurrentStep] = useState(-1)
   
   // Estado das respostas do formulário
   const [filters, setFilters] = useState({
-    location: '',
-    guests: '',
-    date: ''
+    eventDate: ''
   })
   
   // Estado para controlar animações
@@ -39,7 +39,7 @@ const EventFilterModal = ({ isOpen, onClose, onComplete }) => {
   useEffect(() => {
     if (isOpen) {
       setCurrentStep(-1)
-      setFilters({ location: '', guests: '', date: '' })
+      setFilters({ eventDate: '' })
     }
   }, [isOpen])
 
@@ -67,18 +67,17 @@ const EventFilterModal = ({ isOpen, onClose, onComplete }) => {
     }
   }
 
-  // Função para selecionar a data
-  const handleDateChange = (e) => {
-    setFilters(prev => ({ ...prev, date: e.target.value }))
-  }
-
   // Função para finalizar o formulário
   const handleComplete = () => {
-    if (filters.date) {
-      setIsVisible(false)
+    if (filters.eventDate) {
+      setHasAnsweredForm(true)
+      onComplete(filters)
+      setDirection('next')
+      setIsAnimating(true)
+
       setTimeout(() => {
-        onComplete(filters)
-        onClose()
+        setCurrentStep(steps.length)
+        setIsAnimating(false)
       }, 300)
     }
   }
@@ -100,25 +99,34 @@ const EventFilterModal = ({ isOpen, onClose, onComplete }) => {
   // Configuração dos steps de perguntas
   const steps = [
     {
-      title: 'Qual a localização do evento?',
-      subtitle: 'Digite o bairro ou endereço para calcularmos a entrega',
-      field: 'location',
-      placeholder: 'Ex: Nazaré, Umarizal, Ananindeua...',
-      icon: '📍'
-    },
-    {
-      title: 'Quantas pessoas irão?',
-      subtitle: 'Informe a quantidade estimada de convidados',
-      field: 'guests',
-      placeholder: 'Ex: 50, 100, 200...',
-      icon: '👥'
-    },
-    {
-      title: 'Qual o dia do seu evento?',
-      subtitle: 'Informe a data para verificarmos a disponibilidade',
-      field: 'date',
-      isDatePicker: true,
+      title: 'Qual a data do evento?',
+      subtitle: 'Escolha a data para sugerirmos os serviços ideais',
+      field: 'eventDate',
+      placeholder: '',
       icon: '📅'
+    }
+  ]
+
+  const serviceCards = [
+    {
+      title: 'Tendas e Estruturas',
+      link: '/tendas',
+      image: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=2069&auto=format&fit=crop'
+    },
+    {
+      title: 'Mobiliário e Decoração',
+      link: '/moveis',
+      image: 'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?q=80&w=2074&auto=format&fit=crop'
+    },
+    {
+      title: 'Mobiliário e Equipamentos',
+      link: '/moveis',
+      image: 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80'
+    },
+    {
+      title: 'Estruturas de grande porte',
+      link: '/box',
+      image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=2032&auto=format&fit=crop'
     }
   ]
 
@@ -175,8 +183,8 @@ const EventFilterModal = ({ isOpen, onClose, onComplete }) => {
               
               {/* Subtítulo */}
               <p className="text-gray-500 mb-6">
-                Em apenas <span className="font-semibold text-[#FF5F1F]">3 perguntas rápidas</span>, 
-                vamos te ajudar a encontrar tudo que você precisa.
+                Só precisamos da <span className="font-semibold text-[#FF5F1F]">data do evento</span> para
+                sugerir os serviços ideais.
               </p>
 
               {/* Benefícios em linha */}
@@ -185,7 +193,7 @@ const EventFilterModal = ({ isOpen, onClose, onComplete }) => {
                   <span>⚡</span> Rápido
                 </span>
                 <span className="flex items-center gap-1 text-gray-600">
-                  <span>🎯</span> Personalizado
+                  <span>📅</span> Só a data
                 </span>
                 <span className="flex items-center gap-1 text-gray-600">
                   <span>💬</span> Sem compromisso
@@ -256,124 +264,78 @@ const EventFilterModal = ({ isOpen, onClose, onComplete }) => {
                   {currentStepData?.subtitle}
                 </p>
 
-                {/* Input de Data ou Texto */}
-                {currentStepData?.isDatePicker ? (
-                  <div className="space-y-4">
-                    <div className="relative">
-                      <input
-                        type="date"
-                        value={filters.date}
-                        onChange={handleDateChange}
-                        min={new Date().toISOString().split('T')[0]}
-                        className="w-full px-4 py-4 border-2 border-gray-200 rounded-2xl text-lg focus:border-[#FF5F1F] focus:outline-none transition-all cursor-pointer"
-                      />
-                    </div>
-                    
-                    {/* Dica */}
-                    <div className="bg-orange-50 rounded-2xl p-4 border border-orange-100">
-                      <div className="flex items-start gap-3">
-                        <span className="text-2xl">💡</span>
-                        <div>
-                          <p className="font-medium text-[#333333] mb-1">Dica</p>
-                          <p className="text-sm text-gray-600">
-                            Recomendamos agendar com pelo menos 7 dias de antecedência.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
+                <div className="space-y-4">
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl">
+                      {currentStepData?.icon}
+                    </span>
+                    <input
+                      type="date"
+                      value={filters[currentStepData?.field]}
+                      onChange={(e) => setFilters(prev => ({ ...prev, [currentStepData.field]: e.target.value }))}
+                      placeholder={currentStepData?.placeholder}
+                      className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-2xl text-lg focus:border-[#FF5F1F] focus:outline-none transition-all"
+                      autoFocus
+                    />
                   </div>
-                ) : (
-                  <div className="space-y-4">
-                    <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl">
-                        {currentStepData?.icon}
-                      </span>
-                      <input
-                        type={currentStepData?.field === 'guests' ? 'number' : 'text'}
-                        value={filters[currentStepData?.field]}
-                        onChange={(e) => setFilters(prev => ({ ...prev, [currentStepData.field]: e.target.value }))}
-                        placeholder={currentStepData?.placeholder}
-                        className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-2xl text-lg focus:border-[#FF5F1F] focus:outline-none transition-all"
-                        autoFocus
-                      />
-                    </div>
-                    
-                    {/* Botão continuar */}
-                    <button
-                      onClick={() => {
-                        if (filters[currentStepData.field]) {
-                          advanceStep()
-                        }
-                      }}
-                      disabled={!filters[currentStepData?.field]}
-                      className={`w-full py-4 rounded-2xl font-medium transition-all duration-200 ${
-                        filters[currentStepData?.field]
-                          ? 'bg-[#FF5F1F] text-white hover:bg-[#e5551b]'
-                          : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                      }`}
-                    >
-                      Continuar
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Footer com navegação */}
-            <div className="px-6 pb-6 pt-2 border-t border-gray-100">
-              <div className="flex items-center justify-between gap-4">
-                {/* Botão Voltar */}
-                {currentStep > 0 ? (
-                  <button
-                    onClick={handleBack}
-                    className="inline-flex items-center gap-2 px-4 py-3 text-gray-600 hover:text-[#333333] font-medium transition-colors"
-                  >
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                    Voltar
-                  </button>
-                ) : (
-                  <div />
-                )}
-                
-                {/* Botão Finalizar (só no último step) */}
-                {currentStep === 2 && (
+                  
+                  {/* Botão continuar */}
                   <button
                     onClick={handleComplete}
-                    disabled={!filters.date}
-                    className={`inline-flex items-center gap-2 px-6 py-3 rounded-full font-medium transition-all duration-200 ${
-                      filters.date
-                        ? 'bg-green-500 text-white hover:bg-green-600'
+                    disabled={!filters[currentStepData?.field]}
+                    className={`w-full py-4 rounded-2xl font-medium transition-all duration-200 ${
+                      filters[currentStepData?.field]
+                        ? 'bg-[#FF5F1F] text-white hover:bg-[#e5551b]'
                         : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                     }`}
                   >
-                    Finalizar
+                    Ver serviços
                   </button>
-                )}
-              </div>
-            </div>
-
-            {/* Resumo das seleções */}
-            {(filters.location || filters.guests) && (
-              <div className="px-6 pb-4">
-                <div className="flex flex-wrap gap-2">
-                  {filters.location && (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-100 text-green-700 rounded-full text-sm">
-                      <span>📍</span>
-                      {filters.location}
-                    </span>
-                  )}
-                  {filters.guests && (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-100 text-green-700 rounded-full text-sm">
-                      <span>👥</span>
-                      {filters.guests} pessoas
-                    </span>
-                  )}
                 </div>
               </div>
-            )}
+            </div>
           </>
+        )}
+
+        {/* TELA DE SERVIÇOS */}
+        {currentStep === steps.length && (
+          <div className="px-6 pt-6 pb-6">
+            <div 
+              className={`transition-all duration-300 ${
+                isAnimating ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'
+              }`}
+            >
+              <h2 className="text-2xl font-bold text-[#333333] mb-2 text-center">
+                Confira nossos serviços
+              </h2>
+              <p className="text-gray-500 mb-6 text-center">
+                Escolha uma categoria para ver todos os itens disponíveis
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {serviceCards.map((card) => (
+                  <Link
+                    key={card.title}
+                    to={card.link}
+                    onClick={handleClose}
+                    className="group relative rounded-2xl overflow-hidden aspect-[4/3] block hover-scale"
+                  >
+                    <img
+                      src={card.image}
+                      alt={card.title}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-4">
+                      <h3 className="text-lg font-semibold text-white">
+                        {card.title}
+                      </h3>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>

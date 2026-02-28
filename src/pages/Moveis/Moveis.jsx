@@ -1,15 +1,18 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Navbar from '../../shared/components/Navbar'
 import Footer from '../../shared/components/Footer'
 import AnimateIn from '../../shared/components/AnimateIn'
 import Hero from './components/Hero'
 import MoveisGrid from './components/MoveisGrid'
 import ContactSection from './components/ContactSection'
+import { getHasAnsweredForm, subscribeAnsweredForm } from '../../utils/answeredForm'
 
 const Moveis = () => {
   // Estado que controla se o usuário já respondeu o formulário
   // Futuramente será controlado pelo back-end
-  const [hasAnsweredForm] = useState(false)
+  const [hasAnsweredForm, setHasAnsweredForm] = useState(getHasAnsweredForm)
+
+  useEffect(() => subscribeAnsweredForm(setHasAnsweredForm), [])
 
   return (
     <main className="min-h-screen">

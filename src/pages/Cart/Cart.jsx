@@ -9,6 +9,7 @@ import CartItems from './components/CartItems'
 import OrderSummary from './components/OrderSummary'
 import SpecialInstructions from './components/SpecialInstructions'
 import ContactSection from './components/ContactSection'
+import { getCartItems, updateCartItemQuantity, removeCartItem } from '../../utils/cart'
 
 const Cart = () => {
   const { user, loading: authLoading } = useAuth()
@@ -20,33 +21,7 @@ const Cart = () => {
     }
   }, [user, authLoading, navigate])
 
-  // Dados de exemplo - 3 produtos pré-adicionados
-  const [cartItems, setCartItems] = useState([
-    {
-      id: '85417',
-      name: 'Climatizador Joape 110v',
-      price: 300.00,
-      quantity: 1,
-      category: 'Climatizador',
-      image: 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
-    },
-    {
-      id: '75644',
-      name: 'Pórtico 6m x 4,6m',
-      price: 600.00,
-      quantity: 2,
-      category: 'Estrutura',
-      image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
-    },
-    {
-      id: '96447',
-      name: "Tenda Pai D'agua",
-      price: 300.00,
-      quantity: 1,
-      category: 'Tendas',
-      image: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
-    }
-  ])
+  const [cartItems, setCartItems] = useState(() => getCartItems())
 
   const [specialInstructions, setSpecialInstructions] = useState('')
 
@@ -55,17 +30,13 @@ const Cart = () => {
 
   // Handlers
   const handleQuantityChange = (itemId, newQuantity) => {
-    setCartItems(items => 
-      items.map(item => 
-        item.id === itemId 
-          ? { ...item, quantity: newQuantity }
-          : item
-      )
-    )
+    const updated = updateCartItemQuantity(itemId, newQuantity)
+    setCartItems(updated)
   }
 
   const handleRemoveItem = (itemId) => {
-    setCartItems(items => items.filter(item => item.id !== itemId))
+    const updated = removeCartItem(itemId)
+    setCartItems(updated)
   }
 
   const handleFinalize = () => {

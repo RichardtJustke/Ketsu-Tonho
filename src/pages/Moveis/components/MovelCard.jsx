@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { getProductById } from '../../../data/products'
 import { useCloudinaryImages } from '../../../hooks/useCloudinaryImages'
+import { addToCart } from '../../../utils/cart'
 
 const MovelCard = ({ item, hasAnsweredForm, onAction }) => {
   const product = getProductById(item.id)
@@ -8,6 +9,17 @@ const MovelCard = ({ item, hasAnsweredForm, onAction }) => {
   const imageUrl = images.length > 0 ? images[0] : (product?.image || '')
 
   const handleClick = () => {
+    if (hasAnsweredForm) {
+      addToCart({
+        id: item.id,
+        name: item.nome,
+        price: item.valor,
+        category: product?.category || 'moveis',
+        image: imageUrl || product?.image || ''
+      })
+      return
+    }
+
     onAction(item.id)
   }
 
@@ -50,7 +62,7 @@ const MovelCard = ({ item, hasAnsweredForm, onAction }) => {
               onClick={handleClick}
               className="inline-flex items-center gap-2 px-4 py-2.5 border border-black/20 rounded-full text-sm font-medium text-black hover:bg-black hover:text-white transition-colors w-fit"
             >
-              {hasAnsweredForm ? 'ADICIONAR AO CARRINHO' : 'VER DISPONIBILIDADE'}
+              {hasAnsweredForm ? 'ALUGAR AGORA' : 'VER DISPONIBILIDADE'}
               <span className="w-5 h-5 rounded-full bg-[#FF5F1F] flex items-center justify-center">
                 <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M2.5 6H9.5M9.5 6L6.5 3M9.5 6L6.5 9" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, Navigate } from 'react-router-dom'
 import Navbar from '../../shared/components/Navbar'
 import Footer from '../../shared/components/Footer'
@@ -13,12 +13,16 @@ import RelatedProducts from './components/RelatedProducts'
 import ContactSection from './components/ContactSection'
 import { getProductById } from '../../data/products'
 import { useCloudinaryImages } from '../../hooks/useCloudinaryImages'
+import { getHasAnsweredForm, subscribeAnsweredForm } from '../../utils/answeredForm'
+import { addToCart } from '../../utils/cart'
 
 const ProductDetails = () => {
   const { productId } = useParams()
-  const [hasAnsweredForm, setHasAnsweredForm] = useState(false)
+  const [hasAnsweredForm, setHasAnsweredForm] = useState(getHasAnsweredForm)
   const product = getProductById(productId)
   const { images: cloudImages } = useCloudinaryImages(productId)
+
+  useEffect(() => subscribeAnsweredForm(setHasAnsweredForm), [])
 
   if (!product) {
     return <Navigate to="/" replace />
@@ -31,7 +35,14 @@ const ProductDetails = () => {
   }
 
   const handleAddToCart = (id) => {
-    console.log('Adicionando ao carrinho:', id)
+    const item = {
+      id,
+      name: product.name,
+      price: Number(product.specs?.Valor?.replace(/[^\d,.-]/g, '').replace('.', '').replace(',', '.')) || 0,
+      category: product.category || 'produto',
+      image: product.image || ''
+    }
+    addToCart(item)
   }
 
   return (
