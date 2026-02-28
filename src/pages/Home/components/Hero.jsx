@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
-import { getCasesImages } from '../../../utils/imagens'
+import { useCloudinaryImages } from '../../../hooks/useCloudinaryImages'
 
-// Ordem desejada das imagens do hero (por trecho do nome do arquivo)
 const HERO_ORDER = ['Tenda', 'Sem', '5E87AE07', '3A7C7B23']
 
 function orderHeroImages(urls) {
@@ -15,7 +14,7 @@ function orderHeroImages(urls) {
 }
 
 const Hero = ({ onOpenFilterModal }) => {
-  const casesUrls = getCasesImages()
+  const { images: casesUrls } = useCloudinaryImages('cases', { isRawFolder: true })
   const heroImages = orderHeroImages(casesUrls).length > 0
     ? orderHeroImages(casesUrls)
     : ['https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=2098&auto=format&fit=crop']
@@ -34,7 +33,6 @@ const Hero = ({ onOpenFilterModal }) => {
   return (
     <section className="relative min-h-screen">
       <div className="relative w-full overflow-hidden min-h-screen">
-        {/* Carrossel automático (sem botões) */}
         {heroImages.map((src, index) => (
           <div
             key={index}
@@ -48,20 +46,18 @@ const Hero = ({ onOpenFilterModal }) => {
           />
         ))}
 
-        {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent z-[1]" />
 
-        {/* Content */}
-        <div className="relative z-10 flex flex-col justify-end h-full min-h-screen px-6 py-24 sm:px-8 md:px-12 lg:px-16">
+        <div className="relative z-10 flex flex-col justify-end h-full min-h-screen p-8 md:p-12 lg:p-16">
           <div className="max-w-2xl space-y-8">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white leading-tight">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-white leading-tight">
               Estrutura completa para o seu evento acontecer sem preocupação
             </h1>
 
-            <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6">
+            <div className="flex items-start gap-4">
               <button
                 onClick={onOpenFilterModal}
-                className="bg-white text-black text-sm font-medium py-3 px-6 rounded-full flex items-center gap-2 shadow-md hover:shadow-lg transition-shadow w-full sm:w-auto justify-center sm:justify-start"
+                className="bg-white text-black text-sm font-medium py-3 px-6 rounded-full flex items-center gap-2 shadow-md hover:shadow-lg transition-shadow whitespace-nowrap"
               >
                 Monte seu evento
                 <span className="w-6 h-6 rounded-full bg-[#FF5F1F] flex items-center justify-center">
@@ -71,8 +67,8 @@ const Hero = ({ onOpenFilterModal }) => {
                 </span>
               </button>
 
-              <div className="flex items-start gap-4 sm:items-center">
-                <div className="hidden sm:block w-0.5 h-16 bg-white/20" />
+              <div className="flex items-center gap-4">
+                <div className="w-0.5 h-16 bg-white/20" />
                 <p className="text-white text-sm max-w-xs">
                   Locação de tendas, mobiliário, equipamentos e buffet para eventos sociais e corporativos em Belém
                 </p>

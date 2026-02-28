@@ -1,17 +1,16 @@
-import { getProductImages } from '../../../utils/imagens'
+import { useCloudinaryImages } from '../../../hooks/useCloudinaryImages'
 
 const AboutSection = () => {
-  // Busca imagem específica "IMG-20231030-WA0059.jpg" da pasta tenda_branca_5x5
-  const tenda5x5Images = getProductImages('tenda_branca_5x5')
+  const { images: tenda5x5Images } = useCloudinaryImages('tenda_branca_5x5', { isRawFolder: true })
   const aboutImage = tenda5x5Images.find(url => url.includes('IMG-20231030-WA0059')) || tenda5x5Images[0] || 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=2069&auto=format&fit=crop'
+
   return (
     <section className="bg-[#F7F7F8] py-16 md:py-24 px-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-16">
-          {/* Image */}
           <div className="w-full lg:w-1/2">
             <div className="relative rounded-2xl overflow-hidden aspect-[4/3]">
-              <img 
+              <img
                 src={aboutImage}
                 alt="Tudo o que você precisa para realizar o seu evento"
                 className="w-full h-full object-cover"
@@ -19,7 +18,6 @@ const AboutSection = () => {
             </div>
           </div>
 
-          {/* Content */}
           <div className="w-full lg:w-1/2 bg-white rounded-3xl p-8 md:p-10 lg:p-12">
             <h2 className="text-3xl md:text-4xl font-semibold text-black mb-6 leading-tight">
               Tudo o que você precisa para realizar o seu evento
@@ -38,7 +36,7 @@ const AboutSection = () => {
               Saiba mais
               <span className="w-6 h-6 rounded-full bg-white flex items-center justify-center">
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M2.5 6H9.5M9.5 6L6.5 3M9.5 6L6.5 9" stroke="#FF5F1F" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M2.5 6H9.5M9.5 6L6.5 3M9.5 6L6.5 9" stroke="#FF5F1F" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </span>
             </button>

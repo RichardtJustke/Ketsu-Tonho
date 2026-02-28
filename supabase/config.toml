@@ -1,0 +1,4 @@
+project_id = "kiectcpzqkevyzrkwyin"
+
+[functions.cloudinary-images]
+verify_jwt = false

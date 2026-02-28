@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { formatBRL } from '../../../utils/formatCurrency'
 
 const CartItem = ({ item, onQuantityChange, onRemove }) => {
   const [quantity, setQuantity] = useState(item.quantity)
@@ -44,9 +43,9 @@ const CartItem = ({ item, onQuantityChange, onRemove }) => {
         {/* Price & Controls */}
         <div className="flex flex-col items-end gap-3">
           <div className="text-right">
-            <p className="font-semibold text-[#333333] text-lg">R${formatBRL(item.price)}</p>
+            <p className="font-semibold text-[#333333] text-lg">R${item.price.toFixed(2).replace('.', ',')}</p>
             {quantity > 1 && (
-              <p className="text-sm text-gray-500">R${formatBRL(totalPrice)} total</p>
+              <p className="text-sm text-gray-500">R${totalPrice.toFixed(2).replace('.', ',')} total</p>
             )}
           </div>
 
@@ -82,7 +81,7 @@ const CartItem = ({ item, onQuantityChange, onRemove }) => {
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M2 4H14M5.333 4V2.667C5.333 2.313 5.474 1.974 5.724 1.724C5.974 1.474 6.313 1.333 6.667 1.333H9.333C9.687 1.333 10.026 1.474 10.276 1.724C10.526 1.974 10.667 2.313 10.667 2.667V4M12.667 4V13.333C12.667 13.687 12.526 14.026 12.276 14.276C12.026 14.526 11.687 14.667 11.333 14.667H4.667C4.313 14.667 3.974 14.526 3.724 14.276C3.474 14.026 3.333 13.687 3.333 13.333V4H12.667Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
-              Remover
+              Remove
             </button>
           </div>
         </div>

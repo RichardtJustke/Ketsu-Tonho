@@ -1,22 +1,15 @@
-import { getProductFirstImage } from '../../../utils/imagens'
+import { useCloudinaryImages } from '../../../hooks/useCloudinaryImages'
 
 const Hero = () => {
-  const heroImage = getProductFirstImage(
-    'climatizador_juapi_110v',
-    'https://images.unsplash.com/photo-1585771724684-38269d6639fd?q=80&w=2070&auto=format&fit=crop'
-  )
+  const { images } = useCloudinaryImages('climatizador_juapi_110v', { isRawFolder: true })
+  const heroImage = images.length > 0 ? images[0] : 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?q=80&w=2070&auto=format&fit=crop'
 
   return (
     <section className="relative bg-black min-h-[500px] flex items-center">
-      {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-50"
-        style={{
-          backgroundImage: heroImage ? `url('${heroImage}')` : undefined
-        }}
+        style={{ backgroundImage: `url('${heroImage}')` }}
       />
-      
-      {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-32">
         <div className="max-w-xl">
           <h1 className="text-5xl md:text-6xl font-semibold text-white mb-6">

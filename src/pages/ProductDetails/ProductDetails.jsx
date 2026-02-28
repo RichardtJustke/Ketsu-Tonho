@@ -12,97 +12,48 @@ import ProductActions from './components/ProductActions'
 import RelatedProducts from './components/RelatedProducts'
 import ContactSection from './components/ContactSection'
 import { getProductById } from '../../data/products'
-import { getProductImages } from '../../utils/imagens'
+import { useCloudinaryImages } from '../../hooks/useCloudinaryImages'
 
-/**
- * ProductDetails - Página principal de detalhes do produto
- * 
- * Template reutilizável para qualquer produto
- * Controla o estado de formulário respondido
- * Preparado para integração com backend e carrinho
- */
 const ProductDetails = () => {
-  // Obtém o ID do produto da URL
   const { productId } = useParams()
-
-  /**
-   * Estado que controla se o usuário já respondeu o formulário de disponibilidade
-   * 
-   * Regra crítica:
-   * - false: Exibe botão "Ver disponibilidade"
-   * - true: Exibe botão "Adicionar ao carrinho"
-   * 
-   * Futuramente será controlado pelo backend
-   */
   const [hasAnsweredForm, setHasAnsweredForm] = useState(false)
-
-  /**
-   * Busca o produto pelo ID
-   * Se não encontrar, redireciona para a home
-   */
   const product = getProductById(productId)
+  const { images: cloudImages } = useCloudinaryImages(productId)
 
   if (!product) {
     return <Navigate to="/" replace />
   }
 
-  /**
-   * Handler para verificar disponibilidade
-   * Inicia o fluxo de verificação (não adiciona ao carrinho)
-   */
+  const productImages = cloudImages.length > 0 ? cloudImages : (product.image ? [product.image] : [])
+
   const handleCheckAvailability = () => {
-    // TODO: Implementar modal/formulário de verificação de disponibilidade
-    // Por enquanto, simula a transição de estado
     console.log('Verificando disponibilidade para:', product.id)
-    
-    // Em produção, isso seria chamado após o usuário preencher o formulário
-    // setHasAnsweredForm(true)
   }
 
-  /**
-   * Handler para adicionar ao carrinho
-   * Usa o ID do produto para integração futura
-   */
   const handleAddToCart = (id) => {
-    // TODO: Implementar lógica de carrinho
     console.log('Adicionando ao carrinho:', id)
   }
 
   return (
     <main className="min-h-screen">
-      {/* 1. Navbar - Exatamente igual às outras páginas */}
       <Navbar />
-      
-      {/* 2. Hero do Produto - Nome, descrição curta, botão condicional */}
-      <ProductHero 
+      <ProductHero
         product={product}
         hasAnsweredForm={hasAnsweredForm}
         onCheckAvailability={handleCheckAvailability}
       />
-      
       <AnimateIn animation="fade-in-up">
-        <ProductImage
-          images={
-            product.id === 'portico_de_entrada'
-              ? getProductImages(product.id)
-              : (getProductImages(product.id).length > 0 ? getProductImages(product.id) : [product.image])
-          }
-          name={product.name}
-        />
+        <ProductImage images={productImages} name={product.name} />
       </AnimateIn>
-
       <AnimateIn animation="fade-in-up">
         <ProductAbout description={product.fullDescription} />
       </AnimateIn>
-
       <AnimateIn animation="fade-in-up">
         <ProductBenefits benefits={product.benefits} />
       </AnimateIn>
-
       <AnimateIn animation="scale-in">
         <ProductSpecs specs={product.specs} />
       </AnimateIn>
-
       <AnimateIn animation="fade-in-up">
         <ProductActions
           productId={product.id}
@@ -111,16 +62,12 @@ const ProductDetails = () => {
           onAddToCart={handleAddToCart}
         />
       </AnimateIn>
-
       <AnimateIn animation="fade-in-up">
         <RelatedProducts />
       </AnimateIn>
-
       <AnimateIn animation="fade-in-up">
         <ContactSection />
       </AnimateIn>
-      
-      {/* 10. Footer - Mesmo footer do restante do site */}
       <Footer />
     </main>
   )

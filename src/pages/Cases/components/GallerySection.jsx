@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import AnimateIn from '../../../shared/components/AnimateIn'
-import { getCasesImages } from '../../../utils/imagens'
+import { useCloudinaryImages } from '../../../hooks/useCloudinaryImages'
 
 function shuffleArray(arr) {
   const a = [...arr]
@@ -18,7 +18,7 @@ const defaultImages = [
 ]
 
 const GallerySection = () => {
-  const casesImages = getCasesImages()
+  const { images: casesImages } = useCloudinaryImages('cases', { isRawFolder: true })
 
   const galleryImages = useMemo(() => {
     if (casesImages && casesImages.length > 0) {
@@ -30,7 +30,7 @@ const GallerySection = () => {
       }))
     }
     return defaultImages
-  }, [casesImages?.length])
+  }, [casesImages.length])
 
   return (
     <section className="bg-white py-16 md:py-24 px-6">

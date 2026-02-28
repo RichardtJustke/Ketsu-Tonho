@@ -31,9 +31,7 @@ const Footer = () => {
             </div>
 
             <div className="lg:w-1/2">
-              <h4 className="text-white text-lg font-semibold mb-3">
-                Alguma duvida?
-              </h4>
+              <h4 className="text-white text-lg font-semibold mb-3">Alguma duvida?</h4>
               <p className="text-[#F7F7F8] opacity-70 text-sm mb-6">
                 Entre em contato agora e receba um orçamento personalizado sem compromisso
               </p>
@@ -41,7 +39,7 @@ const Footer = () => {
                 Entre em contato
                 <span className="w-6 h-6 rounded-full bg-[#FF5F1F] flex items-center justify-center">
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M2.5 6H9.5M9.5 6L6.5 3M9.5 6L6.5 9" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M2.5 6H9.5M9.5 6L6.5 3M9.5 6L6.5 9" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </span>
               </button>
@@ -60,7 +58,6 @@ const Footer = () => {
                 </a>
               ))}
             </div>
-
             <p className="text-white opacity-70 text-xs text-center">
               © 2025 Tonho Locação. Todos os direitos reservados. CNPJ: XX.XXX.XXX/XXXX-XX
             </p>

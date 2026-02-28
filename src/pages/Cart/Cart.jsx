@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../../shared/contexts/AuthContext'
 import Navbar from '../../shared/components/Navbar'
 import Footer from '../../shared/components/Footer'
 import AnimateIn from '../../shared/components/AnimateIn'
@@ -10,6 +11,15 @@ import SpecialInstructions from './components/SpecialInstructions'
 import ContactSection from './components/ContactSection'
 
 const Cart = () => {
+  const { user, loading: authLoading } = useAuth()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/login')
+    }
+  }, [user, authLoading, navigate])
+
   // Dados de exemplo - 3 produtos pré-adicionados
   const [cartItems, setCartItems] = useState([
     {

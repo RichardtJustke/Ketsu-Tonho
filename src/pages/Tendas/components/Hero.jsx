@@ -1,9 +1,10 @@
-import videoTendas from '../../../imagens/vdd/5ZQGjQQhSx3g1yAwgWhA_DJI_0008-v.mp4'
+import { cloudinaryVideoUrl } from '../../../utils/cloudinary'
+
+const videoTendas = cloudinaryVideoUrl('vdd/5ZQGjQQhSx3g1yAwgWhA_DJI_0008-v')
 
 const Hero = () => {
   return (
     <section className="relative bg-black min-h-[500px] flex items-center overflow-hidden">
-      {/* Background Video */}
       <video
         autoPlay
         muted
@@ -14,7 +15,6 @@ const Hero = () => {
         <source src={videoTendas} type="video/mp4" />
       </video>
 
-      {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-32">
         <div className="max-w-xl">
           <h1 className="text-5xl md:text-6xl font-semibold text-white mb-6">
