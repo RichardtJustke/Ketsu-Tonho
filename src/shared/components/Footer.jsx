@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { getLogoImage } from '../../utils/imagens'
 
 const Footer = () => {
@@ -35,14 +36,14 @@ const Footer = () => {
               <p className="text-[#F7F7F8] opacity-70 text-sm mb-6">
                 Entre em contato agora e receba um orçamento personalizado sem compromisso
               </p>
-              <button className="bg-white text-black text-sm font-medium py-3 px-6 rounded-full flex items-center gap-2 shadow-md hover:shadow-lg transition-shadow">
+              <Link to="/contato" className="bg-white text-black text-sm font-medium py-3 px-6 rounded-full flex items-center gap-2 shadow-md hover:shadow-lg transition-shadow">
                 Entre em contato
                 <span className="w-6 h-6 rounded-full bg-[#FF5F1F] flex items-center justify-center">
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M2.5 6H9.5M9.5 6L6.5 3M9.5 6L6.5 9" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </span>
-              </button>
+              </Link>
             </div>
           </div>
 

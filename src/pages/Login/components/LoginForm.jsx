@@ -54,7 +54,7 @@ const LoginForm = () => {
   }
 
   return (
-    <div className="w-full h-screen flex flex-col justify-between px-6 py-6 lg:px-12 lg:py-6 overflow-hidden">
+    <div className="w-full min-h-screen flex flex-col px-6 py-6 lg:px-12 lg:py-8 overflow-y-auto">
       {/* Voltar */}
       <div>
         <Link
@@ -69,7 +69,7 @@ const LoginForm = () => {
       </div>
 
       {/* Formulário */}
-      <form onSubmit={handleSignIn} className="flex-1 flex flex-col justify-center max-w-[420px]">
+      <form onSubmit={handleSignIn} className="flex-1 flex flex-col justify-center max-w-[420px] py-8">
         <h1 className="text-[#2B3674] text-3xl font-bold mb-2">Sign In</h1>
         <p className="text-[#A3AED0] text-sm mb-5">Enter your email and password to sign in!</p>
 
@@ -183,9 +183,9 @@ const LoginForm = () => {
       </form>
 
       {/* Footer - Info da empresa */}
-      <div className="pt-4">
+      <div className="pt-6 mt-auto">
         <p className="text-[#A3AED0] text-xs">
-          © 2025 Tonho Locação. Todos os direitos reservados. CNPJ: XX.XXX.XXX/XXXX-XX
+          © 2025 Tonho Locação. Todos os direitos reservados.
         </p>
       </div>
     </div>

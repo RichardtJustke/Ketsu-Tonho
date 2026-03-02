@@ -56,10 +56,10 @@ const Hero = ({ onOpenFilterModal }) => {
           <AnimateIn animation="fade-in-up">
             <div className="max-w-2xl space-y-8">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-white leading-tight">
-              Soluções completas para que seu evento aconteça com total tranquilidade
+                Soluções completas para que seu evento aconteça com total tranquilidade
               </h1>
 
-              <div className="flex items-start gap-4">
+              <div className="flex flex-col sm:flex-row flex-wrap items-start gap-4">
                 <button
                   onClick={onOpenFilterModal}
                   className="bg-white text-black text-sm font-medium py-3 px-6 rounded-full flex items-center gap-2 shadow-md hover:shadow-lg transition-shadow whitespace-nowrap"
@@ -73,7 +73,7 @@ const Hero = ({ onOpenFilterModal }) => {
                 </button>
 
                 <div className="flex items-center gap-4">
-                  <div className="w-0.5 h-16 bg-white/20" />
+                  <div className="hidden sm:block w-0.5 h-16 bg-white/20" />
                   <p className="text-white text-sm max-w-xs">
                     Locação de tendas, mobiliário, equipamentos e serviço de buffet para todos os tipos de eventos.
                   </p>

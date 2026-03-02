@@ -13,16 +13,16 @@ import { setHasAnsweredForm } from '../../utils/answeredForm'
 const EventFilterModal = ({ isOpen, onClose, onComplete }) => {
   // Estado do step atual (-1 = intro, 0 = pergunta)
   const [currentStep, setCurrentStep] = useState(-1)
-  
+
   // Estado das respostas do formulário
   const [filters, setFilters] = useState({
     eventDate: ''
   })
-  
+
   // Estado para controlar animações
   const [isAnimating, setIsAnimating] = useState(false)
   const [direction, setDirection] = useState('next')
-  
+
   // Estado para controlar a visibilidade do modal
   const [isVisible, setIsVisible] = useState(false)
 
@@ -47,7 +47,7 @@ const EventFilterModal = ({ isOpen, onClose, onComplete }) => {
   const advanceStep = () => {
     setDirection('next')
     setIsAnimating(true)
-    
+
     setTimeout(() => {
       setCurrentStep(prev => prev + 1)
       setIsAnimating(false)
@@ -59,7 +59,7 @@ const EventFilterModal = ({ isOpen, onClose, onComplete }) => {
     if (currentStep > 0) {
       setDirection('prev')
       setIsAnimating(true)
-      
+
       setTimeout(() => {
         setCurrentStep(prev => prev - 1)
         setIsAnimating(false)
@@ -133,54 +133,50 @@ const EventFilterModal = ({ isOpen, onClose, onComplete }) => {
   const currentStepData = currentStep >= 0 && currentStep < steps.length ? steps[currentStep] : null
 
   return (
-    <div 
-      className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-300 ${
-        isVisible ? 'opacity-100' : 'opacity-0'
-      }`}
+    <div
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'
+        }`}
     >
       {/* Overlay escuro */}
-      <div 
-        className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${
-          isVisible ? 'opacity-100' : 'opacity-0'
-        }`}
+      <div
+        className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'
+          }`}
         onClick={handleClose}
       />
-      
+
       {/* Container do Modal */}
-      <div 
-        className={`relative bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl transition-all duration-300 ${
-          isVisible ? 'scale-100 translate-y-0' : 'scale-95 translate-y-4'
-        }`}
+      <div
+        className={`relative bg-white rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl transition-all duration-300 ${isVisible ? 'scale-100 translate-y-0' : 'scale-95 translate-y-4'
+          }`}
       >
         {/* Botão fechar */}
-        <button 
+        <button
           onClick={handleClose}
           className="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-all"
           aria-label="Fechar"
         >
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M1 1L13 13M1 13L13 1" stroke="#333" strokeWidth="2" strokeLinecap="round"/>
+            <path d="M1 1L13 13M1 13L13 1" stroke="#333" strokeWidth="2" strokeLinecap="round" />
           </svg>
         </button>
 
         {/* TELA DE INTRODUÇÃO */}
         {currentStep === -1 && (
           <div className="px-6 pt-6 pb-6">
-            <div 
-              className={`text-center transition-all duration-300 ${
-                isAnimating ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'
-              }`}
+            <div
+              className={`text-center transition-all duration-300 ${isAnimating ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'
+                }`}
             >
               {/* Ilustração */}
               <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-orange-100 to-amber-100 rounded-full flex items-center justify-center">
                 <span className="text-4xl">🎪</span>
               </div>
-              
+
               {/* Título */}
               <h2 className="text-2xl font-bold text-[#333333] mb-2">
                 Vamos montar seu evento!
               </h2>
-              
+
               {/* Subtítulo */}
               <p className="text-gray-500 mb-6">
                 Só precisamos da <span className="font-semibold text-[#FF5F1F]">data do evento</span> para
@@ -223,19 +219,18 @@ const EventFilterModal = ({ isOpen, onClose, onComplete }) => {
               {/* Indicador de progresso */}
               <div className="flex items-center gap-2 mb-6">
                 {steps.map((_, index) => (
-                  <div 
+                  <div
                     key={index}
-                    className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
-                      index < currentStep 
-                        ? 'bg-green-500' 
-                        : index === currentStep 
-                          ? 'bg-[#FF5F1F]' 
+                    className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${index < currentStep
+                        ? 'bg-green-500'
+                        : index === currentStep
+                          ? 'bg-[#FF5F1F]'
                           : 'bg-gray-200'
-                    }`}
+                      }`}
                   />
                 ))}
               </div>
-              
+
               {/* Número do step */}
               <div className="flex items-center gap-2 mb-2">
                 <span className="w-7 h-7 rounded-full bg-[#FF5F1F] text-white text-sm font-medium flex items-center justify-center">
@@ -247,14 +242,13 @@ const EventFilterModal = ({ isOpen, onClose, onComplete }) => {
 
             {/* Conteúdo do step atual */}
             <div className="px-6 pb-6">
-              <div 
-                className={`transition-all duration-300 ${
-                  isAnimating 
-                    ? direction === 'next' 
-                      ? 'opacity-0 -translate-x-4' 
+              <div
+                className={`transition-all duration-300 ${isAnimating
+                    ? direction === 'next'
+                      ? 'opacity-0 -translate-x-4'
                       : 'opacity-0 translate-x-4'
                     : 'opacity-100 translate-x-0'
-                }`}
+                  }`}
               >
                 {/* Título e subtítulo */}
                 <h2 className="text-2xl font-bold text-[#333333] mb-2">
@@ -278,16 +272,15 @@ const EventFilterModal = ({ isOpen, onClose, onComplete }) => {
                       autoFocus
                     />
                   </div>
-                  
+
                   {/* Botão continuar */}
                   <button
                     onClick={handleComplete}
                     disabled={!filters[currentStepData?.field]}
-                    className={`w-full py-4 rounded-2xl font-medium transition-all duration-200 ${
-                      filters[currentStepData?.field]
+                    className={`w-full py-4 rounded-2xl font-medium transition-all duration-200 ${filters[currentStepData?.field]
                         ? 'bg-[#FF5F1F] text-white hover:bg-[#e5551b]'
                         : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                    }`}
+                      }`}
                   >
                     Ver serviços
                   </button>
@@ -300,10 +293,9 @@ const EventFilterModal = ({ isOpen, onClose, onComplete }) => {
         {/* TELA DE SERVIÇOS */}
         {currentStep === steps.length && (
           <div className="px-6 pt-6 pb-6">
-            <div 
-              className={`transition-all duration-300 ${
-                isAnimating ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'
-              }`}
+            <div
+              className={`transition-all duration-300 ${isAnimating ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'
+                }`}
             >
               <h2 className="text-2xl font-bold text-[#333333] mb-2 text-center">
                 Serviços disponíveis
