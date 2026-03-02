@@ -95,7 +95,7 @@ const BoxCard = ({ box, hasAnsweredForm, onAction }) => {
   return (
     <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover-lift">
       <div className="flex flex-col sm:flex-row">
-        <div className="sm:w-1/2 min-h-[300px] h-72 sm:h-full bg-gray-100">
+        <div className="w-full sm:w-1/2 min-h-[240px] sm:min-h-[300px] h-56 sm:h-full bg-gray-100">
           {displayUrl ? (
             <img
               src={displayUrl}
@@ -108,7 +108,7 @@ const BoxCard = ({ box, hasAnsweredForm, onAction }) => {
           )}
         </div>
 
-        <div className="sm:w-1/2 p-5 flex flex-col justify-between">
+        <div className="w-full sm:w-1/2 p-5 flex flex-col justify-between">
           <div>
             <h3 className="text-lg font-semibold text-black mb-1">
               {box.nome} {box.dimensao !== '-' && box.dimensao}

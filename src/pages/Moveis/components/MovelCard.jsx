@@ -26,16 +26,16 @@ const MovelCard = ({ item, hasAnsweredForm, onAction }) => {
   return (
     <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover-lift">
       <div className="flex flex-col sm:flex-row">
-        <div className="sm:w-1/2">
+        <div className="w-full sm:w-1/2">
           {imageUrl ? (
             <div
-              className="h-72 sm:h-full min-h-[300px] bg-cover bg-center bg-no-repeat"
+              className="h-56 sm:h-full min-h-[240px] sm:min-h-[300px] bg-cover bg-center bg-no-repeat"
               style={{ backgroundImage: `url('${imageUrl}')` }}
             />
           ) : null}
         </div>
 
-        <div className="sm:w-1/2 p-5 flex flex-col justify-between">
+        <div className="w-full sm:w-1/2 p-5 flex flex-col justify-between">
           <div>
             <h3 className="text-lg font-semibold text-black mb-1">
               {item.nome}
