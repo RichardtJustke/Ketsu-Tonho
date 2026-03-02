@@ -20,7 +20,7 @@ const Hero = () => {
               Móveis e Equipamentos
             </h1>
             <p className="text-white/80 text-lg md:text-xl leading-relaxed max-w-2xl">
-              Equipamentos e mobiliário de alta qualidade para o seu evento. Climatizadores, mesas, cadeiras, equipamentos de som e muito mais. Tudo que você precisa para criar o ambiente perfeito.
+              Equipamentos de alta qualidade e mobiliário desde o mais simples ao mais sofisticado. Climatizadores, equipamentos de áudio e vídeo, mesas, cadeiras, tudo que você precisa para criar um ambiente aconchegante para o seu evento.
             </p>
           </div>
         </AnimateIn>

@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../../../integrations/supabase/client'
 
 const LoginForm = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const [showPassword, setShowPassword] = useState(false)
   const [keepLoggedIn, setKeepLoggedIn] = useState(true)
   const [email, setEmail] = useState('')
@@ -19,7 +20,9 @@ const LoginForm = () => {
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password })
       if (error) throw error
-      navigate('/')
+      const params = new URLSearchParams(location.search)
+      const redirectTo = params.get('redirect') || '/'
+      navigate(redirectTo)
     } catch (err) {
       setError(err.message === 'Invalid login credentials' ? 'Email ou senha incorretos.' : err.message)
     } finally {
