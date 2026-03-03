@@ -2,7 +2,7 @@ import { useCloudinaryImages } from '../../../hooks/useCloudinaryImages'
 
 const ProcessSection = () => {
   const { images: tenda5x5Images } = useCloudinaryImages('tenda_branca_5x5', { isRawFolder: true })
-  const processImage = tenda5x5Images.find(url => url.includes('Img 4')) || tenda5x5Images[0] || 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?q=80&w=2070&auto=format&fit=crop'
+  const processImage = tenda5x5Images.find(url => url.includes('Img_4')) || tenda5x5Images[0] || 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?q=80&w=2070&auto=format&fit=crop'
 
   const processCards = [
     {

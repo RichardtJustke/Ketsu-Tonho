@@ -39,9 +39,13 @@ export function useCloudinaryImages(folder, options = {}) {
         setLoading(false)
         return
       }
-      const urls = data?.images || []
-      cache.set(resolvedFolder, urls)
-      setImages(urls)
+      const allUrls = data?.images || []
+      const imageUrls = allUrls.filter(url => {
+        const ext = url.split('.').pop()?.toLowerCase() || ''
+        return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'svg', 'bmp', 'tiff'].includes(ext)
+      })
+      cache.set(resolvedFolder, imageUrls)
+      setImages(imageUrls)
       setLoading(false)
     }).catch((err) => {
       if (cancelled) return

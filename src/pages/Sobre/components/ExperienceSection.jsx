@@ -2,7 +2,7 @@ import { useCloudinaryImages } from '../../../hooks/useCloudinaryImages'
 
 const ExperienceSection = () => {
   const { images: equipeImages } = useCloudinaryImages('equipe', { isRawFolder: true })
-  const imageUrl = equipeImages.length > 2 ? equipeImages[2] : (equipeImages.length > 0 ? equipeImages[0] : 'https://images.unsplash.com/photo-1505236858219-8359eb29e329?q=80&w=2062&auto=format&fit=crop')
+  const imageUrl = equipeImages.find(url => url.includes('equipe_2')) || equipeImages[0] || 'https://images.unsplash.com/photo-1505236858219-8359eb29e329?q=80&w=2062&auto=format&fit=crop'
 
   const checkItems = [
     {

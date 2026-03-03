@@ -3,21 +3,21 @@ import AnimateIn from '../../../shared/components/AnimateIn'
 import { useCloudinaryImages } from '../../../hooks/useCloudinaryImages'
 
 const ItemsSection = () => {
-  const { images: tendaImages } = useCloudinaryImages('tenda_9x6_lona_box_struss', { isRawFolder: true })
+  const { images: tendaImages } = useCloudinaryImages('tenda_branca_5x5', { isRawFolder: true })
+  const { images: movelImages } = useCloudinaryImages('mesa_bistro', { isRawFolder: true })
+  const { images: boxImages } = useCloudinaryImages('tenda_9x6_lona_box_struss', { isRawFolder: true })
   const { images: climaImages } = useCloudinaryImages('climatizador_juapi_110v', { isRawFolder: true })
-  const { images: porticoImages } = useCloudinaryImages('portico_de_entrada', { isRawFolder: true })
 
   const tendaImage = tendaImages[0] || 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=2069&auto=format&fit=crop'
-  // Usa a foto da mesa pranchão para o card de Mobiliário e Decoração
-  const movelImage = 'https://images.unsplash.com/photo-1530018607912-eff2daa1bac4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80'
+  const movelImage = movelImages[0] || 'https://images.unsplash.com/photo-1530018607912-eff2daa1bac4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80'
+  const boxImage = boxImages[0] || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=2032&auto=format&fit=crop'
   const climatizadorImage = climaImages[1] || climaImages[0] || 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?q=80&w=2070&auto=format&fit=crop'
-  const boxImage = porticoImages[0] || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=2032&auto=format&fit=crop'
 
   const items = [
     { image: tendaImage, title: 'Tendas', link: '/tendas' },
     { image: movelImage, title: 'Mobiliário e Decoração', link: '/moveis' },
-    { image: climatizadorImage, title: 'Climatizadores', link: '/moveis' },
-    { image: boxImage, title: 'Estrturas e Box truss', link: '/box' }
+    { image: boxImage, title: 'Estruturas de grande porte', link: '/box' },
+    { image: climatizadorImage, title: 'Climatizadores', link: '/moveis' }
   ]
 
   return (

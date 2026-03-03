@@ -2,7 +2,7 @@ import { useCloudinaryImages } from '../../../hooks/useCloudinaryImages'
 
 const HistorySection = () => {
   const { images: equipeImages } = useCloudinaryImages('equipe', { isRawFolder: true })
-  const imageUrl = equipeImages.length > 3 ? equipeImages[3] : (equipeImages.length > 0 ? equipeImages[equipeImages.length - 1] : 'https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=2069&auto=format&fit=crop')
+  const imageUrl = equipeImages.find(url => url.includes('equipe_3')) || equipeImages[equipeImages.length - 1] || 'https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=2069&auto=format&fit=crop'
 
   const stats = [
     { value: '4.9/5', label: 'Avaliação média dos clientes' },

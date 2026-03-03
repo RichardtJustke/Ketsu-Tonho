@@ -2,7 +2,7 @@ import { useCloudinaryImages } from '../../../hooks/useCloudinaryImages'
 
 const AboutSection = () => {
   const { images: tenda5x5Images } = useCloudinaryImages('tenda_branca_5x5', { isRawFolder: true })
-  const aboutImage = tenda5x5Images.find(url => url.includes('IMG-20231030-WA0059')) || tenda5x5Images[0] || 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=2069&auto=format&fit=crop'
+  const aboutImage = tenda5x5Images.find(url => url.includes('IMG-20231030')) || tenda5x5Images[0] || 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=2069&auto=format&fit=crop'
 
   return (
     <section className="bg-[#F7F7F8] py-16 md:py-24 px-6">

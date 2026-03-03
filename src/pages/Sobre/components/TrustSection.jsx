@@ -2,7 +2,7 @@ import { useCloudinaryImages } from '../../../hooks/useCloudinaryImages'
 
 const TrustSection = () => {
   const { images: casesImages } = useCloudinaryImages('cases', { isRawFolder: true })
-  const imageUrl = casesImages.length > 1 ? casesImages[1] : (casesImages.length > 0 ? casesImages[0] : 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=2069&auto=format&fit=crop')
+  const imageUrl = casesImages.find(url => url.includes('case_1')) || casesImages[0] || 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=2069&auto=format&fit=crop'
 
   const checkItems = [
     'Equipamentos certificados e inspecionados',

@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
     // Use Cloudinary Admin API to list resources in folder
     const auth = btoa(`${apiKey}:${apiSecret}`)
     const searchUrl = `https://api.cloudinary.com/v1_1/${cloudName}/resources/search`
-    const expression = `folder:${safeFolder}`
+    const expression = `folder:${safeFolder} AND resource_type:image`
 
     const response = await fetch(searchUrl, {
       method: 'POST',
