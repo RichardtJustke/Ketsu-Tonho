@@ -1,4 +1,5 @@
 import MovelCard from './MovelCard'
+import AnimateIn from '../../../shared/components/AnimateIn'
 
 const moveis = [
   { id: "climatizador_guaruja", nome: "Climatizador Guarujá", valor: 250 },
@@ -53,13 +54,14 @@ const MoveisGrid = ({ hasAnsweredForm }) => {
       <div className="max-w-7xl mx-auto">
         {/* Grid de Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
-          {moveis.map((item) => (
-            <MovelCard 
-              key={item.id} 
-              item={item} 
-              hasAnsweredForm={hasAnsweredForm}
-              onAction={handleAction}
-            />
+          {moveis.map((item, index) => (
+            <AnimateIn key={item.id} animation="fade-in-up" delay={index * 50}>
+              <MovelCard
+                item={item}
+                hasAnsweredForm={hasAnsweredForm}
+                onAction={handleAction}
+              />
+            </AnimateIn>
           ))}
         </div>
 

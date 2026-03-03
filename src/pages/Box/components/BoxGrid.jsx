@@ -1,4 +1,5 @@
 import BoxCard from './BoxCard'
+import AnimateIn from '../../../shared/components/AnimateIn'
 
 const boxes = [
   { id: "portico_de_entrada", nome: "Pórtico", dimensao: "6m x 4,6m", valor: 600 },
@@ -18,13 +19,14 @@ const BoxGrid = ({ hasAnsweredForm }) => {
       <div className="max-w-7xl mx-auto">
         {/* Grid de Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
-          {boxes.map((box) => (
-            <BoxCard 
-              key={box.id} 
-              box={box} 
-              hasAnsweredForm={hasAnsweredForm}
-              onAction={handleAction}
-            />
+          {boxes.map((box, index) => (
+            <AnimateIn key={box.id} animation="fade-in-up" delay={index * 50}>
+              <BoxCard
+                box={box}
+                hasAnsweredForm={hasAnsweredForm}
+                onAction={handleAction}
+              />
+            </AnimateIn>
           ))}
         </div>
 

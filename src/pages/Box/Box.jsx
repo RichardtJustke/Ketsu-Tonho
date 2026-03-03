@@ -17,18 +17,16 @@ const Box = () => {
   return (
     <main className="min-h-screen">
       <Navbar />
-      
+
       {/* 1. Hero Section */}
       <Hero />
-      
-      <AnimateIn animation="fade-in-up">
-        <BoxGrid hasAnsweredForm={hasAnsweredForm} />
-      </AnimateIn>
+
+      <BoxGrid hasAnsweredForm={hasAnsweredForm} />
 
       <AnimateIn animation="fade-in-up">
         <ContactSection />
       </AnimateIn>
-      
+
       {/* 4. Footer */}
       <Footer />
     </main>

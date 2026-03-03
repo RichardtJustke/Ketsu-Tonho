@@ -17,18 +17,16 @@ const Moveis = () => {
   return (
     <main className="min-h-screen">
       <Navbar />
-      
+
       {/* 1. Hero Section */}
       <Hero />
-      
-      <AnimateIn animation="fade-in-up">
-        <MoveisGrid hasAnsweredForm={hasAnsweredForm} />
-      </AnimateIn>
+
+      <MoveisGrid hasAnsweredForm={hasAnsweredForm} />
 
       <AnimateIn animation="fade-in-up">
         <ContactSection />
       </AnimateIn>
-      
+
       {/* 4. Footer */}
       <Footer />
     </main>
