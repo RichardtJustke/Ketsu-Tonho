@@ -20,7 +20,7 @@ const Hero = () => {
               Pórticos e Box Truss
             </h1>
             <p className="text-white/80 text-lg md:text-xl leading-relaxed max-w-2xl">
-              Os pórticos e box truss são estruturas mais robustas e ideais para eventos de grande porte porque trazem um impacto visual, destacando marcas, nomes, patrocinadores.
+              Estruturas em Box Truss ideais para pórticos, backdrops e coberturas, garantindo segurança, estabilidade e acabamento profissional para seu evento.
             </p>
           </div>
         </AnimateIn>

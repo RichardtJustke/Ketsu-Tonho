@@ -13,8 +13,8 @@ const GallerySection = () => {
         alt: `Case ${index + 1}`,
       }))
     }
-    return defaultImages
-  }, [casesImages.length])
+    return []
+  }, [casesImages])
 
   return (
     <section className="bg-white py-16 md:py-24 px-6">

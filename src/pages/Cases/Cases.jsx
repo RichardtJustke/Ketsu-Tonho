@@ -11,15 +11,9 @@ const Cases = () => {
     <div className="min-h-screen bg-white font-['Figtree']">
       <Navbar />
       <Hero />
-      <AnimateIn animation="fade-in-up">
-        <GallerySection />
-      </AnimateIn>
-      <AnimateIn animation="fade-in-up">
-        <TestimonialsSection />
-      </AnimateIn>
-      <AnimateIn animation="fade-in-up">
-        <ContactSection />
-      </AnimateIn>
+      <GallerySection />
+      <TestimonialsSection />
+      <ContactSection />
       <Footer />
     </div>
   )

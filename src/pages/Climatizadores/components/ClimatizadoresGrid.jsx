@@ -3,9 +3,9 @@ import AnimateIn from '../../../shared/components/AnimateIn'
 
 const climatizadores = [
     { id: "climatizador_guaruja", nome: "Climatizador Guarujá", valor: 250 },
-    { id: "climatizador_juapi_110v", nome: "Climatizador Juapi 110V", valor: 300 },
-    { id: "clima_brisa_br30", nome: "Clima Brisa BR30", valor: 400 },
-    { id: "clima_brisa_i20", nome: "Clima Brisa Portátil I20", valor: 300 }
+    { id: "climatizador_juapi_110v", nome: "Climatizador Joape 110V", valor: 300 },
+    { id: "clima_brisa_br30", nome: "Climabrisa BR30", valor: 400 },
+    { id: "clima_brisa_i20", nome: "Climabrisa Portátil I20", valor: 300 }
 ]
 
 const ClimatizadoresGrid = ({ hasAnsweredForm }) => {

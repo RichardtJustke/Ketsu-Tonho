@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { setHasAnsweredForm } from '../../utils/answeredForm'
 
+import { useCloudinaryImages } from '../../hooks/useCloudinaryImages'
+
 /**
  * EventFilterModal - Formulário interativo step-by-step para filtrar produtos
  * 
@@ -13,6 +15,16 @@ import { setHasAnsweredForm } from '../../utils/answeredForm'
 const EventFilterModal = ({ isOpen, onClose, onComplete }) => {
   // Estado do step atual (-1 = intro, 0 = pergunta)
   const [currentStep, setCurrentStep] = useState(-1)
+
+  const { images: tendaImages } = useCloudinaryImages('tenda_branca_5x5', { isRawFolder: true })
+  const { images: movelImages } = useCloudinaryImages('mesa_bistro', { isRawFolder: true })
+  const { images: boxImages } = useCloudinaryImages('tenda_9x6_lona_box_struss', { isRawFolder: true })
+  const { images: climaImages } = useCloudinaryImages('climatizador_juapi_110v', { isRawFolder: true })
+
+  const tendaImage = tendaImages[0] || 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=2069&auto=format&fit=crop'
+  const movelImage = movelImages[0] || 'https://images.unsplash.com/photo-1530018607912-eff2daa1bac4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80'
+  const boxImage = boxImages[0] || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=2032&auto=format&fit=crop'
+  const climatizadorImage = climaImages[1] || climaImages[0] || 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?q=80&w=2070&auto=format&fit=crop'
 
   // Estado das respostas do formulário
   const [filters, setFilters] = useState({
@@ -111,22 +123,22 @@ const EventFilterModal = ({ isOpen, onClose, onComplete }) => {
     {
       title: 'Tendas e Estruturas',
       link: '/tendas',
-      image: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=2069&auto=format&fit=crop'
+      image: tendaImage
     },
     {
       title: 'Mobiliário e Decoração',
       link: '/moveis',
-      image: 'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?q=80&w=2074&auto=format&fit=crop'
+      image: movelImage
     },
     {
       title: 'Climatizadores',
       link: '/climatizadores',
-      image: 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?q=80&w=2070&auto=format&fit=crop'
+      image: climatizadorImage
     },
     {
       title: 'Estruturas de grande porte',
       link: '/box',
-      image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=2032&auto=format&fit=crop'
+      image: boxImage
     }
   ]
 

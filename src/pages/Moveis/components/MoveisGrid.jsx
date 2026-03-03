@@ -5,8 +5,8 @@ const moveis = [
   { id: "tv_55_suporte", nome: "TV 55\" com suporte", valor: 150 },
   { id: "notebook", nome: "Notebook", valor: 100 },
   { id: "impressora", nome: "Impressora", valor: 90 },
-  { id: "microfone_sem_fio", nome: "Microfone sem fio", valor: 80 },
-  { id: "kit_microfone_sem_fio", nome: "Kit microfone sem fio", valor: 50 },
+  { id: "microfone_sem_fio", nome: "Microfone sem fio", valor: 50 },
+  { id: "kit_microfone_sem_fio", nome: "Kit microfone sem fio", valor: 80 },
   { id: "caixa_som", nome: "Caixa de som", valor: 150 },
   { id: "caixa_som_vertical", nome: "Caixa de som vertical integrada", valor: 300 },
   { id: "fogao_industrial", nome: "Fogão industrial", valor: 80 },
@@ -33,7 +33,6 @@ const moveis = [
   { id: "caixa_termica_360l", nome: "Caixa térmica 360L", valor: 150 },
   { id: "refletor_led_100w", nome: "Refletor LED 100W", valor: 25 },
   { id: "lixeira_100l_pedal", nome: "Lixeira 100L com pedal", valor: 40 },
-  { id: "microondas", nome: "Micro-ondas", valor: 60 },
   { id: "lixeira_escritorio", nome: "Lixeira de escritório", valor: 5 },
   { id: "kit_cones_marcacao", nome: "Kit de cones de marcação", valor: 18 }
 ]
