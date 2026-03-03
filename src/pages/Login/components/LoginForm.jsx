@@ -70,8 +70,8 @@ const LoginForm = () => {
 
       {/* Formulário */}
       <form onSubmit={handleSignIn} className="flex-1 flex flex-col justify-center max-w-[420px] py-8">
-        <h1 className="text-[#2B3674] text-3xl font-bold mb-2">Sign In</h1>
-        <p className="text-[#A3AED0] text-sm mb-5">Enter your email and password to sign in!</p>
+        <h1 className="text-[#2B3674] text-3xl font-bold mb-2">Entrar</h1>
+        <p className="text-[#A3AED0] text-sm mb-5">Insira seu email e senha para entrar!</p>
 
         {/* Error / Success messages */}
         {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
@@ -85,13 +85,13 @@ const LoginForm = () => {
             <path d="M10 18.3333C12.1525 18.3333 14.1083 17.5095 15.5871 16.17L13.008 13.9875C12.1431 14.6451 11.0864 15.0008 10 15C7.83246 15 5.99163 13.6179 5.29913 11.6891L2.58163 13.7829C3.96079 16.4816 6.76163 18.3333 10 18.3333Z" fill="#4CAF50" />
             <path d="M18.1712 8.36788H17.5V8.33329H10V11.6666H14.7096C14.3809 12.5901 13.7889 13.3971 13.0067 13.988L13.008 13.9871L15.587 16.1696C15.4046 16.3354 18.3333 14.1666 18.3333 9.99996C18.3333 9.44121 18.2758 8.89579 18.1712 8.36788Z" fill="#1976D2" />
           </svg>
-          Sign in with Google
+          Entrar com o Google
         </button>
 
         {/* Divisor */}
         <div className="flex items-center gap-4 mb-4">
           <div className="flex-1 h-px bg-[#E0E5F2]"></div>
-          <span className="text-[#A3AED0] text-sm">or</span>
+          <span className="text-[#A3AED0] text-sm">ou</span>
           <div className="flex-1 h-px bg-[#E0E5F2]"></div>
         </div>
 
@@ -102,7 +102,7 @@ const LoginForm = () => {
           </label>
           <input
             type="email"
-            placeholder="mail@simmmple.com"
+            placeholder="seu@email.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -113,12 +113,12 @@ const LoginForm = () => {
         {/* Campo Password */}
         <div className="mb-3">
           <label className="block text-[#2B3674] text-sm font-medium mb-1.5">
-            Password<span className="text-[#FF5F1F]">*</span>
+            Senha<span className="text-[#FF5F1F]">*</span>
           </label>
           <div className="relative">
             <input
               type={showPassword ? 'text' : 'password'}
-              placeholder="Min. 8 characters"
+              placeholder="Mín. 8 caracteres"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -157,10 +157,10 @@ const LoginForm = () => {
                 </svg>
               )}
             </div>
-            <span className="text-[#2B3674] text-sm font-medium">Keep me logged in</span>
+            <span className="text-[#2B3674] text-sm font-medium">Mantenha-me conectado</span>
           </label>
           <button type="button" onClick={handleForgotPassword} className="text-[#FF5F1F] text-sm font-medium hover:opacity-80 transition-opacity">
-            Forget password?
+            Esqueceu a senha?
           </button>
         </div>
 
@@ -170,14 +170,14 @@ const LoginForm = () => {
           disabled={loading}
           className="w-full py-3 bg-[#FF5F1F] rounded-xl text-white text-sm font-bold hover:opacity-90 transition-opacity mb-4 disabled:opacity-50"
         >
-          {loading ? 'Entrando...' : 'Sign In'}
+          {loading ? 'Entrando...' : 'Entrar'}
         </button>
 
         {/* Create Account */}
         <p className="text-[#2B3674] text-sm">
-          Not registered yet?{' '}
+          Ainda não tem conta?{' '}
           <Link to="/register" className="text-[#FF5F1F] font-medium hover:opacity-80 transition-opacity">
-            Create an Account
+            Criar Conta
           </Link>
         </p>
       </form>

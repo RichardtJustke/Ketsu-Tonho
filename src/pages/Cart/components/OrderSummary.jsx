@@ -58,11 +58,11 @@ const OrderSummary = ({ subtotal, installationFee = 300, discount = 0, onFinaliz
       <div className="bg-white rounded-2xl border border-gray-200 p-6">
         <div className="flex items-center gap-2 mb-4">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M16.667 10V17.5H3.333V10" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M18.333 5.833H1.667V10H18.333V5.833Z" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M10 17.5V5.833" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M10 5.833H6.25C5.587 5.833 4.951 5.57 4.482 5.101C4.013 4.632 3.75 3.996 3.75 3.333C3.75 2.671 4.013 2.035 4.482 1.566C4.951 1.097 5.587 0.833 6.25 0.833C9.167 0.833 10 5.833 10 5.833Z" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M10 5.833H13.75C14.413 5.833 15.049 5.57 15.518 5.101C15.987 4.632 16.25 3.996 16.25 3.333C16.25 2.671 15.987 2.035 15.518 1.566C15.049 1.097 14.413 0.833 13.75 0.833C10.833 0.833 10 5.833 10 5.833Z" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M16.667 10V17.5H3.333V10" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M18.333 5.833H1.667V10H18.333V5.833Z" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M10 17.5V5.833" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M10 5.833H6.25C5.587 5.833 4.951 5.57 4.482 5.101C4.013 4.632 3.75 3.996 3.75 3.333C3.75 2.671 4.013 2.035 4.482 1.566C4.951 1.097 5.587 0.833 6.25 0.833C9.167 0.833 10 5.833 10 5.833Z" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M10 5.833H13.75C14.413 5.833 15.049 5.57 15.518 5.101C15.987 4.632 16.25 3.996 16.25 3.333C16.25 2.671 15.987 2.035 15.518 1.566C15.049 1.097 14.413 0.833 13.75 0.833C10.833 0.833 10 5.833 10 5.833Z" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
           <h3 className="font-semibold text-[#333333]">Código Promocional</h3>
         </div>
@@ -75,7 +75,7 @@ const OrderSummary = ({ subtotal, installationFee = 300, discount = 0, onFinaliz
             placeholder="Digite seu código"
             className="flex-1 px-4 py-3 bg-[#F7F7F8] border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#FF5F1F] transition-colors"
           />
-          <button 
+          <button
             onClick={handleApplyCoupon}
             className="px-6 py-3 border border-gray-300 rounded-xl text-sm font-medium text-[#333333] hover:bg-gray-50 transition-colors"
           >
@@ -119,13 +119,13 @@ const OrderSummary = ({ subtotal, installationFee = 300, discount = 0, onFinaliz
         </div>
 
         {/* Finalize Button */}
-        <button 
+        <button
           onClick={onFinalize}
           className="w-full bg-[#333333] text-white font-medium py-4 px-6 rounded-xl flex items-center justify-center gap-2 hover:bg-black transition-colors"
         >
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M13.333 5V3.333C13.333 2.89 13.157 2.467 12.845 2.155C12.533 1.843 12.11 1.667 11.667 1.667H3.333C2.89 1.667 2.467 1.843 2.155 2.155C1.843 2.467 1.667 2.89 1.667 3.333V16.667C1.667 17.11 1.843 17.533 2.155 17.845C2.467 18.157 2.89 18.333 3.333 18.333H11.667C12.11 18.333 12.533 18.157 12.845 17.845C13.157 17.533 13.333 17.11 13.333 16.667V15" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M6.667 10H18.333M18.333 10L15 6.667M18.333 10L15 13.333" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M13.333 5V3.333C13.333 2.89 13.157 2.467 12.845 2.155C12.533 1.843 12.11 1.667 11.667 1.667H3.333C2.89 1.667 2.467 1.843 2.155 2.155C1.843 2.467 1.667 2.89 1.667 3.333V16.667C1.667 17.11 1.843 17.533 2.155 17.845C2.467 18.157 2.89 18.333 3.333 18.333H11.667C12.11 18.333 12.533 18.157 12.845 17.845C13.157 17.533 13.333 17.11 13.333 16.667V15" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M6.667 10H18.333M18.333 10L15 6.667M18.333 10L15 13.333" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
           Enviar orçamento
         </button>
@@ -136,21 +136,21 @@ const OrderSummary = ({ subtotal, installationFee = 300, discount = 0, onFinaliz
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M14.167 1.667H5.833C5.373 1.667 5 2.04 5 2.5V17.5C5 17.96 5.373 18.333 5.833 18.333H14.167C14.627 18.333 15 17.96 15 17.5V2.5C15 2.04 14.627 1.667 14.167 1.667Z" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M1.667 5.833H5M1.667 14.167H5M15 5.833H18.333M15 14.167H18.333" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M14.167 1.667H5.833C5.373 1.667 5 2.04 5 2.5V17.5C5 17.96 5.373 18.333 5.833 18.333H14.167C14.627 18.333 15 17.96 15 17.5V2.5C15 2.04 14.627 1.667 14.167 1.667Z" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M1.667 5.833H5M1.667 14.167H5M15 5.833H18.333M15 14.167H18.333" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
           <div>
             <p className="font-medium text-[#333333] text-sm">Entrega gratuita</p>
-            <p className="text-xs text-gray-500">Em pedidos acima de R$200</p>
+            <p className="text-xs text-gray-500">Para a região metropolitana de Belém</p>
           </div>
         </div>
 
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M10 18.333C14.602 18.333 18.333 14.602 18.333 10C18.333 5.398 14.602 1.667 10 1.667C5.398 1.667 1.667 5.398 1.667 10C1.667 14.602 5.398 18.333 10 18.333Z" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M10 5V10L13.333 11.667" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M10 18.333C14.602 18.333 18.333 14.602 18.333 10C18.333 5.398 14.602 1.667 10 1.667C5.398 1.667 1.667 5.398 1.667 10C1.667 14.602 5.398 18.333 10 18.333Z" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M10 5V10L13.333 11.667" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
           <div>

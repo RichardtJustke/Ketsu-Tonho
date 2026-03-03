@@ -8,7 +8,8 @@ const ItemsSection = () => {
   const { images: porticoImages } = useCloudinaryImages('portico_de_entrada', { isRawFolder: true })
 
   const tendaImage = tendaImages[0] || 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=2069&auto=format&fit=crop'
-  const movelImage = climaImages[0] || 'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?q=80&w=2074&auto=format&fit=crop'
+  // Usa a foto da mesa pranchão para o card de Mobiliário e Decoração
+  const movelImage = 'https://images.unsplash.com/photo-1530018607912-eff2daa1bac4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80'
   const climatizadorImage = climaImages[1] || climaImages[0] || 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?q=80&w=2070&auto=format&fit=crop'
   const boxImage = porticoImages[0] || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=2032&auto=format&fit=crop'
 

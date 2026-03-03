@@ -23,8 +23,8 @@ const CartItem = ({ item, onQuantityChange, onRemove }) => {
     <div className="flex flex-col sm:flex-row gap-4 py-6 border-b border-gray-200 last:border-b-0">
       {/* Product Image */}
       <div className="w-full sm:w-28 h-28 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
-        <img 
-          src={item.image} 
+        <img
+          src={item.image}
           alt={item.name}
           className="w-full h-full object-cover"
         />
@@ -58,7 +58,7 @@ const CartItem = ({ item, onQuantityChange, onRemove }) => {
                 aria-label="Diminuir quantidade"
               >
                 <svg width="14" height="2" viewBox="0 0 14 2" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M1 1H13" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  <path d="M1 1H13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 </svg>
               </button>
               <span className="w-10 text-center font-medium text-[#333333]">{quantity}</span>
@@ -68,20 +68,20 @@ const CartItem = ({ item, onQuantityChange, onRemove }) => {
                 aria-label="Aumentar quantidade"
               >
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M7 1V13M1 7H13" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  <path d="M7 1V13M1 7H13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 </svg>
               </button>
             </div>
 
             {/* Remove Button */}
-            <button 
+            <button
               onClick={() => onRemove?.(item.id)}
               className="flex items-center gap-1.5 text-red-500 hover:text-red-600 transition-colors text-sm font-medium"
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M2 4H14M5.333 4V2.667C5.333 2.313 5.474 1.974 5.724 1.724C5.974 1.474 6.313 1.333 6.667 1.333H9.333C9.687 1.333 10.026 1.474 10.276 1.724C10.526 1.974 10.667 2.313 10.667 2.667V4M12.667 4V13.333C12.667 13.687 12.526 14.026 12.276 14.276C12.026 14.526 11.687 14.667 11.333 14.667H4.667C4.313 14.667 3.974 14.526 3.724 14.276C3.474 14.026 3.333 13.687 3.333 13.333V4H12.667Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M2 4H14M5.333 4V2.667C5.333 2.313 5.474 1.974 5.724 1.724C5.974 1.474 6.313 1.333 6.667 1.333H9.333C9.687 1.333 10.026 1.474 10.276 1.724C10.526 1.974 10.667 2.313 10.667 2.667V4M12.667 4V13.333C12.667 13.687 12.526 14.026 12.276 14.276C12.026 14.526 11.687 14.667 11.333 14.667H4.667C4.313 14.667 3.974 14.526 3.724 14.276C3.474 14.026 3.333 13.687 3.333 13.333V4H12.667Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-              Remove
+              Remover
             </button>
           </div>
         </div>
