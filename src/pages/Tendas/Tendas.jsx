@@ -17,18 +17,16 @@ const Tendas = () => {
   return (
     <main className="min-h-screen">
       <Navbar />
-      
+
       {/* 1. Hero Section */}
       <Hero />
-      
-      <AnimateIn animation="fade-in-up">
-        <TendasGrid hasAnsweredForm={hasAnsweredForm} />
-      </AnimateIn>
+
+      <TendasGrid hasAnsweredForm={hasAnsweredForm} />
 
       <AnimateIn animation="fade-in-up">
         <ContactSection />
       </AnimateIn>
-      
+
       {/* 4. Footer */}
       <Footer />
     </main>

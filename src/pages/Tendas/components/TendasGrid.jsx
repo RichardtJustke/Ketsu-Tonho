@@ -70,24 +70,22 @@ const TendasGrid = ({ hasAnsweredForm }) => {
     <section className="bg-white py-16 md:py-24 px-6">
       <div className="max-w-7xl mx-auto">
         {groupedTendas.map((group, groupIndex) => (
-          <AnimateIn key={group.key} animation="fade-in-up" delay={groupIndex * 80}>
-            <div className="mb-12">
-              <h2 className="text-xl md:text-2xl font-semibold text-black mb-4">
-                {group.label}
-              </h2>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {group.items.map((tenda, itemIndex) => (
-                  <AnimateIn key={tenda.id} animation="fade-in-up" delay={groupIndex * 80 + itemIndex * 100}>
-                    <TendaCard
-                      tenda={tenda}
-                      hasAnsweredForm={hasAnsweredForm}
-                      onAction={handleAction}
-                    />
-                  </AnimateIn>
-                ))}
-              </div>
+          <div key={group.key} className="mb-12">
+            <h2 className="text-xl md:text-2xl font-semibold text-black mb-4">
+              {group.label}
+            </h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {group.items.map((tenda, itemIndex) => (
+                <AnimateIn key={tenda.id} animation="fade-in-up" delay={groupIndex * 80 + itemIndex * 100}>
+                  <TendaCard
+                    tenda={tenda}
+                    hasAnsweredForm={hasAnsweredForm}
+                    onAction={handleAction}
+                  />
+                </AnimateIn>
+              ))}
             </div>
-          </AnimateIn>
+          </div>
         ))}
       </div>
     </section>
