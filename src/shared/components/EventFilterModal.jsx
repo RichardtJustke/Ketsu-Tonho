@@ -119,9 +119,9 @@ const EventFilterModal = ({ isOpen, onClose, onComplete }) => {
       image: 'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?q=80&w=2074&auto=format&fit=crop'
     },
     {
-      title: 'Mobiliário e Equipamentos',
-      link: '/moveis',
-      image: 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80'
+      title: 'Climatizadores',
+      link: '/climatizadores',
+      image: 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?q=80&w=2070&auto=format&fit=crop'
     },
     {
       title: 'Estruturas de grande porte',
@@ -222,10 +222,10 @@ const EventFilterModal = ({ isOpen, onClose, onComplete }) => {
                   <div
                     key={index}
                     className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${index < currentStep
-                        ? 'bg-green-500'
-                        : index === currentStep
-                          ? 'bg-[#FF5F1F]'
-                          : 'bg-gray-200'
+                      ? 'bg-green-500'
+                      : index === currentStep
+                        ? 'bg-[#FF5F1F]'
+                        : 'bg-gray-200'
                       }`}
                   />
                 ))}
@@ -244,10 +244,10 @@ const EventFilterModal = ({ isOpen, onClose, onComplete }) => {
             <div className="px-6 pb-6">
               <div
                 className={`transition-all duration-300 ${isAnimating
-                    ? direction === 'next'
-                      ? 'opacity-0 -translate-x-4'
-                      : 'opacity-0 translate-x-4'
-                    : 'opacity-100 translate-x-0'
+                  ? direction === 'next'
+                    ? 'opacity-0 -translate-x-4'
+                    : 'opacity-0 translate-x-4'
+                  : 'opacity-100 translate-x-0'
                   }`}
               >
                 {/* Título e subtítulo */}
@@ -278,8 +278,8 @@ const EventFilterModal = ({ isOpen, onClose, onComplete }) => {
                     onClick={handleComplete}
                     disabled={!filters[currentStepData?.field]}
                     className={`w-full py-4 rounded-2xl font-medium transition-all duration-200 ${filters[currentStepData?.field]
-                        ? 'bg-[#FF5F1F] text-white hover:bg-[#e5551b]'
-                        : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      ? 'bg-[#FF5F1F] text-white hover:bg-[#e5551b]'
+                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                       }`}
                   >
                     Ver serviços

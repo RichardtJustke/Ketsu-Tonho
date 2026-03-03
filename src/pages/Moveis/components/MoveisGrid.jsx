@@ -2,10 +2,6 @@ import MovelCard from './MovelCard'
 import AnimateIn from '../../../shared/components/AnimateIn'
 
 const moveis = [
-  { id: "climatizador_guaruja", nome: "Climatizador Guarujá", valor: 250 },
-  { id: "climatizador_juapi_110v", nome: "Climatizador Juapi 110V", valor: 300 },
-  { id: "clima_brisa_br30", nome: "Clima Brisa BR30", valor: 400 },
-  { id: "clima_brisa_i20", nome: "Clima Brisa Portátil I20", valor: 300 },
   { id: "tv_55_suporte", nome: "TV 55\" com suporte", valor: 150 },
   { id: "notebook", nome: "Notebook", valor: 100 },
   { id: "impressora", nome: "Impressora", valor: 90 },

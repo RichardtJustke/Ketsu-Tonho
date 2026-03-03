@@ -52,13 +52,13 @@ Com espaço amplo e confortável, a tenda acomoda bem seus convidados, oferecend
 
   'tenda_pe_dagua': {
     id: 'tenda_pe_dagua',
-    name: "Tenda Pé d'Água",
-    shortDescription: "A tenda Pé d'Água é perfeita para eventos que exigem praticidade e versatilidade. Ideal para feiras, festivais gastronômicos, exposições e eventos corporativos.",
-    fullDescription: `A Tenda Pé d'Água é a solução completa para quem busca praticidade, versatilidade e muito estilo. Com design clean e elegante, ela se adapta com facilidade a diferentes tipos de eventos, combinando com qualquer estilo de decoração e proposta.
+    name: "Tenda Pai d'Égua",
+    shortDescription: "A tenda Pai d'Égua é perfeita para eventos que exigem praticidade e versatilidade. Ideal para feiras, festivais gastronômicos, exposições e eventos corporativos.",
+    fullDescription: `A Tenda Pai d'Égua é a solução completa para quem busca praticidade, versatilidade e muito estilo. Com design clean e elegante, ela se adapta com facilidade a diferentes tipos de eventos, combinando com qualquer estilo de decoração e proposta.
 
 Ideal para feiras, festivais gastronômicos, exposições, eventos corporativos e confraternizações, essa tenda oferece um espaço amplo e funcional para acomodar seus convidados e atividades com conforto e segurança.
 
-Com laterais abertas ou fechadas conforme sua necessidade, e disponível em diversos tamanhos, a Tenda Pé d'Água se adapta perfeitamente ao seu evento, garantindo proteção contra sol e chuva sem abrir mão do visual sofisticado.`,
+Com laterais abertas ou fechadas conforme sua necessidade, e disponível em diversos tamanhos, a Tenda Pai d'Égua se adapta perfeitamente ao seu evento, garantindo proteção contra sol e chuva sem abrir mão do visual sofisticado.`,
     image: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
     category: 'tendas',
     benefits: [
@@ -889,7 +889,7 @@ Com capacidade de 100 litros e alcance frontal de até 20 metros, o Climatizador
 
 Econômico e silencioso, ele garante o conforto dos seus convidados sem comprometer a experiência do evento. Alugue agora e transforme o clima do seu evento!`,
     image: 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-    category: 'moveis',
+    category: 'climatizadores',
     benefits: [
       {
         title: 'Compacto e Leve',
@@ -930,7 +930,7 @@ Ideal para festas, eventos corporativos, feiras e qualquer ambiente que precise 
 
 Alugue o Climatizador Joape e proporcione uma experiência confortável e agradável para todos os participantes do seu evento!`,
     image: 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-    category: 'moveis',
+    category: 'climatizadores',
     benefits: [
       {
         title: 'Potência e Eficiência',
@@ -971,7 +971,7 @@ Ideal para galpões, tendas grandes, arenas, feiras e qualquer ambiente amplo qu
 
 Com o Climabrisa BR30, você garante que seus convidados estarão confortáveis mesmo nos dias mais quentes, proporcionando uma experiência agradável e memorável.`,
     image: 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-    category: 'moveis',
+    category: 'climatizadores',
     benefits: [
       {
         title: 'Alta Vazão de Ar',
@@ -1013,7 +1013,7 @@ Ideal para eventos que precisam de flexibilidade no posicionamento do climatizad
 
 Alugue o Climabrisa Portátil i20 e tenha a liberdade de climatizar qualquer ambiente do seu evento com praticidade e eficiência!`,
     image: 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-    category: 'moveis',
+    category: 'climatizadores',
     benefits: [
       {
         title: 'Portátil e Versátil',
@@ -2456,7 +2456,7 @@ export const getAllProducts = () => Object.values(products)
  * @param {string} category - Categoria (tendas, moveis, box)
  * @returns {Array} - Array de produtos filtrados
  */
-export const getProductsByCategory = (category) => 
+export const getProductsByCategory = (category) =>
   Object.values(products).filter(p => p.category === category)
 
 export default products

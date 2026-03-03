@@ -12,7 +12,7 @@ const ServiceSection = () => {
   const productDefs = [
     { id: 'tenda_cristal_10x10', title: 'Tenda Cristal 10x10m', discount: '20%', price: 'R$300,00', cloudImages: cristalImages },
     { id: 'portico_de_entrada', title: 'Pórtico 6m x 4,6m', discount: '5%', price: 'R$600,00', cloudImages: porticoImages },
-    { id: 'tenda_pe_dagua', title: 'Tenda Pai D\'egua', discount: '5%', price: 'R$300,00', buttonText: 'Ver disponibilidade', cloudImages: peDaguaImages },
+    { id: 'tenda_pe_dagua', title: 'Tenda Pai d\'Égua', discount: '5%', price: 'R$300,00', buttonText: 'Ver disponibilidade', cloudImages: peDaguaImages },
     { id: 'climatizador_juapi_110v', title: 'Climatizador Joape 110v', discount: '12%', price: 'R$300,00', cloudImages: climaImages }
   ]
 

@@ -9,6 +9,7 @@ import Contato from './pages/Contato/Contato'
 import Tendas from './pages/Tendas/Tendas'
 import Box from './pages/Box/Box'
 import Moveis from './pages/Moveis/Moveis'
+import Climatizadores from './pages/Climatizadores/Climatizadores'
 import Cart from './pages/Cart/Cart'
 import ProductDetails from './pages/ProductDetails/ProductDetails'
 import ResetPassword from './pages/ResetPassword/ResetPassword'
@@ -35,6 +36,7 @@ function App() {
         <Route path="/tendas" element={<Tendas />} />
         <Route path="/box" element={<Box />} />
         <Route path="/moveis" element={<Moveis />} />
+        <Route path="/climatizadores" element={<Climatizadores />} />
         <Route path="/carrinho" element={<Cart />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/produto/:productId" element={<ProductDetails />} />

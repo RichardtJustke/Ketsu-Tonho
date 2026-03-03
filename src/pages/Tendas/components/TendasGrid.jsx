@@ -2,8 +2,8 @@ import TendaCard from './TendaCard'
 import AnimateIn from '../../../shared/components/AnimateIn'
 
 const tendas = [
-  { id: 'tenda_paissandu_5x5', nome: 'Tenda Paissandu', dimensao: '05x05m', valor: 380 },
-  { id: 'tenda_pe_dagua', nome: "Tenda Pé d'Água", dimensao: '-', valor: 300 },
+  { id: 'tenda_paissandu_5x5', nome: 'Tenda Paysandu', dimensao: '05x05m', valor: 380 },
+  { id: 'tenda_pe_dagua', nome: "Tenda Pai d'Égua", dimensao: '-', valor: 300 },
   { id: 'tenda_remo_5x5', nome: 'Tenda Remo', dimensao: '05x05m', valor: 380 },
   { id: 'tenda_cristal_10x10', nome: 'Tenda Cristal', dimensao: '10x10m', valor: 1700 },
   { id: 'tenda_branca_10x10', nome: 'Tenda Branca', dimensao: '10x10m', valor: 1500 },

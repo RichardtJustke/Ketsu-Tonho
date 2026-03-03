@@ -59,6 +59,7 @@ const Navbar = () => {
     { label: 'Tendas', href: '/tendas' },
     { label: 'Pórticos e Box Truss', href: '/box' },
     { label: 'Móveis e Equipamentos', href: '/moveis' },
+    { label: 'Climatizadores', href: '/climatizadores' },
   ]
 
   const displayName = user?.user_metadata?.name || user?.email?.split('@')[0] || 'Usuário'

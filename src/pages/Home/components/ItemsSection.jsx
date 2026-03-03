@@ -17,7 +17,7 @@ const ItemsSection = () => {
     { image: tendaImage, title: 'Tendas', link: '/tendas' },
     { image: movelImage, title: 'Mobiliário e Decoração', link: '/moveis' },
     { image: boxImage, title: 'Estruturas de grande porte', link: '/box' },
-    { image: climatizadorImage, title: 'Climatizadores', link: '/moveis' }
+    { image: climatizadorImage, title: 'Climatizadores', link: '/climatizadores' }
   ]
 
   return (
