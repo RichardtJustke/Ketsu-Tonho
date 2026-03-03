@@ -13,10 +13,10 @@ const ItemsSection = () => {
   const boxImage = porticoImages[0] || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=2032&auto=format&fit=crop'
 
   const items = [
-    { image: tendaImage, title: 'Tendas e Estruturas', link: '/tendas' },
+    { image: tendaImage, title: 'Tendas', link: '/tendas' },
     { image: movelImage, title: 'Mobiliário e Decoração', link: '/moveis' },
     { image: climatizadorImage, title: 'Climatizadores', link: '/moveis' },
-    { image: boxImage, title: 'Estruturas de grande porte', link: '/box' }
+    { image: boxImage, title: 'Estrturas e Box truss', link: '/box' }
   ]
 
   return (

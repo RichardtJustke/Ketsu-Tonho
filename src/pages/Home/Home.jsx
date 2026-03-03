@@ -29,14 +29,14 @@ const Home = () => {
   return (
     <main className="min-h-screen">
       <Navbar />
-      
+
       {/* Modal de filtro de eventos */}
-      <EventFilterModal 
+      <EventFilterModal
         isOpen={isFilterModalOpen}
         onClose={() => setIsFilterModalOpen(false)}
         onComplete={handleFilterComplete}
       />
-      
+
       {/* 1. Hero Section */}
       <Hero onOpenFilterModal={handleOpenFilterModal} />
 
