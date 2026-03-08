@@ -1,5 +1,8 @@
 import MovelCard from '../../Moveis/components/MovelCard'
 import AnimateIn from '../../../shared/components/AnimateIn'
+import { useAvailability } from '../../../hooks/useAvailability'
+import { getEventDate } from '../../../utils/cart'
+import { getHasAnsweredForm } from '../../../utils/answeredForm'
 
 const climatizadores = [
     { id: "climatizador_guaruja", nome: "Climatizador Guarujá", valor: 250 },
@@ -9,6 +12,9 @@ const climatizadores = [
 ]
 
 const ClimatizadoresGrid = ({ hasAnsweredForm }) => {
+    const eventDate = getHasAnsweredForm() ? getEventDate() : null
+    const { isAvailable, getStock } = useAvailability(eventDate)
+
     const handleAction = (productId) => {
         console.log('Ação do produto:', productId)
     }
@@ -23,6 +29,8 @@ const ClimatizadoresGrid = ({ hasAnsweredForm }) => {
                                 item={item}
                                 hasAnsweredForm={hasAnsweredForm}
                                 onAction={handleAction}
+                                availableStock={getStock(item.id)}
+                                isItemAvailable={isAvailable(item.id)}
                             />
                         </AnimateIn>
                     ))}

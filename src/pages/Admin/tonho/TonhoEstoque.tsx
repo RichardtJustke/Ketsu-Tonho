@@ -1,40 +1,89 @@
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card.tsx";
+import { useEffect, useState, useRef } from "react";
+import { Card, CardContent } from "../components/ui/card.tsx";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table.tsx";
 import { Input } from "../components/ui/input.tsx";
-import { Button } from "../components/ui/button.tsx";
-import { stockStatusBadge } from "../components/StatusBagde.tsx";
-import { stockItems as initialItems, type StockItem } from "../data/mock-data.ts";
-import { Search, Plus, Minus } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { StatusBadge } from "../components/StatusBagde.tsx";
+import { Search, Loader2, Check, X } from "lucide-react";
+
+type EditingCell = { id: string; field: "stock_total" | "stock_available"; value: number } | null;
 
 export default function TonhoEstoque() {
-  const [items, setItems] = useState<StockItem[]>(initialItems);
+  const [items, setItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [editing, setEditing] = useState<EditingCell>(null);
+  const [saving, setSaving] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const filtered = items.filter((i) => i.name.toLowerCase().includes(search.toLowerCase()) || i.category.toLowerCase().includes(search.toLowerCase()));
-
-  const updateQty = (id: string, delta: number) => {
-    setItems((prev) =>
-      prev.map((item) => {
-        if (item.id !== id) return item;
-        const newQty = Math.max(0, item.quantity + delta);
-        const status = newQty === 0 ? "esgotado" : newQty < item.minQuantity ? "baixo" : "normal";
-        return { ...item, quantity: newQty, status };
-      })
-    );
+  const fetchItems = () => {
+    supabase.from("equipment").select("*, equipment_categories(name)").order("name").then(({ data }) => {
+      setItems(data ?? []);
+      setLoading(false);
+    });
   };
+
+  useEffect(() => { fetchItems(); }, []);
+  useEffect(() => { if (editing) inputRef.current?.focus(); }, [editing]);
+
+  const filtered = items.filter((i) => i.name.toLowerCase().includes(search.toLowerCase()));
+
+  const getStatus = (item: any) => {
+    if (item.stock_available === 0) return { status: "danger" as const, label: "Esgotado" };
+    if (item.stock_available < 5) return { status: "warning" as const, label: "Baixo" };
+    return { status: "success" as const, label: "Normal" };
+  };
+
+  const startEdit = (id: string, field: "stock_total" | "stock_available", currentValue: number) => {
+    setEditing({ id, field, value: currentValue });
+  };
+
+  const cancelEdit = () => setEditing(null);
+
+  const saveEdit = async () => {
+    if (!editing) return;
+    const item = items.find((i) => i.id === editing.id);
+    if (!item) return;
+
+    const oldValue = item[editing.field] as number;
+    const newValue = Number(editing.value);
+    if (newValue === oldValue) { cancelEdit(); return; }
+
+    setSaving(true);
+    const quantityChange = newValue - oldValue;
+
+    await supabase.from("equipment").update({ [editing.field]: newValue }).eq("id", editing.id);
+
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase.from("equipment_inventory_log").insert({
+      equipment_id: editing.id,
+      action: "adjustment",
+      quantity_change: quantityChange,
+      notes: `${editing.field === "stock_total" ? "Estoque total" : "Disponível"}: ${oldValue} → ${newValue}`,
+      performed_by: user?.id ?? null,
+    });
+
+    setSaving(false);
+    setEditing(null);
+    fetchItems();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") saveEdit();
+    if (e.key === "Escape") cancelEdit();
+  };
+
+  if (loading) return <div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Estoque — Tonho</h1>
-        <p className="text-muted-foreground">Controle de itens em estoque</p>
+        <p className="text-muted-foreground">Clique nos números para editar</p>
       </div>
-      <div className="flex items-center gap-2">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Buscar item ou categoria..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
-        </div>
+      <div className="relative max-w-sm">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input placeholder="Buscar item..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
       </div>
       <Card>
         <CardContent className="p-0">
@@ -43,28 +92,47 @@ export default function TonhoEstoque() {
               <TableRow>
                 <TableHead>Item</TableHead>
                 <TableHead>Categoria</TableHead>
-                <TableHead className="text-center">Quantidade</TableHead>
-                <TableHead className="text-center">Mín.</TableHead>
+                <TableHead className="text-center">Total</TableHead>
+                <TableHead className="text-center">Disponível</TableHead>
                 <TableHead className="text-center">Status</TableHead>
-                <TableHead className="text-center">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell className="font-medium">{item.name}</TableCell>
-                  <TableCell className="text-muted-foreground">{item.category}</TableCell>
-                  <TableCell className="text-center">{item.quantity}</TableCell>
-                  <TableCell className="text-center text-muted-foreground">{item.minQuantity}</TableCell>
-                  <TableCell className="text-center">{stockStatusBadge(item.status)}</TableCell>
-                  <TableCell className="text-center">
-                    <div className="flex items-center justify-center gap-1">
-                      <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => updateQty(item.id, -1)}><Minus className="h-3 w-3" /></Button>
-                      <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => updateQty(item.id, 1)}><Plus className="h-3 w-3" /></Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {filtered.map((item) => {
+                const st = getStatus(item);
+                const isEditingTotal = editing?.id === item.id && editing.field === "stock_total";
+                const isEditingAvail = editing?.id === item.id && editing.field === "stock_available";
+
+                return (
+                  <TableRow key={item.id}>
+                    <TableCell className="font-medium">{item.name}</TableCell>
+                    <TableCell className="text-muted-foreground">{(item.equipment_categories as any)?.name ?? "—"}</TableCell>
+                    <TableCell className="text-center">
+                      {isEditingTotal ? (
+                        <span className="inline-flex items-center gap-1">
+                          <Input ref={inputRef} type="number" value={editing!.value} onChange={(e) => setEditing({ ...editing!, value: Number(e.target.value) })} onKeyDown={handleKeyDown} className="h-7 w-16 text-center" />
+                          <button onClick={saveEdit} disabled={saving} className="text-green-600 hover:text-green-700"><Check className="h-4 w-4" /></button>
+                          <button onClick={cancelEdit} className="text-destructive hover:text-destructive/80"><X className="h-4 w-4" /></button>
+                        </span>
+                      ) : (
+                        <button onClick={() => startEdit(item.id, "stock_total", item.stock_total)} className="rounded px-2 py-0.5 hover:bg-muted">{item.stock_total}</button>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {isEditingAvail ? (
+                        <span className="inline-flex items-center gap-1">
+                          <Input ref={inputRef} type="number" value={editing!.value} onChange={(e) => setEditing({ ...editing!, value: Number(e.target.value) })} onKeyDown={handleKeyDown} className="h-7 w-16 text-center" />
+                          <button onClick={saveEdit} disabled={saving} className="text-green-600 hover:text-green-700"><Check className="h-4 w-4" /></button>
+                          <button onClick={cancelEdit} className="text-destructive hover:text-destructive/80"><X className="h-4 w-4" /></button>
+                        </span>
+                      ) : (
+                        <button onClick={() => startEdit(item.id, "stock_available", item.stock_available)} className="rounded px-2 py-0.5 hover:bg-muted">{item.stock_available}</button>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-center"><StatusBadge status={st.status} label={st.label} /></TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </CardContent>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { setHasAnsweredForm } from '../../utils/answeredForm'
+import { setEventDate } from '../../utils/cart'
 
 import { useCloudinaryImages } from '../../hooks/useCloudinaryImages'
 
@@ -83,6 +84,7 @@ const EventFilterModal = ({ isOpen, onClose, onComplete }) => {
   const handleComplete = () => {
     if (filters.eventDate) {
       setHasAnsweredForm(true)
+      setEventDate(filters.eventDate)
       onComplete(filters)
       setDirection('next')
       setIsAnimating(true)
@@ -278,6 +280,7 @@ const EventFilterModal = ({ isOpen, onClose, onComplete }) => {
                     <input
                       type="date"
                       value={filters[currentStepData?.field]}
+                      min={new Date().toISOString().split('T')[0]}
                       onChange={(e) => setFilters(prev => ({ ...prev, [currentStepData.field]: e.target.value }))}
                       placeholder={currentStepData?.placeholder}
                       className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-2xl text-lg focus:border-[#FF5F1F] focus:outline-none transition-all"

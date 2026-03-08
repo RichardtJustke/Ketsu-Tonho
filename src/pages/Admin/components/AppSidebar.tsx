@@ -27,28 +27,28 @@ interface NavItem {
 }
 
 const tonhoItems: NavItem[] = [
-  { title: "Dashboard", url: "/tonho", icon: LayoutDashboard },
-  { title: "Estoque", url: "/tonho/estoque", icon: Warehouse },
-  { title: "Produtos", url: "/tonho/produtos", icon: Package },
-  { title: "Vendas", url: "/tonho/vendas", icon: ShoppingCart },
-  { title: "Eventos Fechados", url: "/tonho/eventos", icon: CalendarDays },
-  { title: "Orçamentos", url: "/tonho/orcamentos", icon: FileText },
-  { title: "Calendário", url: "/tonho/calendario", icon: CalendarDays },
+  { title: "Dashboard", url: "/admin/tonho", icon: LayoutDashboard },
+  { title: "Estoque", url: "/admin/tonho/estoque", icon: Warehouse },
+  { title: "Produtos", url: "/admin/tonho/produtos", icon: Package },
+  { title: "Vendas", url: "/admin/tonho/vendas", icon: ShoppingCart },
+  { title: "Eventos Fechados", url: "/admin/tonho/eventos", icon: CalendarDays },
+  { title: "Orçamentos", url: "/admin/tonho/orcamentos", icon: FileText },
+  { title: "Calendário", url: "/admin/tonho/calendario", icon: CalendarDays },
 ];
 
 const chicasItems: NavItem[] = [
-  { title: "Dashboard", url: "/chicas", icon: LayoutDashboard },
-  { title: "Serviços", url: "/chicas/servicos", icon: Wrench },
-  { title: "Disponibilidade", url: "/chicas/disponibilidade", icon: Clock },
-  { title: "Eventos Fechados", url: "/chicas/eventos", icon: CalendarDays },
-  { title: "Orçamentos", url: "/chicas/orcamentos", icon: FileText },
-  { title: "Calendário", url: "/chicas/calendario", icon: CalendarDays },
+  { title: "Dashboard", url: "/admin/chicas", icon: LayoutDashboard },
+  { title: "Serviços", url: "/admin/chicas/servicos", icon: Wrench },
+  { title: "Disponibilidade", url: "/admin/chicas/disponibilidade", icon: Clock },
+  { title: "Eventos Fechados", url: "/admin/chicas/eventos", icon: CalendarDays },
+  { title: "Orçamentos", url: "/admin/chicas/orcamentos", icon: FileText },
+  { title: "Calendário", url: "/admin/chicas/calendario", icon: CalendarDays },
 ];
 
 export function AppSidebar() {
   const location = useLocation();
-  const [tonhoOpen, setTonhoOpen] = useState(location.pathname.startsWith("/tonho"));
-  const [chicasOpen, setChicasOpen] = useState(location.pathname.startsWith("/chicas"));
+  const [tonhoOpen, setTonhoOpen] = useState(location.pathname.startsWith("/admin/tonho"));
+  const [chicasOpen, setChicasOpen] = useState(location.pathname.startsWith("/admin/chicas"));
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const isActive = (path: string) => location.pathname === path;
@@ -64,19 +64,17 @@ export function AppSidebar() {
 
   const sidebarContent = (
     <nav className="flex flex-col gap-1 p-4">
-      {/* Dashboard Geral */}
-      <NavLink to="/" end className={linkClass("/")}>
+      <NavLink to="/admin" end className={linkClass("/admin")}>
         <LayoutDashboard className="h-4 w-4" />
         <span>Dashboard Geral</span>
       </NavLink>
 
-      {/* Tonho */}
       <div className="mt-4">
         <button
           onClick={() => setTonhoOpen(!tonhoOpen)}
           className={cn(
             "flex w-full items-center justify-between rounded-md px-3 py-2 text-xs font-semibold uppercase tracking-wider transition-colors",
-            isGroupActive("/tonho") ? "text-primary" : "text-sidebar-foreground/60 hover:text-sidebar-foreground"
+            isGroupActive("/admin/tonho") ? "text-primary" : "text-sidebar-foreground/60 hover:text-sidebar-foreground"
           )}
         >
           <span>Tonho</span>
@@ -94,13 +92,12 @@ export function AppSidebar() {
         )}
       </div>
 
-      {/* Chicas */}
       <div className="mt-2">
         <button
           onClick={() => setChicasOpen(!chicasOpen)}
           className={cn(
             "flex w-full items-center justify-between rounded-md px-3 py-2 text-xs font-semibold uppercase tracking-wider transition-colors",
-            isGroupActive("/chicas") ? "text-primary" : "text-sidebar-foreground/60 hover:text-sidebar-foreground"
+            isGroupActive("/admin/chicas") ? "text-primary" : "text-sidebar-foreground/60 hover:text-sidebar-foreground"
           )}
         >
           <span>Chicas</span>
@@ -118,17 +115,16 @@ export function AppSidebar() {
         )}
       </div>
 
-      {/* Shared */}
       <div className="mt-4 flex flex-col gap-0.5">
-        <NavLink to="/orcamentos" end className={linkClass("/orcamentos")}>
+        <NavLink to="/admin/orcamentos" end className={linkClass("/admin/orcamentos")}>
           <BarChart3 className="h-4 w-4" />
           <span>Central de Orçamentos</span>
         </NavLink>
-        <NavLink to="/clientes" end className={linkClass("/clientes")}>
+        <NavLink to="/admin/clientes" end className={linkClass("/admin/clientes")}>
           <Users className="h-4 w-4" />
           <span>Clientes</span>
         </NavLink>
-        <NavLink to="/administracao" end className={linkClass("/administracao")}>
+        <NavLink to="/admin/administracao" end className={linkClass("/admin/administracao")}>
           <Settings className="h-4 w-4" />
           <span>Administração</span>
         </NavLink>
@@ -138,7 +134,6 @@ export function AppSidebar() {
 
   return (
     <>
-      {/* Mobile trigger */}
       <button
         onClick={() => setMobileOpen(true)}
         className="fixed left-4 top-4 z-50 rounded-md bg-sidebar-accent p-2 text-foreground md:hidden"
@@ -146,12 +141,10 @@ export function AppSidebar() {
         <Menu className="h-5 w-5" />
       </button>
 
-      {/* Mobile overlay */}
       {mobileOpen && (
         <div className="fixed inset-0 z-40 bg-foreground/30 md:hidden" onClick={() => setMobileOpen(false)} />
       )}
 
-      {/* Sidebar */}
       <aside
         className={cn(
           "fixed left-0 top-0 z-50 flex h-screen w-64 flex-col overflow-y-auto bg-sidebar text-sidebar-foreground transition-transform md:static md:translate-x-0",

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 
-const OrderSummary = ({ subtotal, installationFee = 300, discount = 0, onFinalize }) => {
+const OrderSummary = ({ subtotal, installationFee = 0, discount = 0, onFinalize, isSubmitting = false, showLoginAlert = false }) => {
   const [couponCode, setCouponCode] = useState('')
   const [appliedCode, setAppliedCode] = useState('')
   const [appliedDiscount, setAppliedDiscount] = useState(discount)
@@ -118,16 +119,45 @@ const OrderSummary = ({ subtotal, installationFee = 300, discount = 0, onFinaliz
           <span className="font-bold text-xl text-[#333333]">R${total.toFixed(2).replace('.', ',')}</span>
         </div>
 
+        {/* Login Alert */}
+        {showLoginAlert && (
+          <div className="mb-4 p-4 bg-orange-50 border border-orange-200 rounded-xl">
+            <div className="flex items-center gap-2 mb-1">
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 18.333C14.602 18.333 18.333 14.602 18.333 10C18.333 5.398 14.602 1.667 10 1.667C5.398 1.667 1.667 5.398 1.667 10C1.667 14.602 5.398 18.333 10 18.333Z" stroke="#EA580C" strokeWidth="1.5" />
+                <path d="M10 6.667V10M10 13.333H10.008" stroke="#EA580C" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+              <span className="text-sm font-semibold text-orange-700">Login necessário</span>
+            </div>
+            <p className="text-xs text-orange-600 mb-2">
+              Para enviar seu orçamento, você precisa estar logado.
+            </p>
+            <Link
+              to="/login?redirect=/carrinho%3Fbudget%3Dtrue"
+              className="inline-flex items-center gap-1 text-sm font-semibold text-[#FF5F1F] hover:underline"
+            >
+              Fazer login ou criar conta →
+            </Link>
+          </div>
+        )}
+
         {/* Finalize Button */}
         <button
           onClick={onFinalize}
-          className="w-full bg-[#333333] text-white font-medium py-4 px-6 rounded-xl flex items-center justify-center gap-2 hover:bg-black transition-colors"
+          disabled={isSubmitting || subtotal === 0}
+          className="w-full bg-[#333333] text-white font-medium py-4 px-6 rounded-xl flex items-center justify-center gap-2 hover:bg-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M13.333 5V3.333C13.333 2.89 13.157 2.467 12.845 2.155C12.533 1.843 12.11 1.667 11.667 1.667H3.333C2.89 1.667 2.467 1.843 2.155 2.155C1.843 2.467 1.667 2.89 1.667 3.333V16.667C1.667 17.11 1.843 17.533 2.155 17.845C2.467 18.157 2.89 18.333 3.333 18.333H11.667C12.11 18.333 12.533 18.157 12.845 17.845C13.157 17.533 13.333 17.11 13.333 16.667V15" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M6.667 10H18.333M18.333 10L15 6.667M18.333 10L15 13.333" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          Enviar orçamento
+          {isSubmitting ? (
+            <span>Enviando...</span>
+          ) : (
+            <>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M13.333 5V3.333C13.333 2.89 13.157 2.467 12.845 2.155C12.533 1.843 12.11 1.667 11.667 1.667H3.333C2.89 1.667 2.467 1.843 2.155 2.155C1.843 2.467 1.667 2.89 1.667 3.333V16.667C1.667 17.11 1.843 17.533 2.155 17.845C2.467 18.157 2.89 18.333 3.333 18.333H11.667C12.11 18.333 12.533 18.157 12.845 17.845C13.157 17.533 13.333 17.11 13.333 16.667V15" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M6.667 10H18.333M18.333 10L15 6.667M18.333 10L15 13.333" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Enviar orçamento
+            </>
+          )}
         </button>
       </div>
 

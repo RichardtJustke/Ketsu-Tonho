@@ -4,7 +4,7 @@ import { getProductById } from '../../../data/products'
 import { useCloudinaryImages } from '../../../hooks/useCloudinaryImages'
 import { addToCart } from '../../../utils/cart'
 
-const BoxCard = ({ box, hasAnsweredForm, onAction }) => {
+const BoxCard = ({ box, hasAnsweredForm, onAction, availableStock, isItemAvailable = true }) => {
   const product = getProductById(box.id)
   const { images: folderImages } = useCloudinaryImages(box.id)
 
@@ -14,6 +14,7 @@ const BoxCard = ({ box, hasAnsweredForm, onAction }) => {
   const [imageIndex, setImageIndex] = useState(0)
   const [showSizeOptions, setShowSizeOptions] = useState(false)
   const [selectedSize, setSelectedSize] = useState('')
+  const unavailable = hasAnsweredForm && !isItemAvailable
 
   const displayUrl = imageUrl || primaryUrl || fallbackUrl
 
@@ -67,6 +68,7 @@ const BoxCard = ({ box, hasAnsweredForm, onAction }) => {
   }
 
   const handleClick = () => {
+    if (unavailable) return
     if (hasAnsweredForm) {
       if (!showSizeOptions) {
         setShowSizeOptions(true)
@@ -93,18 +95,23 @@ const BoxCard = ({ box, hasAnsweredForm, onAction }) => {
   }
 
   return (
-    <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover-lift">
+    <div className={`bg-white rounded-2xl overflow-hidden shadow-sm ${unavailable ? 'opacity-60' : 'hover-lift'}`}>
       <div className="flex flex-col sm:flex-row">
-        <div className="w-full sm:w-1/2 min-h-[240px] sm:min-h-[300px] h-56 sm:h-full bg-gray-100">
+        <div className={`w-full sm:w-1/2 min-h-[240px] sm:min-h-[300px] h-56 sm:h-full bg-gray-100 relative`}>
           {displayUrl ? (
             <img
               src={displayUrl}
               alt={box.nome}
-              className="w-full h-full object-cover"
+              className={`w-full h-full object-cover ${unavailable ? 'grayscale' : ''}`}
               onError={handleImageError}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">Imagem do produto</div>
+          )}
+          {unavailable && (
+            <div className="absolute top-3 left-3 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+              INDISPONÍVEL
+            </div>
           )}
         </div>
 
@@ -116,9 +123,16 @@ const BoxCard = ({ box, hasAnsweredForm, onAction }) => {
             <p className="text-[#333333]/70 text-sm mb-4">
               Valor diária a partir de: <span className="font-medium text-black">R${box.valor.toFixed(2).replace('.', ',')}</span>
             </p>
-            <p className="text-[#333333]/60 text-xs">
-              Escolha o tamanho ideal antes de alugar.
-            </p>
+            {unavailable && (
+              <p className="text-red-600 text-xs font-medium mb-2">
+                Sem estoque para a data selecionada
+              </p>
+            )}
+            {!unavailable && (
+              <p className="text-[#333333]/60 text-xs">
+                Escolha o tamanho ideal antes de alugar.
+              </p>
+            )}
           </div>
 
           <div className="flex flex-col gap-2">
@@ -136,17 +150,22 @@ const BoxCard = ({ box, hasAnsweredForm, onAction }) => {
 
             <button
               onClick={handleClick}
-              className="inline-flex items-center gap-2 px-4 py-2.5 border border-black/20 rounded-full text-sm font-medium text-black hover:bg-black hover:text-white transition-colors w-fit"
+              disabled={unavailable}
+              className={`inline-flex items-center gap-2 px-4 py-2.5 border rounded-full text-sm font-medium transition-colors w-fit ${
+                unavailable
+                  ? 'border-black/10 text-black/40 cursor-not-allowed'
+                  : 'border-black/20 text-black hover:bg-black hover:text-white'
+              }`}
             >
-              {hasAnsweredForm ? (showSizeOptions ? 'CONFIRMAR TAMANHO' : 'ALUGAR AGORA') : 'VER DISPONIBILIDADE'}
-              <span className="w-5 h-5 rounded-full bg-[#FF5F1F] flex items-center justify-center">
+              {unavailable ? 'INDISPONÍVEL' : hasAnsweredForm ? (showSizeOptions ? 'CONFIRMAR TAMANHO' : 'ALUGAR AGORA') : 'VER DISPONIBILIDADE'}
+              <span className={`w-5 h-5 rounded-full flex items-center justify-center ${unavailable ? 'bg-black/20' : 'bg-[#FF5F1F]'}`}>
                 <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M2.5 6H9.5M9.5 6L6.5 3M9.5 6L6.5 9" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </span>
             </button>
 
-            {hasAnsweredForm && showSizeOptions && (
+            {hasAnsweredForm && !unavailable && showSizeOptions && (
               <div className="w-full max-w-[240px]">
                 <label className="block text-xs text-[#333333]/70 mb-1">
                   Tamanho

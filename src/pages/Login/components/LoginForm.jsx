@@ -41,8 +41,8 @@ const LoginForm = () => {
     if (!email) { setError('Digite seu email primeiro.'); return }
     setLoading(true)
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`
+      const { error } = await supabase.functions.invoke('send-password-reset', {
+        body: { email, redirect_url: `${window.location.origin}/reset-password` }
       })
       if (error) throw error
       setResetSent(true)

@@ -1,5 +1,8 @@
 import TendaCard from './TendaCard'
 import AnimateIn from '../../../shared/components/AnimateIn'
+import { useAvailability } from '../../../hooks/useAvailability'
+import { getEventDate } from '../../../utils/cart'
+import { getHasAnsweredForm } from '../../../utils/answeredForm'
 
 const tendas = [
   { id: 'tenda_paissandu_5x5', nome: 'Tenda Paysandu', dimensao: '05x05m', valor: 380 },
@@ -61,8 +64,10 @@ const groupTendasByDimension = () => {
 const groupedTendas = groupTendasByDimension()
 
 const TendasGrid = ({ hasAnsweredForm }) => {
+  const eventDate = getHasAnsweredForm() ? getEventDate() : null
+  const { isAvailable, getStock } = useAvailability(eventDate)
+
   const handleAction = (productId) => {
-    // Futura integração com back-end
     console.log('Ação do produto:', productId)
   }
 
@@ -81,6 +86,8 @@ const TendasGrid = ({ hasAnsweredForm }) => {
                     tenda={tenda}
                     hasAnsweredForm={hasAnsweredForm}
                     onAction={handleAction}
+                    availableStock={getStock(tenda.id)}
+                    isItemAvailable={isAvailable(tenda.id)}
                   />
                 </AnimateIn>
               ))}

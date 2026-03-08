@@ -9,7 +9,8 @@ import OrderSummary from './components/OrderSummary'
 import SpecialInstructions from './components/SpecialInstructions'
 import ContactSection from './components/ContactSection'
 import BudgetSuccessModal from './components/BudgetSuccessModal'
-import { getCartItems, updateCartItemQuantity, removeCartItem } from '../../utils/cart'
+import PhoneModal from './components/PhoneModal'
+import { getCartItems, updateCartItemQuantity, removeCartItem, getEventDate, clearCart } from '../../utils/cart'
 import { supabase } from '../../integrations/supabase/client'
 
 const Cart = () => {
@@ -18,16 +19,23 @@ const Cart = () => {
   const [cartItems, setCartItems] = useState(() => getCartItems())
   const [specialInstructions, setSpecialInstructions] = useState('')
   const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [showPhoneModal, setShowPhoneModal] = useState(false)
+  const [pendingUserId, setPendingUserId] = useState(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showLoginAlert, setShowLoginAlert] = useState(false)
 
   // Calcular subtotal
   const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0)
 
-  // Ao retornar do login com ?budget=true, abrir modal se usuário estiver autenticado
+  // Ao retornar do login com ?budget=true, finalizar o pedido automaticamente
   useEffect(() => {
     const params = new URLSearchParams(location.search)
     if (params.get('budget') === 'true') {
       supabase.auth.getUser().then(({ data }) => {
-        if (data.user) setShowSuccessModal(true)
+        if (data.user) {
+          navigate('/carrinho', { replace: true })
+          checkPhoneAndSubmit(data.user.id)
+        }
       })
     }
   }, [location.search])
@@ -43,19 +51,135 @@ const Cart = () => {
     setCartItems(updated)
   }
 
-  const handleFinalize = async () => {
-    const { data } = await supabase.auth.getUser()
-    if (!data.user) {
-      navigate('/login?redirect=/carrinho%3Fbudget%3Dtrue')
+  const checkPhoneAndSubmit = async (userId) => {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('phone')
+      .eq('id', userId)
+      .single()
+
+    if (!profile?.phone || profile.phone.replace(/\D/g, '').length < 10) {
+      setPendingUserId(userId)
+      setShowPhoneModal(true)
       return
     }
-    setShowSuccessModal(true)
+
+    await submitOrder(userId)
+  }
+
+  const submitOrder = async (userId) => {
+    const items = getCartItems()
+    if (items.length === 0) return
+
+    setIsSubmitting(true)
+    try {
+      // Validação de disponibilidade antes de criar o pedido
+      const eventDate = getEventDate()
+      if (eventDate) {
+        const { data: stockData, error: stockError } = await supabase
+          .rpc('get_available_stock_for_date', { target_date: eventDate })
+
+        if (!stockError && stockData) {
+          const stockMap = {}
+          stockData.forEach((row) => { stockMap[row.product_key] = row.available })
+
+          const unavailableItems = items.filter((item) => {
+            const available = stockMap[item.id]
+            return available !== undefined && available < (item.quantity || 1)
+          })
+
+          if (unavailableItems.length > 0) {
+            const names = unavailableItems.map((i) => i.name || i.id).join(', ')
+            alert(`Os seguintes itens não estão mais disponíveis para a data selecionada: ${names}. Remova-os do carrinho e tente novamente.`)
+            setIsSubmitting(false)
+            return
+          }
+        }
+      }
+      const orderSubtotal = items.reduce((acc, item) => acc + (item.price * item.quantity), 0)
+      const evDate = eventDate || getEventDate()
+      const notes = specialInstructions || null
+
+      // Create order with event_date as a proper column
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          user_id: userId,
+          platform: 'tonho',
+          subtotal: orderSubtotal,
+          total_amount: orderSubtotal,
+          delivery_fee: 0,
+          notes,
+          event_date: evDate || null,
+          status: 'pending'
+        })
+        .select('id')
+        .single()
+
+      if (orderError) throw orderError
+
+      // Insert order items
+      const orderItems = items.map((item) => ({
+        order_id: order.id,
+        product_key: item.id,
+        name: item.name || item.title || item.id,
+        unit_price: item.price || 0,
+        quantity: item.quantity || 1,
+        image: item.image || null
+      }))
+
+      const { error: itemsError } = await supabase
+        .from('order_items')
+        .insert(orderItems)
+
+      if (itemsError) throw itemsError
+
+      // Send order received email (fire and forget)
+      supabase.functions.invoke('send-order-notification', {
+        body: { order_id: order.id, type: 'order_received' }
+      }).catch(err => console.warn('Email notification failed:', err))
+
+      // Clear cart and show success
+      clearCart()
+      setCartItems([])
+      setShowSuccessModal(true)
+    } catch (err) {
+      console.error('Erro ao criar pedido:', err)
+      alert('Erro ao enviar orçamento. Tente novamente.')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleFinalize = async () => {
+    if (cartItems.length === 0) return
+
+    const { data } = await supabase.auth.getUser()
+    if (!data.user) {
+      setShowLoginAlert(true)
+      return
+    }
+    setShowLoginAlert(false)
+    await checkPhoneAndSubmit(data.user.id)
   }
 
   return (
     <main className="min-h-screen bg-white">
       {showSuccessModal && (
         <BudgetSuccessModal onClose={() => setShowSuccessModal(false)} />
+      )}
+      {showPhoneModal && pendingUserId && (
+        <PhoneModal
+          userId={pendingUserId}
+          onSuccess={() => {
+            setShowPhoneModal(false)
+            submitOrder(pendingUserId)
+          }}
+          onClose={() => {
+            setShowPhoneModal(false)
+            setPendingUserId(null)
+          }}
+        />
       )}
       <Navbar />
 
@@ -80,14 +204,11 @@ const Cart = () => {
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Left Column - Cart Items + Instructions */}
             <div className="lg:w-2/3 space-y-6">
-              {/* Cart Items */}
               <CartItems
                 items={cartItems}
                 onQuantityChange={handleQuantityChange}
                 onRemove={handleRemoveItem}
               />
-
-              {/* Special Instructions */}
               <SpecialInstructions
                 onInstructionsChange={setSpecialInstructions}
               />
@@ -98,9 +219,11 @@ const Cart = () => {
               <div className="lg:sticky lg:top-24">
                 <OrderSummary
                   subtotal={subtotal}
-                  installationFee={300}
+                  installationFee={0}
                   discount={0}
                   onFinalize={handleFinalize}
+                  isSubmitting={isSubmitting}
+                  showLoginAlert={showLoginAlert}
                 />
               </div>
             </div>
@@ -112,7 +235,6 @@ const Cart = () => {
         <ContactSection />
       </AnimateIn>
 
-      {/* Footer */}
       <Footer />
     </main>
   )

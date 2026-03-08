@@ -1,4 +1,5 @@
 const CART_KEY = 'ketsu_cart_items'
+const EVENT_DATE_KEY = 'ketsu_event_date'
 
 const readCart = () => {
   if (typeof window === 'undefined') return []
@@ -77,4 +78,25 @@ export const removeCartItem = (itemId) => {
   const items = readCart().filter((entry) => entry.id !== itemId)
   writeCart(items)
   return items
+}
+
+export const getEventDate = () => {
+  if (typeof window === 'undefined') return ''
+  return window.localStorage.getItem(EVENT_DATE_KEY) || ''
+}
+
+export const setEventDate = (date) => {
+  if (typeof window === 'undefined') return
+  if (date) {
+    window.localStorage.setItem(EVENT_DATE_KEY, date)
+  } else {
+    window.localStorage.removeItem(EVENT_DATE_KEY)
+  }
+}
+
+export const clearCart = () => {
+  if (typeof window === 'undefined') return
+  window.localStorage.removeItem(CART_KEY)
+  window.localStorage.removeItem(EVENT_DATE_KEY)
+  window.dispatchEvent(new CustomEvent('cartUpdated', { detail: { items: [] } }))
 }

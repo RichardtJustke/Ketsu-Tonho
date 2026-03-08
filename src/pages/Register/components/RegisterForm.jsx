@@ -7,6 +7,7 @@ const RegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [keepLoggedIn, setKeepLoggedIn] = useState(true)
   const [name, setName] = useState('')
+  const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -23,11 +24,20 @@ const RegisterForm = () => {
         email,
         password,
         options: {
-          data: { name },
+          data: { name, phone },
           emailRedirectTo: window.location.origin
         }
       })
       if (error) throw error
+
+      // Sign out immediately to prevent auto-login before email confirmation
+      await supabase.auth.signOut()
+
+      // Send branded confirmation email via Resend
+      await supabase.functions.invoke('send-signup-confirmation', {
+        body: { email, name, redirect_url: window.location.origin }
+      })
+
       setSuccess(true)
     } catch (err) {
       setError(err.message)
@@ -112,7 +122,26 @@ const RegisterForm = () => {
           />
         </div>
 
-        {/* Campo Email */}
+        {/* Campo Telefone */}
+        <div className="mb-3">
+          <label className="block text-[#2B3674] text-sm font-medium mb-1.5">
+            Telefone<span className="text-[#FF5F1F]">*</span>
+          </label>
+          <input
+            type="tel"
+            placeholder="(11) 99999-9999"
+            value={phone}
+            onChange={(e) => {
+              const digits = e.target.value.replace(/\D/g, '').slice(0, 11)
+              let formatted = digits
+              if (digits.length > 2) formatted = `(${digits.slice(0, 2)}) ${digits.slice(2)}`
+              if (digits.length > 7) formatted = `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`
+              setPhone(formatted)
+            }}
+            required
+            className="w-full px-4 py-2.5 bg-transparent border border-[#E0E5F2] rounded-2xl text-[#2B3674] text-sm placeholder-[#A3AED0] focus:outline-none focus:border-[#FF5F1F] transition-colors"
+          />
+        </div>
         <div className="mb-3">
           <label className="block text-[#2B3674] text-sm font-medium mb-1.5">
             Email<span className="text-[#FF5F1F]">*</span>

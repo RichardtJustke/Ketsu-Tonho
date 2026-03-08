@@ -310,6 +310,7 @@ export type Database = {
           id: string
           is_active: boolean
           name: string
+          product_key: string | null
           stock_available: number
           stock_total: number
           updated_at: string
@@ -323,6 +324,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           name: string
+          product_key?: string | null
           stock_available?: number
           stock_total?: number
           updated_at?: string
@@ -336,6 +338,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           name?: string
+          product_key?: string | null
           stock_available?: number
           stock_total?: number
           updated_at?: string
@@ -556,10 +559,52 @@ export type Database = {
           },
         ]
       }
+      order_items: {
+        Row: {
+          created_at: string
+          id: string
+          image: string | null
+          name: string
+          order_id: string
+          product_key: string
+          quantity: number
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image?: string | null
+          name: string
+          order_id: string
+          product_key: string
+          quantity?: number
+          unit_price?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image?: string | null
+          name?: string
+          order_id?: string
+          product_key?: string
+          quantity?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           created_at: string
           delivery_fee: number
+          event_date: string | null
           id: string
           notes: string | null
           platform: Database["public"]["Enums"]["platform_type"]
@@ -572,6 +617,7 @@ export type Database = {
         Insert: {
           created_at?: string
           delivery_fee?: number
+          event_date?: string | null
           id?: string
           notes?: string | null
           platform: Database["public"]["Enums"]["platform_type"]
@@ -584,6 +630,7 @@ export type Database = {
         Update: {
           created_at?: string
           delivery_fee?: number
+          event_date?: string | null
           id?: string
           notes?: string | null
           platform?: Database["public"]["Enums"]["platform_type"]
@@ -593,7 +640,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "orders_user_id_profiles_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payments: {
         Row: {
@@ -643,6 +698,7 @@ export type Database = {
         Row: {
           cpf: string | null
           created_at: string
+          email: string | null
           id: string
           is_active: boolean
           name: string | null
@@ -652,6 +708,7 @@ export type Database = {
         Insert: {
           cpf?: string | null
           created_at?: string
+          email?: string | null
           id: string
           is_active?: boolean
           name?: string | null
@@ -661,6 +718,7 @@ export type Database = {
         Update: {
           cpf?: string | null
           created_at?: string
+          email?: string | null
           id?: string
           is_active?: boolean
           name?: string | null
@@ -795,6 +853,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_available_stock_for_date: {
+        Args: { target_date: string }
+        Returns: {
+          available: number
+          product_key: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

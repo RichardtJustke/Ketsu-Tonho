@@ -14,13 +14,18 @@ import ContactSection from './components/ContactSection'
 import { getProductById } from '../../data/products'
 import { useCloudinaryImages } from '../../hooks/useCloudinaryImages'
 import { getHasAnsweredForm, subscribeAnsweredForm } from '../../utils/answeredForm'
-import { addToCart } from '../../utils/cart'
+import { addToCart, getEventDate } from '../../utils/cart'
+import { useAvailability } from '../../hooks/useAvailability'
 
 const ProductDetails = () => {
   const { productId } = useParams()
   const [hasAnsweredForm, setHasAnsweredForm] = useState(getHasAnsweredForm)
   const product = getProductById(productId)
   const { images: cloudImages } = useCloudinaryImages(productId)
+
+  const eventDate = hasAnsweredForm ? getEventDate() : null
+  const { isAvailable } = useAvailability(eventDate)
+  const itemAvailable = isAvailable(productId)
 
   useEffect(() => subscribeAnsweredForm(setHasAnsweredForm), [])
 
@@ -35,6 +40,7 @@ const ProductDetails = () => {
   }
 
   const handleAddToCart = (id, selectedSize) => {
+    if (hasAnsweredForm && !itemAvailable) return
     const sizeLabel = selectedSize ? ` - ${selectedSize}` : ''
     const item = {
       id,
@@ -73,6 +79,7 @@ const ProductDetails = () => {
           hasAnsweredForm={hasAnsweredForm}
           onCheckAvailability={handleCheckAvailability}
           onAddToCart={handleAddToCart}
+          isItemAvailable={itemAvailable}
         />
       </AnimateIn>
       <AnimateIn animation="fade-in-up">

@@ -1,14 +1,11 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-/**
- * ProductActions - Área de ações com botões
- * Botão Voltar + Botão condicional (Ver disponibilidade OU Adicionar ao carrinho)
- */
-const ProductActions = ({ productId, product, hasAnsweredForm, onCheckAvailability, onAddToCart }) => {
+const ProductActions = ({ productId, product, hasAnsweredForm, onCheckAvailability, onAddToCart, isItemAvailable = true }) => {
   const navigate = useNavigate()
   const [showSizeOptions, setShowSizeOptions] = useState(false)
   const [selectedSize, setSelectedSize] = useState('')
+  const unavailable = hasAnsweredForm && !isItemAvailable
 
   const parseDimensions = (specs = {}) => {
     const lengthRaw = specs.Comprimento || specs.Largura
@@ -60,6 +57,11 @@ const ProductActions = ({ productId, product, hasAnsweredForm, onCheckAvailabili
   return (
     <section className="bg-white px-6 pb-12 md:pb-16">
       <div className="max-w-4xl mx-auto">
+        {unavailable && (
+          <div className="mb-4 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700 text-sm font-medium">
+            Este item está indisponível para a data selecionada.
+          </div>
+        )}
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           {/* Botão Voltar */}
           <button 
@@ -74,9 +76,8 @@ const ProductActions = ({ productId, product, hasAnsweredForm, onCheckAvailabili
             </span>
           </button>
 
-          {/* Botão condicional - NUNCA exibir os dois ao mesmo tempo */}
+          {/* Botão condicional */}
           {!hasAnsweredForm ? (
-            // Estado 1: Antes do formulário respondido - Ver disponibilidade
             <button 
               onClick={onCheckAvailability}
               className="bg-[#FF5F1F] text-white text-sm font-medium py-3 px-6 rounded-full inline-flex items-center gap-2 hover:opacity-90 transition-all"
@@ -88,8 +89,19 @@ const ProductActions = ({ productId, product, hasAnsweredForm, onCheckAvailabili
                 </svg>
               </span>
             </button>
+          ) : unavailable ? (
+            <button 
+              disabled
+              className="bg-black/20 text-black/40 text-sm font-medium py-3 px-6 rounded-full inline-flex items-center gap-2 cursor-not-allowed"
+            >
+              INDISPONÍVEL
+              <span className="w-6 h-6 rounded-full bg-black/10 flex items-center justify-center">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M2.5 6H9.5M9.5 6L6.5 3M9.5 6L6.5 9" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </span>
+            </button>
           ) : (
-            // Estado 2: Depois do formulário respondido - Alugar agora
             <div className="flex flex-col items-center sm:items-start gap-3 w-full sm:w-auto">
               <button 
                 onClick={() => {

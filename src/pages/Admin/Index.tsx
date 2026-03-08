@@ -1,31 +1,48 @@
+import { useEffect, useState } from "react";
 import { MetricCard } from "./components/MetricCard.tsx";
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card.tsx";
-import { budgetStatusBadge, eventStatusBadge } from "./components/StatusBagde.tsx";
-import { events, budgets, sales, getClientName, formatCurrency, formatDate } from "./data/mock-data.ts";
-import { CalendarDays, FileText, ShoppingCart, Wrench, TrendingUp, Clock } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
-
-const chartData = [
-  { month: "Out", tonho: 12000, chicas: 18000 },
-  { month: "Nov", tonho: 15000, chicas: 22000 },
-  { month: "Dez", tonho: 18000, chicas: 25000 },
-  { month: "Jan", tonho: 14000, chicas: 20000 },
-  { month: "Fev", tonho: 21000, chicas: 28000 },
-];
+import { supabase } from "@/integrations/supabase/client";
+import { formatCurrency, formatDate, orderStatusLabel } from "./data/utils.ts";
+import { StatusBadge } from "./components/StatusBagde.tsx";
+import { CalendarDays, FileText, ShoppingCart, Wrench, Clock, Loader2 } from "lucide-react";
 
 const Admin = () => {
-  const totalEvents = events.filter((e) => e.status === "confirmado").length;
-  const pendingBudgets = budgets.filter((b) => ["recebido", "em_edicao"].includes(b.status)).length;
-  const totalSales = sales.reduce((acc, s) => acc + s.value, 0);
-  const chicasEvents = events.filter((e) => e.empresa === "chicas" && e.status === "confirmado").length;
-  const upcomingEvents = events
-    .filter((e) => e.status === "confirmado" && e.date >= "2026-02-20")
-    .sort((a, b) => a.date.localeCompare(b.date))
-    .slice(0, 5);
-  const recentBudgets = budgets
-    .filter((b) => ["recebido", "em_edicao", "enviado"].includes(b.status))
-    .sort((a, b) => b.date.localeCompare(a.date))
-    .slice(0, 5);
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({ confirmedBookings: 0, pendingOrders: 0, tonhoRevenue: 0, chicasEvents: 0 });
+  const [recentOrders, setRecentOrders] = useState<any[]>([]);
+  const [upcomingBookings, setUpcomingBookings] = useState<any[]>([]);
+
+  useEffect(() => {
+    async function load() {
+      const today = new Date().toISOString().split("T")[0];
+
+      const [bookingsRes, ordersRes, tonhoOrdersRes, chicasEventsRes, recentRes, upcomingRes] = await Promise.all([
+        supabase.from("rental_bookings").select("id", { count: "exact" }).eq("status", "confirmed"),
+        supabase.from("orders").select("id", { count: "exact" }).in("status", ["pending", "confirmed"]),
+        supabase.from("orders").select("total_amount").eq("platform", "tonho").eq("status", "completed"),
+        supabase.from("buffet_events").select("id", { count: "exact" }).gte("event_date", today),
+        supabase.from("orders").select("*, profiles!inner(name)").order("created_at", { ascending: false }).limit(5),
+        supabase.from("rental_bookings").select("*, profiles!inner(name), equipment!inner(name)").gte("start_date", today).order("start_date").limit(5),
+      ]);
+
+      const revenue = (tonhoOrdersRes.data ?? []).reduce((sum, o) => sum + Number(o.total_amount), 0);
+
+      setStats({
+        confirmedBookings: bookingsRes.count ?? 0,
+        pendingOrders: ordersRes.count ?? 0,
+        tonhoRevenue: revenue,
+        chicasEvents: chicasEventsRes.count ?? 0,
+      });
+      setRecentOrders(recentRes.data ?? []);
+      setUpcomingBookings(upcomingRes.data ?? []);
+      setLoading(false);
+    }
+    load();
+  }, []);
+
+  if (loading) {
+    return <div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -34,113 +51,45 @@ const Admin = () => {
         <p className="text-muted-foreground">Visão consolidada — Tonho & Chicas</p>
       </div>
 
-      {/* Metric Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <MetricCard
-          title="Eventos Confirmados"
-          value={totalEvents}
-          subtitle="Total ambas empresas"
-          icon={<CalendarDays className="h-5 w-5" />}
-        />
-        <MetricCard
-          title="Orçamentos Pendentes"
-          value={pendingBudgets}
-          subtitle="Aguardando resposta"
-          icon={<FileText className="h-5 w-5" />}
-        />
-        <MetricCard
-          title="Vendas Tonho"
-          value={formatCurrency(totalSales)}
-          subtitle="Total acumulado"
-          icon={<ShoppingCart className="h-5 w-5" />}
-        />
-        <MetricCard
-          title="Serviços Chicas"
-          value={chicasEvents}
-          subtitle="Eventos agendados"
-          icon={<Wrench className="h-5 w-5" />}
-        />
+        <MetricCard title="Reservas Confirmadas" value={stats.confirmedBookings} subtitle="Total ambas empresas" icon={<CalendarDays className="h-5 w-5" />} />
+        <MetricCard title="Pedidos Pendentes" value={stats.pendingOrders} subtitle="Aguardando resposta" icon={<FileText className="h-5 w-5" />} />
+        <MetricCard title="Receita Tonho" value={formatCurrency(stats.tonhoRevenue)} subtitle="Pedidos concluídos" icon={<ShoppingCart className="h-5 w-5" />} />
+        <MetricCard title="Eventos Chicas" value={stats.chicasEvents} subtitle="Agendados" icon={<Wrench className="h-5 w-5" />} />
       </div>
 
-      {/* Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <TrendingUp className="h-4 w-4 text-primary" />
-            Comparativo Mensal
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-              <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={12} />
-              <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickFormatter={(v) => `${v / 1000}k`} />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "hsl(var(--card))",
-                  border: "1px solid hsl(var(--border))",
-                  borderRadius: "var(--radius)",
-                }}
-                formatter={(value: number) => formatCurrency(value)}
-              />
-              <Legend />
-              <Bar dataKey="tonho" name="Tonho" fill="hsl(var(--chart-1))" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="chicas" name="Chicas" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-
-      {/* Bottom grid */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* Upcoming Events */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Clock className="h-4 w-4 text-primary" />
-              Próximos Eventos
-            </CardTitle>
+            <CardTitle className="flex items-center gap-2 text-base"><Clock className="h-4 w-4 text-primary" />Próximas Reservas</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {upcomingEvents.map((event) => (
-              <div key={event.id} className="flex items-center justify-between rounded-md border p-3">
+            {upcomingBookings.length === 0 && <p className="text-sm text-muted-foreground">Nenhuma reserva futura.</p>}
+            {upcomingBookings.map((b: any) => (
+              <div key={b.id} className="flex items-center justify-between rounded-md border p-3">
                 <div>
-                  <p className="font-medium text-sm">{event.title}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {getClientName(event.clientId)} · {formatDate(event.date)}
-                  </p>
+                  <p className="font-medium text-sm">{(b.equipment as any)?.name}</p>
+                  <p className="text-xs text-muted-foreground">{(b.profiles as any)?.name} · {formatDate(b.start_date)}</p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium uppercase text-muted-foreground">{event.empresa}</span>
-                  {eventStatusBadge(event.status)}
-                </div>
+                <StatusBadge status={b.status === "confirmed" ? "success" : "neutral"} label={b.status} />
               </div>
             ))}
           </CardContent>
         </Card>
 
-        {/* Recent Budgets */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <FileText className="h-4 w-4 text-primary" />
-              Orçamentos Recentes
-            </CardTitle>
+            <CardTitle className="flex items-center gap-2 text-base"><FileText className="h-4 w-4 text-primary" />Pedidos Recentes</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {recentBudgets.map((budget) => (
-              <div key={budget.id} className="flex items-center justify-between rounded-md border p-3">
+            {recentOrders.length === 0 && <p className="text-sm text-muted-foreground">Nenhum pedido encontrado.</p>}
+            {recentOrders.map((o: any) => (
+              <div key={o.id} className="flex items-center justify-between rounded-md border p-3">
                 <div>
-                  <p className="font-medium text-sm">{budget.title}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {getClientName(budget.clientId)} · {formatCurrency(budget.value)}
-                  </p>
+                  <p className="font-medium text-sm">{(o.profiles as any)?.name}</p>
+                  <p className="text-xs text-muted-foreground">{formatCurrency(Number(o.total_amount))} · {o.platform}</p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium uppercase text-muted-foreground">{budget.empresa}</span>
-                  {budgetStatusBadge(budget.status)}
-                </div>
+                <StatusBadge status={o.status === "completed" ? "success" : o.status === "pending" ? "warning" : "neutral"} label={orderStatusLabel(o.status)} />
               </div>
             ))}
           </CardContent>

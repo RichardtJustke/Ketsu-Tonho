@@ -1,4 +1,14 @@
+import { useState } from 'react'
+
 const ContactSection = () => {
+  const [message, setMessage] = useState('')
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    const text = message.trim() || 'Olá, gostaria de tirar uma dúvida sobre eventos.'
+    window.open(`https://wa.me/5591989045318?text=${encodeURIComponent(text)}`, '_blank')
+  }
+
   return (
     <section className="bg-[#F7F7F8] py-16 md:py-24 px-6">
       <div className="max-w-7xl mx-auto">
@@ -24,7 +34,7 @@ const ContactSection = () => {
               </div>
               <div>
                 <span className="font-medium text-black">WhatsApp:</span>
-                <p className="text-[#333333] opacity-80 text-sm">...</p>
+                <a href="https://wa.me/5591989045318" target="_blank" rel="noopener noreferrer" className="text-[#333333] opacity-80 text-sm block hover:text-[#25D366] transition-colors">(91) 98904-5318</a>
               </div>
             </div>
 
@@ -33,7 +43,7 @@ const ContactSection = () => {
           {/* Right Form */}
           <div className="lg:w-1/2">
             <div className="bg-white rounded-2xl p-8">
-              <form className="space-y-5">
+              <form className="space-y-5" onSubmit={handleSubmit}>
                 <div>
                   <p className="text-[#333333] text-sm mb-2">
                     Escreva sua dúvida sobre o evento e, ao enviar, vamos continuar o atendimento com você pelo WhatsApp.
@@ -44,6 +54,8 @@ const ContactSection = () => {
                   <textarea 
                     placeholder="Conte pra gente o que você precisa para o seu evento"
                     rows={4}
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
                     className="w-full px-4 py-3 rounded-xl bg-[#F7F7F8] border border-black/10 text-sm placeholder:text-[#333333]/50 focus:outline-none focus:border-[#25D366] transition-colors resize-none"
                   />
                 </div>
