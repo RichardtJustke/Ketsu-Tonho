@@ -5,29 +5,40 @@ import AnimateIn from '../../shared/components/AnimateIn'
 import Hero from './components/Hero'
 import MoveisGrid from './components/MoveisGrid'
 import ContactSection from './components/ContactSection'
+import EventFilterModal from '../../shared/components/EventFilterModal'
 import { getHasAnsweredForm, subscribeAnsweredForm } from '../../utils/answeredForm'
 
 const Moveis = () => {
-  // Estado que controla se o usuário já respondeu o formulário
-  // Futuramente será controlado pelo back-end
   const [hasAnsweredForm, setHasAnsweredForm] = useState(getHasAnsweredForm)
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
 
   useEffect(() => subscribeAnsweredForm(setHasAnsweredForm), [])
+
+  const handleFilterComplete = (filters) => {
+    console.log('Filtros do evento:', filters)
+  }
 
   return (
     <main className="min-h-screen">
       <Navbar />
 
-      {/* 1. Hero Section */}
+      <EventFilterModal
+        isOpen={isFilterModalOpen}
+        onClose={() => setIsFilterModalOpen(false)}
+        onComplete={handleFilterComplete}
+      />
+
       <Hero />
 
-      <MoveisGrid hasAnsweredForm={hasAnsweredForm} />
+      <MoveisGrid
+        hasAnsweredForm={hasAnsweredForm}
+        onOpenFilterModal={() => setIsFilterModalOpen(true)}
+      />
 
       <AnimateIn animation="fade-in-up">
         <ContactSection />
       </AnimateIn>
 
-      {/* 4. Footer */}
       <Footer />
     </main>
   )

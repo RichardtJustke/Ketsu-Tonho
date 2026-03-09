@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Package,
@@ -16,9 +16,12 @@ import {
   Clock,
   Menu,
   X,
+  LogOut,
+  Ticket,
 } from "lucide-react";
 import { NavLink } from "./NavLink.tsx";
 import { cn } from "../lib/utils.ts";
+import { useAuth } from "../../../shared/contexts/AuthContext.jsx";
 
 interface NavItem {
   title: string;
@@ -47,6 +50,8 @@ const chicasItems: NavItem[] = [
 
 export function AppSidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
   const [tonhoOpen, setTonhoOpen] = useState(location.pathname.startsWith("/admin/tonho"));
   const [chicasOpen, setChicasOpen] = useState(location.pathname.startsWith("/admin/chicas"));
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -62,8 +67,13 @@ export function AppSidebar() {
         : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
     );
 
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/admin/login');
+  };
+
   const sidebarContent = (
-    <nav className="flex flex-col gap-1 p-4">
+    <nav className="flex flex-col gap-1 p-4 flex-1">
       <NavLink to="/admin" end className={linkClass("/admin")}>
         <LayoutDashboard className="h-4 w-4" />
         <span>Dashboard Geral</span>
@@ -124,10 +134,24 @@ export function AppSidebar() {
           <Users className="h-4 w-4" />
           <span>Clientes</span>
         </NavLink>
+        <NavLink to="/admin/cupons" end className={linkClass("/admin/cupons")}>
+          <Ticket className="h-4 w-4" />
+          <span>Cupons</span>
+        </NavLink>
         <NavLink to="/admin/administracao" end className={linkClass("/admin/administracao")}>
           <Settings className="h-4 w-4" />
           <span>Administração</span>
         </NavLink>
+      </div>
+
+      <div className="mt-auto border-t border-sidebar-border pt-4">
+        <button
+          onClick={handleLogout}
+          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-sidebar-foreground/70 transition-colors hover:bg-destructive/10 hover:text-destructive"
+        >
+          <LogOut className="h-4 w-4" />
+          <span>Sair</span>
+        </button>
       </div>
     </nav>
   );

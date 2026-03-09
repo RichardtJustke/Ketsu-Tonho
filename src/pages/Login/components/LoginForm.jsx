@@ -31,9 +31,11 @@ const LoginForm = () => {
   }
 
   const handleGoogleSignIn = async () => {
+    const params = new URLSearchParams(location.search)
+    const redirect = params.get('redirect') || '/'
     await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.origin }
+      options: { redirectTo: `${window.location.origin}${redirect}` }
     })
   }
 
@@ -185,7 +187,7 @@ const LoginForm = () => {
       {/* Footer - Info da empresa */}
       <div className="pt-6 mt-auto">
         <p className="text-[#A3AED0] text-xs">
-          © 2025 Tonho Locação. Todos os direitos reservados.
+          © 2026 Tonho Locação. Todos os direitos reservados.
         </p>
       </div>
     </div>

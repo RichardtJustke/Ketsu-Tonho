@@ -1,16 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Card, CardContent } from "../components/ui/card.tsx";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table.tsx";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "../components/ui/pagination.tsx";
 import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency, formatDate, orderStatusLabel } from "../data/utils.ts";
 import { StatusBadge } from "../components/StatusBagde.tsx";
 import { ChevronDown, ChevronUp, Loader2 } from "lucide-react";
+
+const PAGE_SIZE = 12;
 
 export default function TonhoOrcamentos() {
   const [orders, setOrders] = useState<any[]>([]);
   const [orderItems, setOrderItems] = useState<Record<string, any[]>>({});
   const [loading, setLoading] = useState(true);
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     const load = async () => {
@@ -31,6 +35,10 @@ export default function TonhoOrcamentos() {
     };
     load();
   }, []);
+
+  const totalPages = Math.max(1, Math.ceil(orders.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const paged = orders.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   if (loading) return <div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 
@@ -53,7 +61,7 @@ export default function TonhoOrcamentos() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {orders.map((o) => (
+              {paged.map((o) => (
                 <>
                   <TableRow key={o.id} className="cursor-pointer" onClick={() => setExpandedOrder(expandedOrder === o.id ? null : o.id)}>
                     <TableCell className="px-2">
@@ -78,6 +86,9 @@ export default function TonhoOrcamentos() {
                             )}
                             {(o.profiles as any)?.phone && (
                               <p className="text-xs text-muted-foreground">📞 Telefone: <span className="font-semibold text-foreground">{(o.profiles as any).phone}</span></p>
+                            )}
+                            {Number(o.discount_amount) > 0 && (
+                              <p className="text-xs text-muted-foreground">🏷️ Cupom: <span className="font-semibold text-foreground">{o.coupon_code}</span> — Desconto: <span className="font-semibold text-green-600">-{formatCurrency(Number(o.discount_amount))}</span></p>
                             )}
                           </div>
                           <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">Itens do pedido</p>
@@ -108,6 +119,26 @@ export default function TonhoOrcamentos() {
           </Table>
         </CardContent>
       </Card>
+
+      {totalPages > 1 && (
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); setPage(Math.max(1, currentPage - 1)); }} />
+            </PaginationItem>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+              <PaginationItem key={p}>
+                <PaginationLink href="#" isActive={p === currentPage} onClick={(e) => { e.preventDefault(); setPage(p); }}>
+                  {p}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            <PaginationItem>
+              <PaginationNext href="#" onClick={(e) => { e.preventDefault(); setPage(Math.min(totalPages, currentPage + 1)); }} />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      )}
     </div>
   );
 }

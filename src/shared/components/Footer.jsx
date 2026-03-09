@@ -4,13 +4,13 @@ import { getLogoImage } from '../../utils/imagens'
 const Footer = () => {
   const logoUrl = getLogoImage()
   const footerLinks = [
-    { label: 'Home', href: '/' },
-    { label: 'Serviços', href: '#servicos' },
-    { label: 'Cases', href: '/cases' },
-    { label: 'Sobre', href: '/sobre' },
-    { label: 'Contato', href: '/contato' },
-    { label: 'Carrinho', href: '/carrinho' },
-    { label: 'Login', href: '/login' },
+    { label: 'Home', to: '/' },
+    { label: 'Tendas', to: '/tendas' },
+    { label: 'Cases', to: '/cases' },
+    { label: 'Sobre', to: '/sobre' },
+    { label: 'Contato', to: '/contato' },
+    { label: 'Carrinho', to: '/carrinho' },
+    { label: 'Login', to: '/login' },
   ]
 
   return (
@@ -19,13 +19,13 @@ const Footer = () => {
         <div className="bg-black rounded-3xl p-8 md:p-12 lg:p-16">
           <div className="flex flex-col lg:flex-row justify-between gap-12 pb-12 border-b border-white/20">
             <div className="lg:w-1/2">
-              <a href="/" className="text-white text-xl font-semibold inline-block mb-6">
+              <Link to="/" className="text-white text-xl font-semibold inline-block mb-6">
                 {logoUrl ? (
                   <img src={logoUrl} alt="Logo" className="h-8 object-contain" />
                 ) : (
                   'Logo'
                 )}
-              </a>
+              </Link>
               <p className="text-[#F7F7F8] opacity-70 text-sm leading-relaxed max-w-md">
                 Há mais de 10 anos realizando eventos com estrutura completa, qualidade e compromisso. Seu evento acontece. A gente cuida do resto.
               </p>
@@ -50,17 +50,17 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row justify-between items-center gap-6 pt-8">
             <div className="flex flex-wrap justify-center gap-6">
               {footerLinks.map((link) => (
-                <a
+                <Link
                   key={link.label}
-                  href={link.href}
+                  to={link.to}
                   className="text-white opacity-70 text-sm hover:opacity-100 transition-opacity"
                 >
                   {link.label}
-                </a>
+                </Link>
               ))}
             </div>
             <p className="text-white opacity-70 text-xs text-center">
-              © 2025 Tonho Locação. Todos os direitos reservados. CNPJ: XX.XXX.XXX/XXXX-XX
+              © 2026 Tonho Locação. Todos os direitos reservados.
             </p>
           </div>
         </div>

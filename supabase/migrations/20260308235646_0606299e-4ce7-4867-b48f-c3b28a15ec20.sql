@@ -1,0 +1,1 @@
+ALTER TABLE public.orders ADD COLUMN was_modified boolean NOT NULL DEFAULT false;

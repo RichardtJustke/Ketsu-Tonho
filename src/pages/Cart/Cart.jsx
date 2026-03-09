@@ -10,19 +10,23 @@ import SpecialInstructions from './components/SpecialInstructions'
 import ContactSection from './components/ContactSection'
 import BudgetSuccessModal from './components/BudgetSuccessModal'
 import PhoneModal from './components/PhoneModal'
-import { getCartItems, updateCartItemQuantity, removeCartItem, getEventDate, clearCart } from '../../utils/cart'
+import { useCartContext } from '../../shared/contexts/CartContext'
+import { getEventDate } from '../../utils/cart'
 import { supabase } from '../../integrations/supabase/client'
 
 const Cart = () => {
   const navigate = useNavigate()
   const location = useLocation()
-  const [cartItems, setCartItems] = useState(() => getCartItems())
+  const { items: cartItems, updateQuantity, removeItem, clear } = useCartContext()
   const [specialInstructions, setSpecialInstructions] = useState('')
-  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [couponDiscount, setCouponDiscount] = useState(0)
+  const [appliedCouponId, setAppliedCouponId] = useState(null)
+  const [appliedCouponCode, setAppliedCouponCode] = useState(null)
   const [showPhoneModal, setShowPhoneModal] = useState(false)
   const [pendingUserId, setPendingUserId] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showLoginAlert, setShowLoginAlert] = useState(false)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
 
   // Calcular subtotal
   const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0)
@@ -42,13 +46,11 @@ const Cart = () => {
 
   // Handlers
   const handleQuantityChange = (itemId, newQuantity) => {
-    const updated = updateCartItemQuantity(itemId, newQuantity)
-    setCartItems(updated)
+    updateQuantity(itemId, newQuantity)
   }
 
   const handleRemoveItem = (itemId) => {
-    const updated = removeCartItem(itemId)
-    setCartItems(updated)
+    removeItem(itemId)
   }
 
   const checkPhoneAndSubmit = async (userId) => {
@@ -68,8 +70,7 @@ const Cart = () => {
   }
 
   const submitOrder = async (userId) => {
-    const items = getCartItems()
-    if (items.length === 0) return
+    if (cartItems.length === 0) return
 
     setIsSubmitting(true)
     try {
@@ -83,7 +84,7 @@ const Cart = () => {
           const stockMap = {}
           stockData.forEach((row) => { stockMap[row.product_key] = row.available })
 
-          const unavailableItems = items.filter((item) => {
+          const unavailableItems = cartItems.filter((item) => {
             const available = stockMap[item.id]
             return available !== undefined && available < (item.quantity || 1)
           })
@@ -96,22 +97,26 @@ const Cart = () => {
           }
         }
       }
-      const orderSubtotal = items.reduce((acc, item) => acc + (item.price * item.quantity), 0)
+      const orderSubtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0)
+      const finalDiscount = couponDiscount || 0
+      const orderTotal = orderSubtotal - finalDiscount
       const evDate = eventDate || getEventDate()
       const notes = specialInstructions || null
 
-      // Create order with event_date as a proper column
+      // Create order
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert({
           user_id: userId,
           platform: 'tonho',
           subtotal: orderSubtotal,
-          total_amount: orderSubtotal,
+          total_amount: Math.max(0, orderTotal),
           delivery_fee: 0,
           notes,
           event_date: evDate || null,
-          status: 'pending'
+          status: 'pending',
+          coupon_code: appliedCouponCode || null,
+          discount_amount: finalDiscount
         })
         .select('id')
         .single()
@@ -119,7 +124,7 @@ const Cart = () => {
       if (orderError) throw orderError
 
       // Insert order items
-      const orderItems = items.map((item) => ({
+      const orderItems = cartItems.map((item) => ({
         order_id: order.id,
         product_key: item.id,
         name: item.name || item.title || item.id,
@@ -134,14 +139,28 @@ const Cart = () => {
 
       if (itemsError) throw itemsError
 
+      // Increment coupon usage
+      if (appliedCouponId) {
+        const { data: coupon } = await supabase
+          .from('coupons')
+          .select('current_uses')
+          .eq('id', appliedCouponId)
+          .single()
+        if (coupon) {
+          await supabase
+            .from('coupons')
+            .update({ current_uses: coupon.current_uses + 1 })
+            .eq('id', appliedCouponId)
+        }
+      }
+
       // Send order received email (fire and forget)
       supabase.functions.invoke('send-order-notification', {
         body: { order_id: order.id, type: 'order_received' }
       }).catch(err => console.warn('Email notification failed:', err))
 
       // Clear cart and show success
-      clearCart()
-      setCartItems([])
+      clear()
       setShowSuccessModal(true)
     } catch (err) {
       console.error('Erro ao criar pedido:', err)
@@ -222,6 +241,9 @@ const Cart = () => {
                   installationFee={0}
                   discount={0}
                   onFinalize={handleFinalize}
+                  onDiscountChange={setCouponDiscount}
+                  onCouponIdChange={setAppliedCouponId}
+                  onCouponCodeChange={setAppliedCouponCode}
                   isSubmitting={isSubmitting}
                   showLoginAlert={showLoginAlert}
                 />

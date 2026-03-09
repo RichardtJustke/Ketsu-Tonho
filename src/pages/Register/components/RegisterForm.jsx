@@ -12,7 +12,6 @@ const RegisterForm = () => {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [success, setSuccess] = useState(false)
 
   const handleSignUp = async (e) => {
     e.preventDefault()
@@ -24,21 +23,13 @@ const RegisterForm = () => {
         email,
         password,
         options: {
-          data: { name, phone },
-          emailRedirectTo: window.location.origin
+          data: { name, phone }
         }
       })
       if (error) throw error
 
-      // Sign out immediately to prevent auto-login before email confirmation
-      await supabase.auth.signOut()
-
-      // Send branded confirmation email via Resend
-      await supabase.functions.invoke('send-signup-confirmation', {
-        body: { email, name, redirect_url: window.location.origin }
-      })
-
-      setSuccess(true)
+      // Redirect to home after successful signup
+      navigate('/')
     } catch (err) {
       setError(err.message)
     } finally {
@@ -51,20 +42,6 @@ const RegisterForm = () => {
       provider: 'google',
       options: { redirectTo: window.location.origin }
     })
-  }
-
-  if (success) {
-    return (
-      <div className="w-full h-screen flex flex-col justify-center items-center px-6 py-6 lg:px-16 lg:py-8">
-        <div className="max-w-[420px] text-center">
-          <h1 className="text-[#2B3674] text-3xl font-bold mb-4">Verifique seu email!</h1>
-          <p className="text-[#A3AED0] text-sm mb-6">Enviamos um link de confirmação para <strong className="text-[#2B3674]">{email}</strong>. Clique no link para ativar sua conta.</p>
-          <Link to="/login" className="text-[#FF5F1F] font-medium hover:opacity-80 transition-opacity">
-            Voltar para o Login
-          </Link>
-        </div>
-      </div>
-    )
   }
 
   return (
@@ -229,7 +206,7 @@ const RegisterForm = () => {
       {/* Footer - Info da empresa */}
       <div className="pt-4">
         <p className="text-[#A3AED0] text-xs">
-          © 2025 Tonho Locação. Todos os direitos reservados. CNPJ: XX.XXX.XXX/XXXX-XX
+          © 2026 Tonho Locação. Todos os direitos reservados.
         </p>
       </div>
     </div>

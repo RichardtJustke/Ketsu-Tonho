@@ -1,56 +1,97 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
+import { supabase } from '../../../integrations/supabase/client'
 
-const OrderSummary = ({ subtotal, installationFee = 0, discount = 0, onFinalize, isSubmitting = false, showLoginAlert = false }) => {
+const OrderSummary = ({ subtotal, installationFee = 0, discount = 0, onFinalize, onDiscountChange, onCouponIdChange, onCouponCodeChange, isSubmitting = false, showLoginAlert = false }) => {
   const [couponCode, setCouponCode] = useState('')
   const [appliedCode, setAppliedCode] = useState('')
   const [appliedDiscount, setAppliedDiscount] = useState(discount)
   const [couponMessage, setCouponMessage] = useState('')
-
-  const calculateDiscountValue = (code) => {
-    const normalized = code.trim().toUpperCase()
-    let percentage = 0
-
-    if (normalized === 'TONHO10') percentage = 10
-    if (normalized === 'PRIMEIRA') percentage = 20
-    if (normalized === 'EVENTO30') percentage = 30
-
-    if (!percentage) return { value: 0, percentage: 0 }
-
-    const value = subtotal * (percentage / 100)
-    return { value, percentage }
-  }
+  const [validating, setValidating] = useState(false)
+  const couponDataRef = useRef(null)
 
   useEffect(() => {
-    if (!appliedCode) return
-    const { value } = calculateDiscountValue(appliedCode)
+    onDiscountChange?.(appliedDiscount)
+  }, [appliedDiscount])
+
+  // Recalculate when subtotal changes and a coupon is applied
+  useEffect(() => {
+    if (!appliedCode || !couponDataRef.current) return
+    const c = couponDataRef.current
+    const value = c.discount_type === 'percentage'
+      ? subtotal * (c.discount_value / 100)
+      : Math.min(c.discount_value, subtotal)
     setAppliedDiscount(value)
   }, [subtotal, appliedCode])
 
   const effectiveDiscount = appliedDiscount || discount
   const total = subtotal + installationFee - effectiveDiscount
 
-  const handleApplyCoupon = () => {
+  const handleApplyCoupon = async () => {
     const trimmed = couponCode.trim().toUpperCase()
     if (!trimmed) {
       setAppliedCode('')
       setAppliedDiscount(0)
       setCouponMessage('Digite um código promocional.')
+      onCouponIdChange?.(null)
       return
     }
 
-    const { value, percentage } = calculateDiscountValue(trimmed)
+    setValidating(true)
+    const { data, error } = await supabase
+      .from('coupons')
+      .select('*')
+      .eq('code', trimmed)
+      .eq('is_active', true)
+      .or('platform.is.null,platform.eq.tonho')
+      .maybeSingle()
 
-    if (!percentage) {
+    setValidating(false)
+
+    if (error || !data) {
       setAppliedCode('')
       setAppliedDiscount(0)
-      setCouponMessage('Código inválido. Use TONHO10, PRIMEIRA ou EVENTO30.')
+      setCouponMessage('Código inválido.')
+      onDiscountChange?.(0)
+      onCouponIdChange?.(null)
       return
     }
 
+    // Check expiration
+    if (data.expires_at && new Date(data.expires_at) < new Date()) {
+      setAppliedCode('')
+      setAppliedDiscount(0)
+      setCouponMessage('Este cupom está expirado.')
+      onDiscountChange?.(0)
+      onCouponIdChange?.(null)
+      return
+    }
+
+    // Check usage limit
+    if (data.max_uses !== null && data.current_uses >= data.max_uses) {
+      setAppliedCode('')
+      setAppliedDiscount(0)
+      setCouponMessage('Este cupom atingiu o limite de uso.')
+      onDiscountChange?.(0)
+      onCouponIdChange?.(null)
+      return
+    }
+
+    // Valid coupon — calculate discount
+    const value = data.discount_type === 'percentage'
+      ? subtotal * (data.discount_value / 100)
+      : Math.min(data.discount_value, subtotal)
+
+    couponDataRef.current = data
     setAppliedCode(trimmed)
     setAppliedDiscount(value)
-    setCouponMessage(`Código ${trimmed} aplicado: ${percentage}% de desconto nos itens.`)
+    onCouponIdChange?.(data.id)
+    onCouponCodeChange?.(trimmed)
+
+    const label = data.discount_type === 'percentage'
+      ? `${data.discount_value}%`
+      : `R$${Number(data.discount_value).toFixed(2).replace('.', ',')}`
+    setCouponMessage(`Código ${trimmed} aplicado: ${label} de desconto.`)
   }
 
   return (
@@ -78,18 +119,19 @@ const OrderSummary = ({ subtotal, installationFee = 0, discount = 0, onFinalize,
           />
           <button
             onClick={handleApplyCoupon}
-            className="px-6 py-3 border border-gray-300 rounded-xl text-sm font-medium text-[#333333] hover:bg-gray-50 transition-colors"
+            disabled={validating}
+            className="px-6 py-3 border border-gray-300 rounded-xl text-sm font-medium text-[#333333] hover:bg-gray-50 transition-colors disabled:opacity-50"
           >
-            Aplicar
+            {validating ? '...' : 'Aplicar'}
           </button>
         </div>
 
         <p className="text-xs text-gray-500 mt-3">
-          Use <span className="font-semibold">TONHO10</span>, <span className="font-semibold">PRIMEIRA</span> ou <span className="font-semibold">EVENTO30</span> para 10%, 20% ou 30% de desconto nos itens.
+          Insira um código promocional se tiver um.
         </p>
 
         {couponMessage && (
-          <p className="text-xs mt-2 {appliedCode ? 'text-green-600' : 'text-red-500'}">
+          <p className={`text-xs mt-2 ${appliedCode ? 'text-green-600' : 'text-red-500'}`}>
             {couponMessage}
           </p>
         )}

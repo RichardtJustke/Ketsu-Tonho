@@ -1,17 +1,21 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card.tsx";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./components/ui/table.tsx";
 import { Input } from "./components/ui/input.tsx";
 import { Button } from "./components/ui/button.tsx";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "./components/ui/pagination.tsx";
 import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency, formatDate, orderStatusLabel } from "./data/utils.ts";
 import { StatusBadge } from "./components/StatusBagde.tsx";
 import { Search, ArrowLeft, User, Mail, Phone, Loader2 } from "lucide-react";
 
+const PAGE_SIZE = 12;
+
 export default function Clientes() {
   const [profiles, setProfiles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [clientOrders, setClientOrders] = useState<any[]>([]);
 
@@ -22,16 +26,22 @@ export default function Clientes() {
     });
   }, []);
 
+  useEffect(() => { setPage(1); }, [search]);
+
   const loadClientDetails = async (id: string) => {
     setSelectedId(id);
     const { data } = await supabase.from("orders").select("*").eq("user_id", id).order("created_at", { ascending: false });
     setClientOrders(data ?? []);
   };
 
-  const filtered = profiles.filter((p) =>
+  const filtered = useMemo(() => profiles.filter((p) =>
     (p.name ?? "").toLowerCase().includes(search.toLowerCase()) ||
     (p.email ?? "").toLowerCase().includes(search.toLowerCase())
-  );
+  ), [profiles, search]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const paged = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   const selectedClient = profiles.find((p) => p.id === selectedId);
 
@@ -103,7 +113,7 @@ export default function Clientes() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((p) => (
+              {paged.map((p) => (
                 <TableRow key={p.id}>
                   <TableCell className="font-medium">{p.name ?? "—"}</TableCell>
                   <TableCell className="text-muted-foreground">{p.email ?? "—"}</TableCell>
@@ -120,6 +130,26 @@ export default function Clientes() {
           </Table>
         </CardContent>
       </Card>
+
+      {totalPages > 1 && (
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); setPage(Math.max(1, currentPage - 1)); }} />
+            </PaginationItem>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+              <PaginationItem key={p}>
+                <PaginationLink href="#" isActive={p === currentPage} onClick={(e) => { e.preventDefault(); setPage(p); }}>
+                  {p}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            <PaginationItem>
+              <PaginationNext href="#" onClick={(e) => { e.preventDefault(); setPage(Math.min(totalPages, currentPage + 1)); }} />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      )}
     </div>
   );
 }

@@ -1,16 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Card, CardContent } from "../components/ui/card.tsx";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table.tsx";
 import { Input } from "../components/ui/input.tsx";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "../components/ui/pagination.tsx";
 import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency, formatDate, orderStatusLabel } from "../data/utils.ts";
 import { StatusBadge } from "../components/StatusBagde.tsx";
 import { Search, Loader2 } from "lucide-react";
 
+const PAGE_SIZE = 12;
+
 export default function TonhoVendas() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     supabase.from("orders").select("*, profiles!inner(name)").eq("platform", "tonho").eq("status", "completed").order("created_at", { ascending: false }).then(({ data }) => {
@@ -19,7 +23,12 @@ export default function TonhoVendas() {
     });
   }, []);
 
-  const filtered = orders.filter((o) => (o.profiles as any)?.name?.toLowerCase().includes(search.toLowerCase()));
+  useEffect(() => { setPage(1); }, [search]);
+
+  const filtered = useMemo(() => orders.filter((o) => (o.profiles as any)?.name?.toLowerCase().includes(search.toLowerCase())), [orders, search]);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const paged = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   if (loading) return <div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 
@@ -45,7 +54,7 @@ export default function TonhoVendas() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((o) => (
+              {paged.map((o) => (
                 <TableRow key={o.id}>
                   <TableCell>{formatDate(o.created_at)}</TableCell>
                   <TableCell className="font-medium">{(o.profiles as any)?.name}</TableCell>
@@ -60,6 +69,26 @@ export default function TonhoVendas() {
           </Table>
         </CardContent>
       </Card>
+
+      {totalPages > 1 && (
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); setPage(Math.max(1, currentPage - 1)); }} />
+            </PaginationItem>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+              <PaginationItem key={p}>
+                <PaginationLink href="#" isActive={p === currentPage} onClick={(e) => { e.preventDefault(); setPage(p); }}>
+                  {p}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            <PaginationItem>
+              <PaginationNext href="#" onClick={(e) => { e.preventDefault(); setPage(Math.min(totalPages, currentPage + 1)); }} />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      )}
     </div>
   );
 }

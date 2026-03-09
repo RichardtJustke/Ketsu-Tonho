@@ -1,10 +1,13 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { Card, CardContent } from "../components/ui/card.tsx";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table.tsx";
 import { Input } from "../components/ui/input.tsx";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "../components/ui/pagination.tsx";
 import { supabase } from "@/integrations/supabase/client";
 import { StatusBadge } from "../components/StatusBagde.tsx";
 import { Search, Loader2, Check, X } from "lucide-react";
+
+const PAGE_SIZE = 12;
 
 type EditingCell = { id: string; field: "stock_total" | "stock_available"; value: number } | null;
 
@@ -14,6 +17,7 @@ export default function TonhoEstoque() {
   const [search, setSearch] = useState("");
   const [editing, setEditing] = useState<EditingCell>(null);
   const [saving, setSaving] = useState(false);
+  const [page, setPage] = useState(1);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const fetchItems = () => {
@@ -25,8 +29,12 @@ export default function TonhoEstoque() {
 
   useEffect(() => { fetchItems(); }, []);
   useEffect(() => { if (editing) inputRef.current?.focus(); }, [editing]);
+  useEffect(() => { setPage(1); }, [search]);
 
-  const filtered = items.filter((i) => i.name.toLowerCase().includes(search.toLowerCase()));
+  const filtered = useMemo(() => items.filter((i) => i.name.toLowerCase().includes(search.toLowerCase())), [items, search]);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const paged = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   const getStatus = (item: any) => {
     if (item.stock_available === 0) return { status: "danger" as const, label: "Esgotado" };
@@ -98,7 +106,7 @@ export default function TonhoEstoque() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((item) => {
+              {paged.map((item) => {
                 const st = getStatus(item);
                 const isEditingTotal = editing?.id === item.id && editing.field === "stock_total";
                 const isEditingAvail = editing?.id === item.id && editing.field === "stock_available";
@@ -137,6 +145,26 @@ export default function TonhoEstoque() {
           </Table>
         </CardContent>
       </Card>
+
+      {totalPages > 1 && (
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); setPage(Math.max(1, currentPage - 1)); }} />
+            </PaginationItem>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+              <PaginationItem key={p}>
+                <PaginationLink href="#" isActive={p === currentPage} onClick={(e) => { e.preventDefault(); setPage(p); }}>
+                  {p}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            <PaginationItem>
+              <PaginationNext href="#" onClick={(e) => { e.preventDefault(); setPage(Math.min(totalPages, currentPage + 1)); }} />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      )}
     </div>
   );
 }

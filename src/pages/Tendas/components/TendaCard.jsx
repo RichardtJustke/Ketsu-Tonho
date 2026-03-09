@@ -1,24 +1,23 @@
 import { Link } from 'react-router-dom'
-import { getProductById } from '../../../data/products'
 import { useCloudinaryImages } from '../../../hooks/useCloudinaryImages'
-import { addToCart } from '../../../utils/cart'
+import { useCartContext } from '../../../shared/contexts/CartContext'
 
 const TendaCard = ({ tenda, hasAnsweredForm, onAction, availableStock, isItemAvailable = true }) => {
-  const product = getProductById(tenda.id)
   const { images } = useCloudinaryImages(tenda.id)
-  const imageUrl = images.length > 0 ? images[0] : (product?.image || '')
+  const { addItem } = useCartContext()
+  const imageUrl = images.length > 0 ? images[0] : ''
   const unavailable = hasAnsweredForm && !isItemAvailable
 
   const handleClick = () => {
     if (unavailable) return
     if (hasAnsweredForm) {
       const name = `${tenda.nome}${tenda.dimensao !== '-' ? ` ${tenda.dimensao}` : ''}`
-      addToCart({
+      addItem({
         id: tenda.id,
         name,
         price: tenda.valor,
-        category: product?.category || 'tendas',
-        image: imageUrl || product?.image || ''
+        category: 'tendas',
+        image: imageUrl
       })
       return
     }

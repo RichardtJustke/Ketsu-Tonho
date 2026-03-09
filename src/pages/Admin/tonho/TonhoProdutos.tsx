@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { Card, CardContent } from "../components/ui/card.tsx";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table.tsx";
 import { Input } from "../components/ui/input.tsx";
@@ -7,13 +7,22 @@ import { Switch } from "../components/ui/switch.tsx";
 import { Textarea } from "../components/ui/textarea.tsx";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select.tsx";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "../components/ui/dialog.tsx";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../components/ui/alert-dialog.tsx";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "../components/ui/pagination.tsx";
 import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency } from "../data/utils.ts";
 import { StatusBadge } from "../components/StatusBagde.tsx";
-import { Search, Loader2, Pencil, Plus } from "lucide-react";
+import { Search, Loader2, Pencil, Plus, Upload, X, Trash2, ImageIcon } from "lucide-react";
 
 const PAGE_SIZE = 12;
+
+interface EquipmentImage {
+  id: string;
+  equipment_id: string;
+  image_url: string;
+  is_primary: boolean;
+  display_order: number;
+}
 
 export default function TonhoProdutos() {
   const [items, setItems] = useState<any[]>([]);
@@ -23,21 +32,36 @@ export default function TonhoProdutos() {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [page, setPage] = useState(1);
 
+  // Images map: equipment_id -> primary image_url
+  const [imageMap, setImageMap] = useState<Record<string, string>>({});
+
   // Edit dialog state
   const [editItem, setEditItem] = useState<any | null>(null);
   const [saving, setSaving] = useState(false);
   const [isNew, setIsNew] = useState(false);
 
-  const fetchData = () => {
+  // Image upload state
+  const [editImages, setEditImages] = useState<EquipmentImage[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Delete state
+  const [deleting, setDeleting] = useState(false);
+
+  const fetchData = async () => {
     setLoading(true);
-    Promise.all([
+    const [eqRes, catRes, imgRes] = await Promise.all([
       supabase.from("equipment").select("*, equipment_categories(name)").order("name"),
       supabase.from("equipment_categories").select("*").order("name"),
-    ]).then(([eqRes, catRes]) => {
-      setItems(eqRes.data ?? []);
-      setCategories(catRes.data ?? []);
-      setLoading(false);
-    });
+      supabase.from("equipment_images").select("id, equipment_id, image_url, is_primary, display_order").eq("is_primary", true),
+    ]);
+    setItems(eqRes.data ?? []);
+    setCategories(catRes.data ?? []);
+    const map: Record<string, string> = {};
+    (imgRes.data ?? []).forEach((img: any) => { map[img.equipment_id] = img.image_url; });
+    setImageMap(map);
+    setLoading(false);
   };
 
   useEffect(() => { fetchData(); }, []);
@@ -56,41 +80,129 @@ export default function TonhoProdutos() {
 
   useEffect(() => { setPage(1); }, [search, categoryFilter]);
 
+  const fetchEditImages = async (equipmentId: string) => {
+    const { data } = await supabase.from("equipment_images").select("*").eq("equipment_id", equipmentId).order("display_order");
+    setEditImages((data as EquipmentImage[]) ?? []);
+  };
+
   const openEdit = (item: any) => {
     setEditItem({ ...item });
     setIsNew(false);
+    setPendingFiles([]);
+    fetchEditImages(item.id);
   };
 
   const openNew = () => {
     setEditItem({
-      name: "", description: "", daily_price: 0, deposit_amount: 0,
-      stock_total: 0, stock_available: 0, category_id: categories[0]?.id ?? null, is_active: true,
+      name: "", daily_price: 0, deposit_amount: 0,
+      stock_total: 0, stock_available: 0, category_id: "", is_active: true,
+      product_key: "", dimension: "", short_description: "", full_description: "",
     });
     setIsNew(true);
+    setEditImages([]);
+    setPendingFiles([]);
+  };
+
+  const uploadFiles = async (equipmentId: string, files: File[]) => {
+    for (const file of files) {
+      const ext = file.name.split(".").pop();
+      const path = `${equipmentId}/${Date.now()}.${ext}`;
+      const { error: uploadErr } = await supabase.storage.from("equipment-images").upload(path, file);
+      if (uploadErr) { console.error("Upload error:", uploadErr); continue; }
+      const { data: urlData } = supabase.storage.from("equipment-images").getPublicUrl(path);
+      const hasPrimary = editImages.length > 0 || files.indexOf(file) > 0;
+      await supabase.from("equipment_images").insert({
+        equipment_id: equipmentId,
+        image_url: urlData.publicUrl,
+        is_primary: !hasPrimary,
+        display_order: editImages.length + files.indexOf(file),
+      });
+    }
   };
 
   const handleSave = async () => {
     if (!editItem) return;
     setSaving(true);
-    const payload = {
+    const payload: any = {
       name: editItem.name,
-      description: editItem.description || null,
       daily_price: Number(editItem.daily_price),
       deposit_amount: Number(editItem.deposit_amount),
       stock_total: Number(editItem.stock_total),
       stock_available: Number(editItem.stock_available),
       category_id: editItem.category_id || null,
       is_active: editItem.is_active,
+      dimension: editItem.dimension || null,
+      short_description: editItem.short_description || null,
+      full_description: editItem.full_description || null,
     };
+    if (isNew && editItem.product_key) {
+      payload.product_key = editItem.product_key;
+    }
+
+    let equipmentId = editItem.id;
 
     if (isNew) {
-      await supabase.from("equipment").insert(payload);
+      const { data } = await supabase.from("equipment").insert(payload).select("id").single();
+      equipmentId = data?.id;
     } else {
       await supabase.from("equipment").update(payload).eq("id", editItem.id);
     }
+
+    if (equipmentId && pendingFiles.length > 0) {
+      setUploading(true);
+      await uploadFiles(equipmentId, pendingFiles);
+      setUploading(false);
+    }
+
     setSaving(false);
     setEditItem(null);
     fetchData();
+  };
+
+  const handleDeleteImage = async (img: EquipmentImage) => {
+    // Extract path from URL for storage deletion
+    const urlParts = img.image_url.split("/equipment-images/");
+    if (urlParts[1]) {
+      await supabase.storage.from("equipment-images").remove([decodeURIComponent(urlParts[1])]);
+    }
+    await supabase.from("equipment_images").delete().eq("id", img.id);
+    setEditImages((prev) => prev.filter((i) => i.id !== img.id));
+  };
+
+  const handleSetPrimary = async (img: EquipmentImage) => {
+    // Unset all, then set this one
+    await supabase.from("equipment_images").update({ is_primary: false }).eq("equipment_id", img.equipment_id);
+    await supabase.from("equipment_images").update({ is_primary: true }).eq("id", img.id);
+    setEditImages((prev) => prev.map((i) => ({ ...i, is_primary: i.id === img.id })));
+  };
+
+  const handleDeleteProduct = async () => {
+    if (!editItem?.id) return;
+    setDeleting(true);
+    // Delete images from storage
+    const { data: imgs } = await supabase.from("equipment_images").select("image_url").eq("equipment_id", editItem.id);
+    if (imgs && imgs.length > 0) {
+      const paths = imgs.map((i: any) => {
+        const parts = i.image_url.split("/equipment-images/");
+        return parts[1] ? decodeURIComponent(parts[1]) : null;
+      }).filter(Boolean);
+      if (paths.length > 0) await supabase.storage.from("equipment-images").remove(paths);
+    }
+    await supabase.from("equipment_images").delete().eq("equipment_id", editItem.id);
+    await supabase.from("equipment").delete().eq("id", editItem.id);
+    setDeleting(false);
+    setEditItem(null);
+    fetchData();
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    setPendingFiles((prev) => [...prev, ...files]);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const removePendingFile = (idx: number) => {
+    setPendingFiles((prev) => prev.filter((_, i) => i !== idx));
   };
 
   const getStatus = (item: any) => {
@@ -135,7 +247,7 @@ export default function TonhoProdutos() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nome</TableHead>
+                <TableHead>Produto</TableHead>
                 <TableHead>Categoria</TableHead>
                 <TableHead className="text-right">Preço/dia</TableHead>
                 <TableHead className="text-center">Estoque</TableHead>
@@ -146,9 +258,23 @@ export default function TonhoProdutos() {
             <TableBody>
               {paged.map((item) => {
                 const st = getStatus(item);
+                const thumb = imageMap[item.id];
                 return (
                   <TableRow key={item.id} className={!item.is_active ? "opacity-50" : ""}>
-                    <TableCell className="font-medium max-w-[250px] truncate">{item.name}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-md border bg-muted">
+                          {thumb ? (
+                            <img src={thumb} alt={item.name} className="h-full w-full object-cover" />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center">
+                              <ImageIcon className="h-4 w-4 text-muted-foreground" />
+                            </div>
+                          )}
+                        </div>
+                        <span className="font-medium max-w-[200px] truncate">{item.name}</span>
+                      </div>
+                    </TableCell>
                     <TableCell className="text-muted-foreground">{(item.equipment_categories as any)?.name ?? "—"}</TableCell>
                     <TableCell className="text-right font-semibold text-primary">{formatCurrency(Number(item.daily_price))}</TableCell>
                     <TableCell className="text-center">{item.stock_available}/{item.stock_total}</TableCell>
@@ -195,13 +321,68 @@ export default function TonhoProdutos() {
           </DialogHeader>
           {editItem && (
             <div className="grid gap-4 py-2">
+              {/* Images Section */}
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold">Imagens</Label>
+                {editImages.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {editImages.map((img) => (
+                      <div key={img.id} className="relative group">
+                        <img src={img.image_url} alt="" className={`h-20 w-20 rounded-md border object-cover ${img.is_primary ? "ring-2 ring-primary" : ""}`} />
+                        <div className="absolute inset-0 flex items-center justify-center gap-1 rounded-md bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
+                          {!img.is_primary && (
+                            <button onClick={() => handleSetPrimary(img)} className="rounded bg-primary p-1 text-[10px] text-primary-foreground" title="Definir como principal">★</button>
+                          )}
+                          <button onClick={() => handleDeleteImage(img)} className="rounded bg-destructive p-1 text-destructive-foreground">
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                        {img.is_primary && <span className="absolute -top-1 -right-1 rounded-full bg-primary px-1 text-[9px] text-primary-foreground">Principal</span>}
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {/* Pending file previews */}
+                {pendingFiles.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {pendingFiles.map((file, idx) => (
+                      <div key={idx} className="relative group">
+                        <img src={URL.createObjectURL(file)} alt="" className="h-20 w-20 rounded-md border object-cover opacity-70" />
+                        <button onClick={() => removePendingFile(idx)} className="absolute -top-1 -right-1 rounded-full bg-destructive p-0.5 text-destructive-foreground">
+                          <X className="h-3 w-3" />
+                        </button>
+                        <span className="absolute bottom-0 left-0 right-0 rounded-b-md bg-black/60 text-center text-[9px] text-white">Novo</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={handleFileSelect} className="hidden" />
+                <button type="button" onClick={() => fileInputRef.current?.click()} className="inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-sm hover:bg-muted">
+                  <Upload className="h-4 w-4" /> Adicionar imagem
+                </button>
+              </div>
+
               <div className="space-y-1.5">
                 <Label>Nome</Label>
                 <Input value={editItem.name} onChange={(e) => setEditItem({ ...editItem, name: e.target.value })} />
               </div>
+              {isNew && (
+                <div className="space-y-1.5">
+                  <Label>Chave do produto (product_key)</Label>
+                  <Input value={editItem.product_key ?? ""} onChange={(e) => setEditItem({ ...editItem, product_key: e.target.value })} placeholder="ex: tenda_branca_5x5" />
+                </div>
+              )}
               <div className="space-y-1.5">
-                <Label>Descrição</Label>
-                <Textarea value={editItem.description ?? ""} onChange={(e) => setEditItem({ ...editItem, description: e.target.value })} rows={3} />
+                <Label>Dimensão</Label>
+                <Input value={editItem.dimension ?? ""} onChange={(e) => setEditItem({ ...editItem, dimension: e.target.value })} placeholder="ex: 5x5m" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Descrição curta (exibida nos cards)</Label>
+                <Textarea value={editItem.short_description ?? ""} onChange={(e) => setEditItem({ ...editItem, short_description: e.target.value })} rows={2} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Descrição completa (página do produto)</Label>
+                <Textarea value={editItem.full_description ?? ""} onChange={(e) => setEditItem({ ...editItem, full_description: e.target.value })} rows={4} />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
@@ -225,9 +406,10 @@ export default function TonhoProdutos() {
               </div>
               <div className="space-y-1.5">
                 <Label>Categoria</Label>
-                <Select value={editItem.category_id ?? ""} onValueChange={(v) => setEditItem({ ...editItem, category_id: v })}>
-                  <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                <Select value={editItem.category_id || ""} onValueChange={(v) => setEditItem({ ...editItem, category_id: v || null })}>
+                  <SelectTrigger><SelectValue placeholder="Selecione uma categoria..." /></SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="none" disabled className="text-muted-foreground">Selecione uma categoria...</SelectItem>
                     {categories.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
                   </SelectContent>
                 </Select>
@@ -238,11 +420,38 @@ export default function TonhoProdutos() {
               </div>
             </div>
           )}
-          <DialogFooter>
-            <button onClick={() => setEditItem(null)} className="rounded-md border px-4 py-2 text-sm hover:bg-muted">Cancelar</button>
-            <button onClick={handleSave} disabled={saving || !editItem?.name} className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
-              {saving && <Loader2 className="h-4 w-4 animate-spin" />} Salvar
-            </button>
+          <DialogFooter className="flex-col gap-2 sm:flex-row sm:justify-between">
+            <div>
+              {!isNew && editItem && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <button className="inline-flex items-center gap-1 rounded-md border border-destructive px-3 py-2 text-sm text-destructive hover:bg-destructive hover:text-destructive-foreground">
+                      <Trash2 className="h-4 w-4" /> Excluir
+                    </button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Excluir produto?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Esta ação não pode ser desfeita. O produto "{editItem?.name}" e todas as suas imagens serão removidos permanentemente.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleDeleteProduct} disabled={deleting} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                        {deleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Excluir
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => setEditItem(null)} className="rounded-md border px-4 py-2 text-sm hover:bg-muted">Cancelar</button>
+              <button onClick={handleSave} disabled={saving || uploading || !editItem?.name} className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
+                {(saving || uploading) && <Loader2 className="h-4 w-4 animate-spin" />} Salvar
+              </button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>

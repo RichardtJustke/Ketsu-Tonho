@@ -41,7 +41,12 @@ export default function ChicasOrcamentos() {
                 <TableRow key={o.id}>
                   <TableCell>{formatDate(o.created_at)}</TableCell>
                   <TableCell className="font-medium">{(o.profiles as any)?.name}</TableCell>
-                  <TableCell className="text-right font-medium">{formatCurrency(Number(o.total_amount))}</TableCell>
+                  <TableCell className="text-right font-medium">
+                    {formatCurrency(Number(o.total_amount))}
+                    {Number(o.discount_amount) > 0 && (
+                      <span className="block text-xs text-green-600">🏷️ -{formatCurrency(Number(o.discount_amount))}</span>
+                    )}
+                  </TableCell>
                   <TableCell className="text-center">
                     <StatusBadge status={o.status === "paid" ? "success" : o.status === "pending" ? "warning" : "primary"} label={orderStatusLabel(o.status)} />
                   </TableCell>

@@ -1,35 +1,61 @@
+import { useState, useEffect } from 'react'
 import BoxCard from './BoxCard'
 import AnimateIn from '../../../shared/components/AnimateIn'
 import { useAvailability } from '../../../hooks/useAvailability'
 import { getEventDate } from '../../../utils/cart'
 import { getHasAnsweredForm } from '../../../utils/answeredForm'
+import { supabase } from '@/integrations/supabase/client'
 
-const boxes = [
-  { id: "portico_de_entrada", nome: "Pórtico", dimensao: "6m x 4,6m", valor: 600 },
-  { id: "tenda_box_truss_9x6", nome: "Tenda Box Truss", dimensao: "9x6", valor: 2800 },
-  { id: "backdrop_3x2", nome: "Backdrop", dimensao: "3m x 2m", valor: 240 }
-]
+const CATEGORY_ID = 'a1000000-0000-0000-0000-000000000002'
 
-const BoxGrid = ({ hasAnsweredForm }) => {
+const BoxGrid = ({ hasAnsweredForm, onOpenFilterModal }) => {
+  const [items, setItems] = useState([])
+  const [loading, setLoading] = useState(true)
   const eventDate = getHasAnsweredForm() ? getEventDate() : null
   const { isAvailable, getStock } = useAvailability(eventDate)
 
-  const handleAction = (productId) => {
-    console.log('Ação do produto:', productId)
+  useEffect(() => {
+    supabase
+      .from('equipment')
+      .select('*')
+      .eq('category_id', CATEGORY_ID)
+      .eq('is_active', true)
+      .order('name')
+      .then(({ data }) => {
+        setItems(data || [])
+        setLoading(false)
+      })
+  }, [])
+
+  const handleAction = () => {
+    onOpenFilterModal?.()
+  }
+
+  if (loading) {
+    return (
+      <section className="bg-white py-16 md:py-24 px-6">
+        <div className="max-w-7xl mx-auto text-center text-muted-foreground">Carregando...</div>
+      </section>
+    )
   }
 
   return (
     <section className="bg-white py-16 md:py-24 px-6">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
-          {boxes.map((box, index) => (
-            <AnimateIn key={box.id} animation="fade-in-up" delay={index * 50}>
+          {items.map((item, index) => (
+            <AnimateIn key={item.id} animation="fade-in-up" delay={index * 50}>
               <BoxCard
-                box={box}
+                box={{
+                  id: item.product_key,
+                  nome: item.name,
+                  dimensao: item.dimension || '-',
+                  valor: Number(item.daily_price)
+                }}
                 hasAnsweredForm={hasAnsweredForm}
                 onAction={handleAction}
-                availableStock={getStock(box.id)}
-                isItemAvailable={isAvailable(box.id)}
+                availableStock={getStock(item.product_key)}
+                isItemAvailable={isAvailable(item.product_key)}
               />
             </AnimateIn>
           ))}

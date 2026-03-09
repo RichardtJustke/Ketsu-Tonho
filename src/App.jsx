@@ -34,6 +34,7 @@ import ChicasCalendario from './pages/Admin/chicas/ChicasCalendario.tsx'
 import Clientes from './pages/Admin/Clientes.tsx'
 import CentralOrcamentos from './pages/Admin/CentralOrcamentos.tsx'
 import Administracao from './pages/Admin/Administracao.tsx'
+import Cupons from './pages/Admin/Cupons.tsx'
 
 function App() {
   const location = useLocation()
@@ -75,6 +76,7 @@ function App() {
         <Route path="/admin/chicas/calendario" element={<AdminGuard><AppLayout><ChicasCalendario /></AppLayout></AdminGuard>} />
         <Route path="/admin/clientes" element={<AdminGuard><AppLayout><Clientes /></AppLayout></AdminGuard>} />
         <Route path="/admin/orcamentos" element={<AdminGuard><AppLayout><CentralOrcamentos /></AppLayout></AdminGuard>} />
+        <Route path="/admin/cupons" element={<AdminGuard><AppLayout><Cupons /></AppLayout></AdminGuard>} />
         <Route path="/admin/administracao" element={<AdminGuard><AppLayout><Administracao /></AppLayout></AdminGuard>} />
       </Routes>
     </PageTransition>

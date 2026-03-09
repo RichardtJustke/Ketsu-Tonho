@@ -2,20 +2,33 @@ import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { getLogoImage } from '../../utils/imagens'
 import { useAuth } from '../../shared/contexts/AuthContext'
-import { getCartItems, subscribeCart } from '../../utils/cart'
+import { useCartContext } from '../../shared/contexts/CartContext'
 
 
 const Navbar = () => {
   const location = useLocation()
   const { user, loading, signOut } = useAuth()
+  const { items: cartItems } = useCartContext()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isServicosOpen, setIsServicosOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isMobileServicosOpen, setIsMobileServicosOpen] = useState(false)
-  const [cartCount, setCartCount] = useState(0)
   const [showCartToast, setShowCartToast] = useState(false)
+  const [prevCount, setPrevCount] = useState(0)
   const logoUrl = getLogoImage()
+
+  const cartCount = cartItems.reduce((sum, item) => sum + (item.quantity || 1), 0)
+
+  // Show toast when cart count increases
+  useEffect(() => {
+    if (cartCount > prevCount && prevCount > 0) {
+      setShowCartToast(true)
+      const timer = setTimeout(() => setShowCartToast(false), 2500)
+      return () => clearTimeout(timer)
+    }
+    setPrevCount(cartCount)
+  }, [cartCount])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -39,21 +52,6 @@ const Navbar = () => {
     }
     return () => { document.body.style.overflow = '' }
   }, [isMobileMenuOpen])
-
-  useEffect(() => {
-    const items = getCartItems()
-    const count = items.reduce((sum, item) => sum + (item.quantity || 1), 0)
-    setCartCount(count)
-
-    const unsubscribe = subscribeCart((updatedItems) => {
-      const newCount = updatedItems.reduce((sum, item) => sum + (item.quantity || 1), 0)
-      setCartCount(newCount)
-      setShowCartToast(true)
-      setTimeout(() => setShowCartToast(false), 2500)
-    })
-
-    return unsubscribe
-  }, [])
 
   const servicosSubmenu = [
     { label: 'Tendas', href: '/tendas' },

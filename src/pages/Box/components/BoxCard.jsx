@@ -1,15 +1,14 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { getProductById } from '../../../data/products'
 import { useCloudinaryImages } from '../../../hooks/useCloudinaryImages'
-import { addToCart } from '../../../utils/cart'
+import { useCartContext } from '../../../shared/contexts/CartContext'
 
 const BoxCard = ({ box, hasAnsweredForm, onAction, availableStock, isItemAvailable = true }) => {
-  const product = getProductById(box.id)
   const { images: folderImages } = useCloudinaryImages(box.id)
+  const { addItem } = useCartContext()
 
-  const primaryUrl = folderImages.length > 0 ? folderImages[0] : (product?.image || '')
-  const fallbackUrl = product?.image || 'https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=800&auto=format&fit=crop'
+  const primaryUrl = folderImages.length > 0 ? folderImages[0] : ''
+  const fallbackUrl = 'https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=800&auto=format&fit=crop'
   const [imageUrl, setImageUrl] = useState(null)
   const [imageIndex, setImageIndex] = useState(0)
   const [showSizeOptions, setShowSizeOptions] = useState(false)
@@ -79,11 +78,11 @@ const BoxCard = ({ box, hasAnsweredForm, onAction, availableStock, isItemAvailab
 
       const baseName = `${box.nome}${box.dimensao !== '-' ? ` ${box.dimensao}` : ''}`
       const name = selectedSize ? `${baseName} - ${selectedSize}` : baseName
-      addToCart({
+      addItem({
         id: box.id,
         name,
         price: box.valor,
-        category: product?.category || 'box',
+        category: 'box',
         image: displayUrl || fallbackUrl
       })
       setShowSizeOptions(false)

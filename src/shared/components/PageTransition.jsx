@@ -80,7 +80,9 @@ const PageTransition = ({ children }) => {
                 height: `calc(${100 / blindsCount}% + 2px)`,
                 top: `${(index * 100) / blindsCount}%`,
                 transform: getTransform(),
-                transition: phase !== 'hidden' ? 'transform 0.35s cubic-bezier(0.76, 0, 0.24, 1)' : 'none',
+                transitionProperty: phase !== 'hidden' ? 'transform' : 'none',
+                transitionDuration: phase !== 'hidden' ? '0.35s' : '0s',
+                transitionTimingFunction: 'cubic-bezier(0.76, 0, 0.24, 1)',
                 transitionDelay: phase === 'entering' 
                   ? `${index * 40}ms` 
                   : phase === 'exiting'

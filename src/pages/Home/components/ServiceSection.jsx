@@ -1,26 +1,55 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import AnimateIn from '../../../shared/components/AnimateIn'
-import { getProductById } from '../../../data/products'
 import { useCloudinaryImages } from '../../../hooks/useCloudinaryImages'
+import { supabase } from '@/integrations/supabase/client'
+
+const FEATURED_KEYS = [
+  'tenda_cristal_10x10',
+  'portico_de_entrada',
+  'tenda_pe_dagua',
+  'climatizador_juapi_110v'
+]
 
 const ServiceSection = () => {
+  const [dbProducts, setDbProducts] = useState([])
+
   const { images: cristalImages } = useCloudinaryImages('tenda_cristal_10x10', { isRawFolder: true })
   const { images: porticoImages } = useCloudinaryImages('portico_de_entrada', { isRawFolder: true })
   const { images: peDaguaImages } = useCloudinaryImages('tenda_pe_dagua', { isRawFolder: true })
   const { images: climaImages } = useCloudinaryImages('climatizador_juapi_110v', { isRawFolder: true })
 
-  const productDefs = [
-    { id: 'tenda_cristal_10x10', title: 'Tenda Cristal 10x10m', discount: '20%', price: 'R$300,00', cloudImages: cristalImages },
-    { id: 'portico_de_entrada', title: 'Pórtico 6m x 4,6m', discount: '5%', price: 'R$600,00', cloudImages: porticoImages },
-    { id: 'tenda_pe_dagua', title: 'Tenda Pai d\'Égua', discount: '5%', price: 'R$300,00', buttonText: 'Ver disponibilidade', cloudImages: peDaguaImages },
-    { id: 'climatizador_juapi_110v', title: 'Climatizador Joape 110v', discount: '12%', price: 'R$300,00', cloudImages: climaImages }
+  const cloudMap = {
+    'tenda_cristal_10x10': cristalImages,
+    'portico_de_entrada': porticoImages,
+    'tenda_pe_dagua': peDaguaImages,
+    'climatizador_juapi_110v': climaImages
+  }
+
+  useEffect(() => {
+    supabase
+      .from('equipment')
+      .select('product_key, name, daily_price')
+      .in('product_key', FEATURED_KEYS)
+      .eq('is_active', true)
+      .then(({ data }) => setDbProducts(data || []))
+  }, [])
+
+  // Static fallback data merged with DB
+  const staticDefs = [
+    { id: 'tenda_cristal_10x10', title: 'Tenda Cristal 10x10m', discount: '20%', price: 'R$300,00' },
+    { id: 'portico_de_entrada', title: 'Pórtico 6m x 4,6m', discount: '5%', price: 'R$600,00' },
+    { id: 'tenda_pe_dagua', title: 'Tenda Pai d\'Égua', discount: '5%', price: 'R$300,00', buttonText: 'Ver disponibilidade' },
+    { id: 'climatizador_juapi_110v', title: 'Climatizador Joape 110v', discount: '12%', price: 'R$300,00' }
   ]
 
-  const products = productDefs.map((p) => {
-    const product = getProductById(p.id)
-    const fallbackUrl = product?.image || 'https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=800&auto=format&fit=crop'
-    const image = p.cloudImages.length > 0 ? p.cloudImages[0] : fallbackUrl
-    return { ...p, image, fallbackUrl }
+  const products = staticDefs.map((p) => {
+    const db = dbProducts.find(d => d.product_key === p.id)
+    const title = db?.name || p.title
+    const price = db?.daily_price ? `R$${Number(db.daily_price).toFixed(2).replace('.', ',')}` : p.price
+    const imgs = cloudMap[p.id] || []
+    const image = imgs.length > 0 ? imgs[0] : 'https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=800&auto=format&fit=crop'
+    return { ...p, title, price, image }
   })
 
   return (
@@ -42,7 +71,6 @@ const ServiceSection = () => {
                       src={product.image}
                       alt={product.title}
                       className="w-full h-full object-cover"
-                      onError={(e) => { e.target.onerror = null; e.target.src = product.fallbackUrl }}
                     />
                   </div>
 

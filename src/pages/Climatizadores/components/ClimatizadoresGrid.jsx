@@ -1,43 +1,67 @@
+import { useState, useEffect } from 'react'
 import MovelCard from '../../Moveis/components/MovelCard'
 import AnimateIn from '../../../shared/components/AnimateIn'
 import { useAvailability } from '../../../hooks/useAvailability'
 import { getEventDate } from '../../../utils/cart'
 import { getHasAnsweredForm } from '../../../utils/answeredForm'
+import { supabase } from '@/integrations/supabase/client'
 
-const climatizadores = [
-    { id: "climatizador_guaruja", nome: "Climatizador Guarujá", valor: 250 },
-    { id: "climatizador_juapi_110v", nome: "Climatizador Joape 110V", valor: 300 },
-    { id: "clima_brisa_br30", nome: "Climabrisa BR30", valor: 400 },
-    { id: "clima_brisa_i20", nome: "Climabrisa Portátil I20", valor: 300 }
-]
+const CATEGORY_ID = 'a1000000-0000-0000-0000-000000000003'
 
-const ClimatizadoresGrid = ({ hasAnsweredForm }) => {
-    const eventDate = getHasAnsweredForm() ? getEventDate() : null
-    const { isAvailable, getStock } = useAvailability(eventDate)
+const ClimatizadoresGrid = ({ hasAnsweredForm, onOpenFilterModal }) => {
+  const [items, setItems] = useState([])
+  const [loading, setLoading] = useState(true)
+  const eventDate = getHasAnsweredForm() ? getEventDate() : null
+  const { isAvailable, getStock } = useAvailability(eventDate)
 
-    const handleAction = (productId) => {
-        console.log('Ação do produto:', productId)
-    }
+  useEffect(() => {
+    supabase
+      .from('equipment')
+      .select('*')
+      .eq('category_id', CATEGORY_ID)
+      .eq('is_active', true)
+      .order('name')
+      .then(({ data }) => {
+        setItems(data || [])
+        setLoading(false)
+      })
+  }, [])
 
+  const handleAction = () => {
+    onOpenFilterModal?.()
+  }
+
+  if (loading) {
     return (
-        <section className="bg-white py-16 md:py-24 px-6">
-            <div className="max-w-7xl mx-auto">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
-                    {climatizadores.map((item, index) => (
-                        <AnimateIn key={item.id} animation="fade-in-up" delay={index * 50}>
-                            <MovelCard
-                                item={item}
-                                hasAnsweredForm={hasAnsweredForm}
-                                onAction={handleAction}
-                                availableStock={getStock(item.id)}
-                                isItemAvailable={isAvailable(item.id)}
-                            />
-                        </AnimateIn>
-                    ))}
-                </div>
-            </div>
-        </section>
+      <section className="bg-white py-16 md:py-24 px-6">
+        <div className="max-w-7xl mx-auto text-center text-muted-foreground">Carregando...</div>
+      </section>
     )
+  }
+
+  return (
+    <section className="bg-white py-16 md:py-24 px-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
+          {items.map((item, index) => (
+            <AnimateIn key={item.id} animation="fade-in-up" delay={index * 50}>
+              <MovelCard
+                item={{
+                  id: item.product_key,
+                  nome: item.name,
+                  valor: Number(item.daily_price)
+                }}
+                hasAnsweredForm={hasAnsweredForm}
+                onAction={handleAction}
+                availableStock={getStock(item.product_key)}
+                isItemAvailable={isAvailable(item.product_key)}
+              />
+            </AnimateIn>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
 }
 
 export default ClimatizadoresGrid

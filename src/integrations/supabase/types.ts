@@ -174,8 +174,11 @@ export type Database = {
           created_at: string
           end_date: string | null
           equipment_id: string | null
+          event_date: string | null
           id: string
           menu_item_id: string | null
+          package_data: Json | null
+          people_count: string | null
           platform: Database["public"]["Enums"]["platform_type"]
           quantity: number
           start_date: string | null
@@ -186,8 +189,11 @@ export type Database = {
           created_at?: string
           end_date?: string | null
           equipment_id?: string | null
+          event_date?: string | null
           id?: string
           menu_item_id?: string | null
+          package_data?: Json | null
+          people_count?: string | null
           platform: Database["public"]["Enums"]["platform_type"]
           quantity?: number
           start_date?: string | null
@@ -198,8 +204,11 @@ export type Database = {
           created_at?: string
           end_date?: string | null
           equipment_id?: string | null
+          event_date?: string | null
           id?: string
           menu_item_id?: string | null
+          package_data?: Json | null
+          people_count?: string | null
           platform?: Database["public"]["Enums"]["platform_type"]
           quantity?: number
           start_date?: string | null
@@ -222,6 +231,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      coupons: {
+        Row: {
+          code: string
+          created_at: string
+          current_uses: number
+          discount_type: string
+          discount_value: number
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          max_uses: number | null
+          platform: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          current_uses?: number
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          max_uses?: number | null
+          platform?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          current_uses?: number
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          max_uses?: number | null
+          platform?: string | null
+        }
+        Relationships: []
       }
       email_logs: {
         Row: {
@@ -302,43 +350,58 @@ export type Database = {
       }
       equipment: {
         Row: {
+          benefits: Json | null
           category_id: string | null
           created_at: string
           daily_price: number
           deposit_amount: number
           description: string | null
+          dimension: string | null
+          full_description: string | null
           id: string
           is_active: boolean
           name: string
           product_key: string | null
+          short_description: string | null
+          specs: Json | null
           stock_available: number
           stock_total: number
           updated_at: string
         }
         Insert: {
+          benefits?: Json | null
           category_id?: string | null
           created_at?: string
           daily_price?: number
           deposit_amount?: number
           description?: string | null
+          dimension?: string | null
+          full_description?: string | null
           id?: string
           is_active?: boolean
           name: string
           product_key?: string | null
+          short_description?: string | null
+          specs?: Json | null
           stock_available?: number
           stock_total?: number
           updated_at?: string
         }
         Update: {
+          benefits?: Json | null
           category_id?: string | null
           created_at?: string
           daily_price?: number
           deposit_amount?: number
           description?: string | null
+          dimension?: string | null
+          full_description?: string | null
           id?: string
           is_active?: boolean
           name?: string
           product_key?: string | null
+          short_description?: string | null
+          specs?: Json | null
           stock_available?: number
           stock_total?: number
           updated_at?: string
@@ -602,8 +665,10 @@ export type Database = {
       }
       orders: {
         Row: {
+          coupon_code: string | null
           created_at: string
           delivery_fee: number
+          discount_amount: number
           event_date: string | null
           id: string
           notes: string | null
@@ -613,10 +678,13 @@ export type Database = {
           total_amount: number
           updated_at: string
           user_id: string
+          was_modified: boolean
         }
         Insert: {
+          coupon_code?: string | null
           created_at?: string
           delivery_fee?: number
+          discount_amount?: number
           event_date?: string | null
           id?: string
           notes?: string | null
@@ -626,10 +694,13 @@ export type Database = {
           total_amount?: number
           updated_at?: string
           user_id: string
+          was_modified?: boolean
         }
         Update: {
+          coupon_code?: string | null
           created_at?: string
           delivery_fee?: number
+          discount_amount?: number
           event_date?: string | null
           id?: string
           notes?: string | null
@@ -639,6 +710,7 @@ export type Database = {
           total_amount?: number
           updated_at?: string
           user_id?: string
+          was_modified?: boolean
         }
         Relationships: [
           {
@@ -853,6 +925,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      auto_complete_past_events: { Args: never; Returns: undefined }
       get_available_stock_for_date: {
         Args: { target_date: string }
         Returns: {

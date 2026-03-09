@@ -1,23 +1,22 @@
 import { Link } from 'react-router-dom'
-import { getProductById } from '../../../data/products'
 import { useCloudinaryImages } from '../../../hooks/useCloudinaryImages'
-import { addToCart } from '../../../utils/cart'
+import { useCartContext } from '../../../shared/contexts/CartContext'
 
 const MovelCard = ({ item, hasAnsweredForm, onAction, availableStock, isItemAvailable = true }) => {
-  const product = getProductById(item.id)
   const { images } = useCloudinaryImages(item.id)
-  const imageUrl = images.length > 0 ? images[0] : (product?.image || '')
+  const { addItem } = useCartContext()
+  const imageUrl = images.length > 0 ? images[0] : ''
   const unavailable = hasAnsweredForm && !isItemAvailable
 
   const handleClick = () => {
     if (unavailable) return
     if (hasAnsweredForm) {
-      addToCart({
+      addItem({
         id: item.id,
         name: item.nome,
         price: item.valor,
-        category: product?.category || 'moveis',
-        image: imageUrl || product?.image || ''
+        category: 'moveis',
+        image: imageUrl
       })
       return
     }
