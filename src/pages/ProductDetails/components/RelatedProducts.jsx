@@ -9,19 +9,19 @@ const RelatedProducts = ({ currentCategory }) => {
     {
       id: 'tendas',
       title: 'Tendas e Estruturas',
-      image: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
+      image: 'https://res.cloudinary.com/dqvldq2ku/image/upload/v1772152433/3A7C7B230F064074BED7-1000w_fhksbr.jpg',
       href: '/tendas'
     },
     {
       id: 'moveis',
-      title: 'Mobiliário e Equipamentos',
-      image: 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
+      title: 'Mobiliário e Decoração',
+      image: 'https://res.cloudinary.com/dqvldq2ku/image/upload/v1772152429/5E87AE070D5F59B45560-1920w_ut64ts.jpg',
       href: '/moveis'
     },
     {
       id: 'box',
       title: 'Estruturas de grande porte',
-      image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
+      image: 'https://res.cloudinary.com/dqvldq2ku/image/upload/v1772152426/Tenda_Cristal-2-1920w_wxvz7l.jpg',
       href: '/box'
     },
     {
@@ -32,9 +32,9 @@ const RelatedProducts = ({ currentCategory }) => {
     }
   ]
 
-  const normalizedCategory = (currentCategory || '').toLowerCase()
+  const normalizedCategory = (currentCategory || '').toLowerCase().trim()
   const relatedCategories = allCategories.filter(
-    (category) => category.id !== normalizedCategory
+    (category) => !normalizedCategory.includes(category.id) && category.id !== normalizedCategory
   )
 
   return (
