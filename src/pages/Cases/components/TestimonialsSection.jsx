@@ -1,178 +1,291 @@
+import { useState, useEffect, useRef } from 'react'
+import AnimateIn from '../../../shared/components/AnimateIn'
+
+const testimonials = [
+  {
+    stars: 5,
+    text: 'A equipe da Ketsu superou todas as expectativas! A tenda ficou impecável e a decoração transformou completamente o espaço. Nosso casamento ficou dos sonhos.',
+    name: 'Mariana Silva',
+    role: 'Casamento — Belém, PA',
+  },
+  {
+    stars: 5,
+    text: 'Profissionalismo do início ao fim. O box truss e toda a estrutura de iluminação ficaram perfeitos para o nosso evento corporativo. Recomendo de olhos fechados!',
+    name: 'Carlos Mendes',
+    role: 'Evento Corporativo — Ananindeua',
+  },
+  {
+    stars: 5,
+    text: 'Contratamos tendas e mobiliário para a confraternização da empresa. Tudo entregue no prazo, montado com cuidado e a qualidade surpreendeu todos os convidados.',
+    name: 'Fernanda Costa',
+    role: 'Confraternização — Belém, PA',
+  },
+  {
+    stars: 5,
+    text: 'O atendimento é incrível, sempre muito atenciosos e prestativos. Os climatizadores fizeram toda a diferença no conforto dos nossos convidados durante o evento.',
+    name: 'Rafael Oliveira',
+    role: 'Festa de Aniversário — Marituba',
+  },
+  {
+    stars: 5,
+    text: 'Já é a terceira vez que contratamos a Ketsu e a qualidade se mantém impecável. O mobiliário e as tendas são de primeira linha. Parceria de confiança!',
+    name: 'Ana Paula Rodrigues',
+    role: 'Eventos Sociais — Belém, PA',
+  },
+  {
+    stars: 5,
+    text: 'A estrutura de box truss para o nosso festival ficou sensacional. Equipe pontual, organizada e muito competente. Já estamos planejando o próximo evento juntos.',
+    name: 'Lucas Ferreira',
+    role: 'Festival — Belém, PA',
+  },
+]
+
+const StarRating = ({ rating }) => {
+  return (
+    <div className="flex gap-1">
+      {[...Array(5)].map((_, i) => (
+        <svg
+          key={i}
+          width="18"
+          height="18"
+          viewBox="0 0 16 16"
+          fill={i < rating ? '#FF5F1F' : '#E0E0E0'}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path d="M8 0L10.3 5.3L16 6.2L12 10.1L12.9 16L8 13.3L3.1 16L4 10.1L0 6.2L5.7 5.3L8 0Z" />
+        </svg>
+      ))}
+    </div>
+  )
+}
+
+const QuoteIcon = () => (
+  <svg
+    width="40"
+    height="40"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className="text-[#FF5F1F] opacity-30"
+  >
+    <path
+      d="M4.583 17.321C3.553 16.227 3 15 3 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311 1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 01-3.5 3.5c-1.073 0-2.099-.49-2.748-1.179zm10 0C13.553 16.227 13 15 13 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311 1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 01-3.5 3.5c-1.073 0-2.099-.49-2.748-1.179z"
+      fill="currentColor"
+    />
+  </svg>
+)
+
 const TestimonialsSection = () => {
-  const testimonials = [
-    {
-      rating: '5 out of 5 Rating',
-      stars: 5,
-      text: '"Absolutely revolutionary! I can track my expenses effortlessly, making budgeting incredibly easy and manageable for anyone who truly wants to take"',
-      name: 'Max Cole',
-      role: 'Architect',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=2070&auto=format&fit=crop'
-    },
-    {
-      rating: '4.8 out of 5 Rating',
-      stars: 5,
-      text: '"The interface is incredibly user-friendly, making budgeting a total breeze for everyone, regardless of their experience level or background, and truly enjoyable"',
-      name: 'Leo Park',
-      role: 'Property Manager, NY',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1974&auto=format&fit=crop'
-    },
-    {
-      rating: '4.9 out of 5 Rating',
-      stars: 5,
-      text: '"I love how financial goals at a quick glance, presented clearly and effectively, which keeps me motivated to achieve them all, every single time without fail!"',
-      name: 'Sam Lee',
-      role: 'Homeowner, Brooklyn',
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1974&auto=format&fit=crop'
-    },
-    {
-      rating: '4.7 out of 5 Rating',
-      stars: 5,
-      text: '"The best app I\'ve ever used for managing my finances efficiently and effectively. I highly recommend it to everyone I know and trust wholeheartedly, without hesitation!"',
-      name: 'Tom Fox',
-      role: 'First-Time Homeowner',
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1974&auto=format&fit=crop'
-    },
-    {
-      rating: '4.5 out of 5 Rating',
-      stars: 4.5,
-      text: '"This app completely changed how I manage my money. Everything is so simple now. This app completely changed how I manage my money. Everything is so simple now."',
-      name: 'Jay Kim',
-      role: '8502 Preston Rd. Inglewood',
-      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=2070&auto=format&fit=crop'
-    },
-    {
-      rating: '4.5 out of 5 Rating',
-      stars: 4.5,
-      text: '"This app completely changed how I manage my money. Everything is so simple now. This app completely changed how I manage my money. Everything is so simple now."',
-      name: 'Ray Cho',
-      role: 'Homeowner, Long Island',
-      avatar: 'https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?q=80&w=1974&auto=format&fit=crop'
-    },
-    {
-      rating: '4.8 out of 5 Rating',
-      stars: 5,
-      text: '"An essential tool for anyone looking to take control of their finances effectively and confidently, without any hassle or confusion whatsoever, truly a must-have resource!"',
-      name: 'Lucas Brown',
-      role: 'Conditioning Repair',
-      avatar: 'https://images.unsplash.com/photo-1463453091185-61582044d556?q=80&w=2070&auto=format&fit=crop'
-    },
-    {
-      rating: '4.9 out of 5 Rating',
-      stars: 5,
-      text: '"Fantastic features that help me save more and spend wisely every single month, truly impressive and beneficial for my financial well-being overall, without a doubt, I must say!"',
-      name: 'Olivia White',
-      role: 'Air Quality Solutions',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1964&auto=format&fit=crop'
-    },
-    {
-      rating: '4.5 out of 5 Rating',
-      stars: 4.5,
-      text: '"This app has made me much more aware of my spending habits. It is very helpful indeed and quite insightful for my budgeting efforts overall, I must honestly say, and I appreciate it!"',
-      name: 'Eva Brooks',
-      role: 'HVAC System Tune-Up',
-      avatar: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=1964&auto=format&fit=crop'
-    },
-    {
-      rating: '4.6 out of 5 Rating',
-      stars: 4.5,
-      text: '"Great app! I really appreciate the budgeting tools and reminders. Keep up the great work and continuous innovation to enhance user experience overall, always striving!"',
-      name: 'Ethan Young',
-      role: 'HVAC Repair',
-      avatar: 'https://images.unsplash.com/photo-1507591064344-4c6ce005b128?q=80&w=2070&auto=format&fit=crop'
-    },
-    {
-      rating: '4.7 out of 5 Rating',
-      stars: 5,
-      text: '"User-friendly and effective! My financial health has improved significantly over time, and I feel truly empowered to make much better financial decisions, every single day!"',
-      name: 'Isabella Martinez',
-      role: 'Conditioning Repair',
-      avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=1976&auto=format&fit=crop'
-    },
-    {
-      rating: '5 out of 5 Rating',
-      stars: 5,
-      text: '"From booking to installation, the Heatfix team was friendly, knowledgeable, and efficient. My new HVAC system works perfectly."',
-      name: 'Liam Johnson',
-      role: 'Architect',
-      avatar: 'https://images.unsplash.com/photo-1552058544-f2b08422138a?q=80&w=1998&auto=format&fit=crop'
+  const [activeIndex, setActiveIndex] = useState(0)
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true)
+  const scrollRef = useRef(null)
+  const intervalRef = useRef(null)
+
+  // Auto-rotate testimonials
+  useEffect(() => {
+    if (!isAutoPlaying) return
+
+    intervalRef.current = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % testimonials.length)
+    }, 5000)
+
+    return () => clearInterval(intervalRef.current)
+  }, [isAutoPlaying])
+
+  // Scroll to active card on mobile
+  useEffect(() => {
+    if (scrollRef.current) {
+      const card = scrollRef.current.children[activeIndex]
+      if (card) {
+        card.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'center',
+        })
+      }
     }
-  ]
+  }, [activeIndex])
 
-  const StarRating = ({ rating }) => {
-    const fullStars = Math.floor(rating)
-    const hasHalfStar = rating % 1 !== 0
+  const handleDotClick = (index) => {
+    setActiveIndex(index)
+    setIsAutoPlaying(false)
+    // Resume auto-play after 10 seconds of inactivity
+    setTimeout(() => setIsAutoPlaying(true), 10000)
+  }
 
-    return (
-      <div className="flex gap-0.5">
-        {[...Array(fullStars)].map((_, i) => (
-          <svg key={i} width="16" height="16" viewBox="0 0 16 16" fill="#FF5F1F" xmlns="http://www.w3.org/2000/svg">
-            <path d="M8 0L10.3 5.3L16 6.2L12 10.1L12.9 16L8 13.3L3.1 16L4 10.1L0 6.2L5.7 5.3L8 0Z"/>
-          </svg>
-        ))}
-        {hasHalfStar && (
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="#FF5F1F" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="halfStar">
-                <stop offset="50%" stopColor="#FF5F1F"/>
-                <stop offset="50%" stopColor="#E0E0E0"/>
-              </linearGradient>
-            </defs>
-            <path d="M8 0L10.3 5.3L16 6.2L12 10.1L12.9 16L8 13.3L3.1 16L4 10.1L0 6.2L5.7 5.3L8 0Z" fill="url(#halfStar)"/>
-          </svg>
-        )}
-        {[...Array(5 - Math.ceil(rating))].map((_, i) => (
-          <svg key={`empty-${i}`} width="16" height="16" viewBox="0 0 16 16" fill="#E0E0E0" xmlns="http://www.w3.org/2000/svg">
-            <path d="M8 0L10.3 5.3L16 6.2L12 10.1L12.9 16L8 13.3L3.1 16L4 10.1L0 6.2L5.7 5.3L8 0Z"/>
-          </svg>
-        ))}
-      </div>
-    )
+  const handlePrev = () => {
+    setActiveIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length)
+    setIsAutoPlaying(false)
+    setTimeout(() => setIsAutoPlaying(true), 10000)
+  }
+
+  const handleNext = () => {
+    setActiveIndex((prev) => (prev + 1) % testimonials.length)
+    setIsAutoPlaying(false)
+    setTimeout(() => setIsAutoPlaying(true), 10000)
   }
 
   return (
-    <section className="bg-white py-16 md:py-24 px-6">
+    <section className="bg-[#F7F7F8] py-20 md:py-28 px-6 overflow-hidden">
       <div className="max-w-7xl mx-auto">
-        {/* Grid de depoimentos - 4 colunas */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {testimonials.map((testimonial, index) => (
-            <div 
-              key={index} 
-              className="bg-[#F7F7F8] rounded-2xl p-5 flex flex-col"
-            >
-              {/* Rating stars e texto */}
-              <div className="flex items-center justify-between mb-3">
-                <StarRating rating={testimonial.stars} />
+        {/* Header */}
+        <AnimateIn animation="fade-in-up">
+          <div className="text-center mb-16">
+            <span className="inline-block text-[#FF5F1F] text-sm font-medium tracking-widest uppercase mb-4">
+              Depoimentos
+            </span>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-black mb-4">
+              O que nossos clientes dizem
+            </h2>
+            <p className="text-black/50 max-w-xl mx-auto text-base md:text-lg">
+              A satisfação dos nossos clientes é o nosso maior orgulho. Confira alguns depoimentos de quem já viveu a experiência Ketsu.
+            </p>
+          </div>
+        </AnimateIn>
+
+        {/* Featured testimonial — large card */}
+        <AnimateIn animation="fade-in-up" delay={100}>
+          <div className="relative bg-white rounded-3xl p-8 md:p-12 mb-10 border border-black/5 shadow-lg overflow-hidden">
+            {/* Decorative glow */}
+            <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#FF5F1F]/5 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-20 -left-20 w-48 h-48 bg-[#FF5F1F]/3 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="relative z-10 flex flex-col md:flex-row items-start gap-8">
+              <div className="flex-shrink-0">
+                <QuoteIcon />
               </div>
-              
-              <p className="text-[#333333] opacity-80 text-xs mb-3">
-                {testimonial.rating}
-              </p>
+              <div className="flex-1 min-w-0">
+                <p
+                  className="text-black text-lg md:text-2xl font-light leading-relaxed mb-8 transition-opacity duration-500"
+                  key={activeIndex}
+                  style={{ animation: 'fadeInUp 0.5s ease-out' }}
+                >
+                  "{testimonials[activeIndex].text}"
+                </p>
+                <div className="flex items-center gap-4">
+                  <div
+                    className="w-12 h-12 rounded-full bg-gradient-to-br from-[#FF5F1F] to-[#FF8F5F] flex items-center justify-center text-white font-semibold text-lg"
+                  >
+                    {testimonials[activeIndex].name.charAt(0)}
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-black text-base">
+                      {testimonials[activeIndex].name}
+                    </h4>
+                    <p className="text-black/40 text-sm">
+                      {testimonials[activeIndex].role}
+                    </p>
+                  </div>
+                  <div className="ml-auto hidden md:block">
+                    <StarRating rating={testimonials[activeIndex].stars} />
+                  </div>
+                </div>
+              </div>
+            </div>
 
-              {/* Review text */}
-              <p className="text-black font-medium text-sm leading-relaxed mb-4 flex-grow">
-                {testimonial.text}
-              </p>
+            {/* Navigation arrows */}
+            <div className="absolute top-1/2 -translate-y-1/2 left-3 md:-left-0 z-20 hidden md:block">
+              <button
+                onClick={handlePrev}
+                className="w-10 h-10 rounded-full bg-black/5 hover:bg-black/10 border border-black/10 flex items-center justify-center text-black transition-colors"
+                aria-label="Anterior"
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            </div>
+            <div className="absolute top-1/2 -translate-y-1/2 right-3 md:-right-0 z-20 hidden md:block">
+              <button
+                onClick={handleNext}
+                className="w-10 h-10 rounded-full bg-black/5 hover:bg-black/10 border border-black/10 flex items-center justify-center text-black transition-colors"
+                aria-label="Próximo"
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M6 4L10 8L6 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </AnimateIn>
 
-              {/* User info */}
-              <div className="flex items-center gap-3 pt-3 border-t border-black/5">
-                <img 
-                  src={testimonial.avatar} 
-                  alt={testimonial.name}
-                  className="w-10 h-10 rounded-full object-cover"
-                />
-                <div>
-                  <h4 className="font-semibold text-black text-xs uppercase">
+        {/* Small cards row */}
+        <div
+          ref={scrollRef}
+          className="flex gap-4 overflow-x-auto pb-4 scroll-smooth hide-scrollbar"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {testimonials.map((testimonial, index) => (
+            <button
+              key={index}
+              onClick={() => handleDotClick(index)}
+              className={`flex-shrink-0 w-[260px] md:w-[280px] rounded-2xl p-5 text-left transition-all duration-300 border ${index === activeIndex
+                ? 'bg-white border-[#FF5F1F]/30 shadow-lg shadow-[#FF5F1F]/10'
+                : 'bg-white/60 border-black/5 hover:border-black/10'
+                }`}
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold transition-colors duration-300 ${index === activeIndex
+                    ? 'bg-gradient-to-br from-[#FF5F1F] to-[#FF8F5F] text-white'
+                    : 'bg-black/10 text-black/50'
+                    }`}
+                >
+                  {testimonial.name.charAt(0)}
+                </div>
+                <div className="min-w-0">
+                  <h4 className="font-medium text-black text-sm truncate">
                     {testimonial.name}
                   </h4>
-                  <p className="text-[#333333] opacity-80 text-xs">
+                  <p className="text-black/30 text-xs truncate">
                     {testimonial.role}
                   </p>
                 </div>
               </div>
-            </div>
+              <p className="text-black/50 text-xs leading-relaxed line-clamp-2">
+                "{testimonial.text}"
+              </p>
+            </button>
+          ))}
+        </div>
+
+        {/* Dots — mobile only */}
+        <div className="flex justify-center gap-2 mt-6 md:hidden">
+          {testimonials.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => handleDotClick(index)}
+              className={`rounded-full transition-all duration-300 ${index === activeIndex
+                ? 'w-8 h-2 bg-[#FF5F1F]'
+                : 'w-2 h-2 bg-black/20 hover:bg-black/40'
+                }`}
+              aria-label={`Depoimento ${index + 1}`}
+            />
           ))}
         </div>
       </div>
+
+      <style>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(12px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+      `}</style>
     </section>
   )
 }
