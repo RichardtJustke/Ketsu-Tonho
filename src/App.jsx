@@ -5,7 +5,6 @@ import Sobre from './pages/Sobre/Sobre'
 import Cases from './pages/Cases/Cases'
 import Login from './pages/Login/Login'
 import Register from './pages/Register/Register'
-import Contato from './pages/Contato/Contato'
 import Tendas from './pages/Tendas/Tendas'
 import Box from './pages/Box/Box'
 import Moveis from './pages/Moveis/Moveis'
@@ -51,7 +50,6 @@ function App() {
         <Route path="/cases" element={<Cases />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/contato" element={<Contato />} />
         <Route path="/tendas" element={<Tendas />} />
         <Route path="/box" element={<Box />} />
         <Route path="/moveis" element={<Moveis />} />

@@ -107,7 +107,6 @@ const Navbar = () => {
 
             <Link to="/cases" className="text-white text-sm hover:opacity-80 transition-opacity">Cases</Link>
             <Link to="/sobre" className="text-white text-sm hover:opacity-80 transition-opacity">Sobre</Link>
-            <Link to="/contato" className="text-white text-sm hover:opacity-80 transition-opacity">Contato</Link>
 
             <div className="relative">
               <Link
@@ -241,9 +240,6 @@ const Navbar = () => {
             </Link>
             <Link to="/sobre" className="text-white text-base py-3 px-2 rounded-xl hover:bg-white/10 transition-colors">
               Sobre
-            </Link>
-            <Link to="/contato" className="text-white text-base py-3 px-2 rounded-xl hover:bg-white/10 transition-colors">
-              Contato
             </Link>
 
             <div className="pt-4 mt-2 border-t border-white/10">
