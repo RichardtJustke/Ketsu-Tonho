@@ -6,7 +6,7 @@ const HistorySection = () => {
 
   const stats = [
     { value: '4.9/5', label: 'Avaliação média dos clientes' },
-    { value: '1000+', label: 'Eventos realizados' }
+    { value: '5000+', label: 'Eventos realizados' }
   ]
 
   return (
