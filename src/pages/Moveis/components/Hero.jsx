@@ -1,10 +1,8 @@
-import { useCloudinaryImages } from '../../../hooks/useCloudinaryImages'
 import AnimateIn from '../../../shared/components/AnimateIn'
 import { useParallax } from '../../../hooks/useParallax'
 
 const Hero = () => {
-  const { images } = useCloudinaryImages('mesa_dobravel_portatil', { isRawFolder: true })
-  const heroImage = images.length > 0 ? images[0] : 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?q=80&w=2070&auto=format&fit=crop'
+  const heroImage = 'https://res.cloudinary.com/dqvldq2ku/image/upload/v1772152429/5E87AE070D5F59B45560-1920w_ut64ts.jpg'
   const { style: parallaxStyle } = useParallax(0.25)
 
   return (

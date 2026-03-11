@@ -1,17 +1,16 @@
-import { useCloudinaryImages } from '../../../hooks/useCloudinaryImages'
 import AnimateIn from '../../../shared/components/AnimateIn'
 import { useParallax } from '../../../hooks/useParallax'
 
+const heroImage = 'https://res.cloudinary.com/dqvldq2ku/image/upload/v1772152816/IMG_8644-1920w_i8mbk3.jpg'
+
 const Hero = () => {
-  const { images } = useCloudinaryImages('portico_de_entrada', { isRawFolder: true })
-  const heroImage = images.length > 0 ? images[0] : null
   const { style: parallaxStyle } = useParallax(0.25)
 
   return (
     <section className="relative bg-black min-h-[500px] flex items-center overflow-hidden">
       <div
-        className={`absolute inset-0 opacity-50 will-change-transform ${heroImage ? 'bg-cover bg-center bg-no-repeat' : 'bg-gray-900'}`}
-        style={heroImage ? { ...parallaxStyle, backgroundImage: `url('${heroImage}')` } : parallaxStyle}
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-50 will-change-transform"
+        style={{ ...parallaxStyle, backgroundImage: `url('${heroImage}')` }}
       />
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-32">
         <AnimateIn animation="fade-in-up">

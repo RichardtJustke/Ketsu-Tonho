@@ -1,24 +1,17 @@
-import { cloudinaryVideoUrl } from '../../../utils/cloudinary'
 import AnimateIn from '../../../shared/components/AnimateIn'
 import { useParallax } from '../../../hooks/useParallax'
 
-const videoTendas = cloudinaryVideoUrl('vdd/5ZQGjQQhSx3g1yAwgWhA_DJI_0008-v')
+const heroImage = 'https://res.cloudinary.com/dqvldq2ku/image/upload/v1772155248/Tenda_Cristal-1-1920w_lwsccv.jpg'
 
 const Hero = () => {
   const { style: parallaxStyle } = useParallax(0.2)
 
   return (
     <section className="relative bg-black min-h-[500px] flex items-center overflow-hidden">
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        className="absolute inset-0 w-full h-full object-cover opacity-50 will-change-transform"
-        style={parallaxStyle}
-      >
-        <source src={videoTendas} type="video/mp4" />
-      </video>
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-50 will-change-transform"
+        style={{ ...parallaxStyle, backgroundImage: `url('${heroImage}')` }}
+      />
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-32">
         <AnimateIn animation="fade-in-up">
