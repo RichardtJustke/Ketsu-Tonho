@@ -25,7 +25,7 @@ const EventFilterModal = ({ isOpen, onClose, onComplete }) => {
   const tendaImage = tendaImages[0] || 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=2069&auto=format&fit=crop'
   const movelImage = 'https://res.cloudinary.com/dqvldq2ku/image/upload/v1772152429/5E87AE070D5F59B45560-1920w_ut64ts.jpg'
   const boxImage = boxImages[0] || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=2032&auto=format&fit=crop'
-  const climatizadorImage = climaImages[1] || climaImages[0] || 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?q=80&w=2070&auto=format&fit=crop'
+  const climatizadorImage = 'https://res.cloudinary.com/dqvldq2ku/image/upload/v1772152446/Joape_3-1920w_rbtko2.jpg'
 
   // Estado das respostas do formulário
   const [filters, setFilters] = useState({

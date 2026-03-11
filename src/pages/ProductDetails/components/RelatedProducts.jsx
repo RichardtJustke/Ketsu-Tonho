@@ -8,34 +8,42 @@ const RelatedProducts = ({ currentCategory }) => {
   const allCategories = [
     {
       id: 'tendas',
+      aliases: ['tendas'],
       title: 'Tendas e Estruturas',
       image: 'https://res.cloudinary.com/dqvldq2ku/image/upload/v1772152433/3A7C7B230F064074BED7-1000w_fhksbr.jpg',
       href: '/tendas'
     },
     {
       id: 'moveis',
+      aliases: ['moveis', 'mobili', 'equipamentos'],
       title: 'Mobiliário e Decoração',
       image: 'https://res.cloudinary.com/dqvldq2ku/image/upload/v1772152429/5E87AE070D5F59B45560-1920w_ut64ts.jpg',
       href: '/moveis'
     },
     {
       id: 'box',
+      aliases: ['box', 'portico', 'truss'],
       title: 'Estruturas de grande porte',
       image: 'https://res.cloudinary.com/dqvldq2ku/image/upload/v1772152426/Tenda_Cristal-2-1920w_wxvz7l.jpg',
       href: '/box'
     },
     {
       id: 'climatizadores',
+      aliases: ['climatizador', 'climatizadores'],
       title: 'Climatizadores',
-      image: 'https://images.unsplash.com/photo-1585771724684-38269d6639fd?q=80&w=2070&auto=format&fit=crop',
+      image: 'https://res.cloudinary.com/dqvldq2ku/image/upload/v1772152446/Joape_3-1920w_rbtko2.jpg',
       href: '/climatizadores'
     }
   ]
 
-  const normalizedCategory = (currentCategory || '').toLowerCase().trim()
-  const relatedCategories = allCategories.filter(
-    (category) => !normalizedCategory.includes(category.id) && category.id !== normalizedCategory
-  )
+  // Normalize: remove accents and lowercase
+  const normalize = (str) => str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
+  const normalizedCategory = normalize(currentCategory || '')
+
+  const relatedCategories = allCategories.filter((category) => {
+    // Check if any alias matches the current category
+    return !category.aliases.some(alias => normalizedCategory.includes(alias))
+  })
 
   return (
     <section className="bg-[#F7F7F8] py-12 md:py-16 px-6">
