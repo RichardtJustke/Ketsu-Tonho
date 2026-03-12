@@ -56,7 +56,7 @@ const Hero = ({ onOpenFilterModal }) => {
           <AnimateIn animation="fade-in-up">
             <div className="max-w-2xl space-y-8">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-white leading-tight">
-                Soluções completas para que seu evento aconteça com total tranquilidade
+                Seu evento, nossa paixão.
               </h1>
 
               <div className="flex flex-col sm:flex-row flex-wrap items-start gap-4">

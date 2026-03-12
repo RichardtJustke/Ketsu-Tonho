@@ -87,6 +87,7 @@ Deno.serve(async (req) => {
     const { data: linkData, error: linkError } = await adminClient.auth.admin.generateLink({
       type: "signup",
       email,
+      password: crypto.randomUUID(),
       options: { redirectTo },
     });
 

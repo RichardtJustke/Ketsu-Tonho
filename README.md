@@ -1,5 +1,4 @@
 # 🎪 Tonho Locação - Sistema Web de Locação de Eventos
-.
 
 ## 📋 Sobre o Projeto
 
