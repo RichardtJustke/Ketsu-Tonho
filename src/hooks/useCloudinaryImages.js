@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../integrations/supabase/client'
-import { getFolderName } from '../utils/cloudinary'
+import { getFolderName, filterAndOrderImages } from '../utils/cloudinary'
 
 /** Module-level cache to avoid refetching */
 const cache = new Map()
@@ -40,10 +40,11 @@ export function useCloudinaryImages(folder, options = {}) {
         return
       }
       const allUrls = data?.images || []
-      const imageUrls = allUrls.filter(url => {
+      const filteredUrls = allUrls.filter(url => {
         const ext = url.split('.').pop()?.toLowerCase() || ''
         return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'svg', 'bmp', 'tiff'].includes(ext)
       })
+      const imageUrls = filterAndOrderImages(folder, filteredUrls)
       cache.set(resolvedFolder, imageUrls)
       setImages(imageUrls)
       setLoading(false)

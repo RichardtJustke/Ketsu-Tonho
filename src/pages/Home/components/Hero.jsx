@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react'
 import { useCloudinaryImages } from '../../../hooks/useCloudinaryImages'
 import AnimateIn from '../../../shared/components/AnimateIn'
 import { useParallax } from '../../../hooks/useParallax'
+import { GLOBAL_BLACKLIST } from '../../../utils/cloudinary'
 
 const HERO_ORDER = ['Tenda', 'Sem', '5E87AE07', '3A7C7B23']
 
 function orderHeroImages(urls) {
   if (!urls || urls.length === 0) return []
-  const withIndex = urls.map((url) => {
+  const filtered = urls.filter(url => !GLOBAL_BLACKLIST.some(key => url.includes(key)))
+  const withIndex = filtered.map((url) => {
     const i = HERO_ORDER.findIndex((key) => url.includes(key))
     return { url, order: i >= 0 ? i : 999 }
   })
