@@ -17,7 +17,7 @@ const MoveisGrid = ({ hasAnsweredForm, onOpenFilterModal }) => {
   useEffect(() => {
     supabase
       .from('equipment')
-      .select('*')
+      .select('*, equipment_images(*)')
       .eq('category_id', CATEGORY_ID)
       .eq('is_active', true)
       .order('name')
@@ -49,7 +49,8 @@ const MoveisGrid = ({ hasAnsweredForm, onOpenFilterModal }) => {
                 item={{
                   id: item.product_key,
                   nome: item.name,
-                  valor: Number(item.daily_price)
+                  valor: Number(item.daily_price),
+                  dbImage: item.equipment_images?.find(img => img.is_primary)?.image_url
                 }}
                 hasAnsweredForm={hasAnsweredForm}
                 onAction={handleAction}

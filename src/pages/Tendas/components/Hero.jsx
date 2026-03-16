@@ -20,7 +20,7 @@ const Hero = () => {
               Tendas
             </h1>
             <p className="text-white/80 text-lg md:text-xl leading-relaxed max-w-2xl">
-              Descubra a liberdade de celebrar ao ar livre com nossas tendas de alta qualidade. Projetadas para resistir aos elementos e proporcionar conforto, nossas tendas são a escolha perfeita para seus eventos ao ar livre.
+              Nossas tendas são a solução ideal para o seu evento ao ar livre, garantindo proteção, organização e um ambiente mais confortável para os convidados e equipes. Trabalhamos com diversos modelos e tamanhos, perfeitos para eventos corporativos, sociais, feiras, festivais e ativações de marca.
             </p>
           </div>
         </AnimateIn>

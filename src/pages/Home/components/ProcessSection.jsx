@@ -60,8 +60,8 @@ const ProcessSection = () => {
           <circle cx="24" cy="24" r="4" fill="white" opacity="0.3" />
         </svg>
       ),
-      title: 'Mobiliário e Decoração',
-      description: 'Puffs, vasos decorativos, balizadores e outros itens para deixar seu evento com a cara que você imaginou'
+      title: 'Mobiliários e equipamentos',
+      description: 'Vasos decorativos, balizadores e outros itens para deixar seu evento com a cara que você imaginou'
     },
     {
       icon: (

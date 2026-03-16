@@ -128,7 +128,7 @@ const EventFilterModal = ({ isOpen, onClose, onComplete }) => {
       image: tendaImage
     },
     {
-      title: 'Mobiliário e Decoração',
+      title: 'Mobiliários e equipamentos',
       link: '/moveis',
       image: movelImage
     },
@@ -138,7 +138,7 @@ const EventFilterModal = ({ isOpen, onClose, onComplete }) => {
       image: climatizadorImage
     },
     {
-      title: 'Estruturas de grande porte',
+      title: 'Estruturas em box 3',
       link: '/box',
       image: boxImage
     }

@@ -16,14 +16,14 @@ const RelatedProducts = ({ currentCategory }) => {
     {
       id: 'moveis',
       aliases: ['moveis', 'mobili', 'equipamentos'],
-      title: 'Mobiliário e Decoração',
+      title: 'Mobiliários e equipamentos',
       image: 'https://res.cloudinary.com/dqvldq2ku/image/upload/v1772152429/5E87AE070D5F59B45560-1920w_ut64ts.jpg',
       href: '/moveis'
     },
     {
       id: 'box',
       aliases: ['box', 'portico', 'truss'],
-      title: 'Estruturas de grande porte',
+      title: 'Estruturas em box 3',
       image: 'https://res.cloudinary.com/dqvldq2ku/image/upload/v1772152426/Tenda_Cristal-2-1920w_wxvz7l.jpg',
       href: '/box'
     },

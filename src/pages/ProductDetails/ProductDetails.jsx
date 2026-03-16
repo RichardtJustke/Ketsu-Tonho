@@ -77,9 +77,10 @@ const ProductDetails = () => {
     dimension: dbProduct.dimension || null
   }
 
-  const productImages = cloudImages.length > 0
-    ? cloudImages
-    : dbProduct.equipment_images?.sort((a, b) => a.display_order - b.display_order).map(i => i.image_url) || []
+  const dbImages = dbProduct.equipment_images?.sort((a, b) => a.display_order - b.display_order).map(i => i.image_url) || []
+  const productImages = dbImages.length > 0
+    ? dbImages
+    : cloudImages || []
 
   const handleCheckAvailability = () => {
     console.log('Verificando disponibilidade para:', productId)

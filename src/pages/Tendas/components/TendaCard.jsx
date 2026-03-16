@@ -5,7 +5,7 @@ import { useCartContext } from '../../../shared/contexts/CartContext'
 const TendaCard = ({ tenda, hasAnsweredForm, onAction, availableStock, isItemAvailable = true }) => {
   const { images } = useCloudinaryImages(tenda.id)
   const { addItem } = useCartContext()
-  const imageUrl = images.length > 0 ? images[0] : ''
+  const imageUrl = tenda.dbImage || (images.length > 0 ? images[0] : '')
   const unavailable = hasAnsweredForm && !isItemAvailable
 
   const handleClick = () => {
@@ -73,11 +73,10 @@ const TendaCard = ({ tenda, hasAnsweredForm, onAction, availableStock, isItemAva
             <button
               onClick={handleClick}
               disabled={unavailable}
-              className={`inline-flex items-center gap-2 px-4 py-2.5 border rounded-full text-sm font-medium transition-colors w-fit ${
-                unavailable
+              className={`inline-flex items-center gap-2 px-4 py-2.5 border rounded-full text-sm font-medium transition-colors w-fit ${unavailable
                   ? 'border-black/10 text-black/40 cursor-not-allowed'
                   : 'border-black/20 text-black hover:bg-black hover:text-white'
-              }`}
+                }`}
             >
               {unavailable ? 'INDISPONÍVEL' : hasAnsweredForm ? 'ALUGAR AGORA' : 'VER DISPONIBILIDADE'}
               <span className={`w-5 h-5 rounded-full flex items-center justify-center ${unavailable ? 'bg-black/20' : 'bg-[#FF5F1F]'}`}>

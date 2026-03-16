@@ -17,7 +17,7 @@ const BoxGrid = ({ hasAnsweredForm, onOpenFilterModal }) => {
   useEffect(() => {
     supabase
       .from('equipment')
-      .select('*')
+      .select('*, equipment_images(*)')
       .eq('category_id', CATEGORY_ID)
       .eq('is_active', true)
       .order('name')
@@ -50,7 +50,8 @@ const BoxGrid = ({ hasAnsweredForm, onOpenFilterModal }) => {
                   id: item.product_key,
                   nome: item.name,
                   dimensao: item.dimension || '-',
-                  valor: Number(item.daily_price)
+                  valor: Number(item.daily_price),
+                  dbImage: item.equipment_images?.find(img => img.is_primary)?.image_url
                 }}
                 hasAnsweredForm={hasAnsweredForm}
                 onAction={handleAction}

@@ -7,7 +7,7 @@ const BoxCard = ({ box, hasAnsweredForm, onAction, availableStock, isItemAvailab
   const { images: folderImages } = useCloudinaryImages(box.id)
   const { addItem } = useCartContext()
 
-  const primaryUrl = folderImages.length > 0 ? folderImages[0] : ''
+  const primaryUrl = box.dbImage || (folderImages.length > 0 ? folderImages[0] : '')
   const fallbackUrl = 'https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=800&auto=format&fit=crop'
   const [imageUrl, setImageUrl] = useState(null)
   const [imageIndex, setImageIndex] = useState(0)
@@ -150,11 +150,10 @@ const BoxCard = ({ box, hasAnsweredForm, onAction, availableStock, isItemAvailab
             <button
               onClick={handleClick}
               disabled={unavailable}
-              className={`inline-flex items-center gap-2 px-4 py-2.5 border rounded-full text-sm font-medium transition-colors w-fit ${
-                unavailable
+              className={`inline-flex items-center gap-2 px-4 py-2.5 border rounded-full text-sm font-medium transition-colors w-fit ${unavailable
                   ? 'border-black/10 text-black/40 cursor-not-allowed'
                   : 'border-black/20 text-black hover:bg-black hover:text-white'
-              }`}
+                }`}
             >
               {unavailable ? 'INDISPONÍVEL' : hasAnsweredForm ? (showSizeOptions ? 'CONFIRMAR TAMANHO' : 'ALUGAR AGORA') : 'VER DISPONIBILIDADE'}
               <span className={`w-5 h-5 rounded-full flex items-center justify-center ${unavailable ? 'bg-black/20' : 'bg-[#FF5F1F]'}`}>

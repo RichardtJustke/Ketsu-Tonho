@@ -18,7 +18,7 @@ const Hero = () => {
               Móveis e Equipamentos
             </h1>
             <p className="text-white/80 text-lg md:text-xl leading-relaxed max-w-2xl">
-              Equipamentos de alta qualidade e mobiliário desde o mais simples ao mais sofisticado. Climatizadores, equipamentos de áudio e vídeo, mesas, cadeiras, tudo que você precisa para criar um ambiente aconchegante para o seu evento.
+              Oferecemos uma linha completa de móveis e equipamentos para eventos pensados para garantir conforto, funcionalidade e organização em diferentes tipos de produções. Trabalhamos com mesas, cadeiras, bistrôs, balcões, além de diversos equipamentos que auxiliam na estrutura e no funcionamento do evento.
             </p>
           </div>
         </AnimateIn>
