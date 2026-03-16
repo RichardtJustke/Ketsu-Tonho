@@ -22,7 +22,7 @@ const TrustSection = () => {
   return (
     <section className="bg-[#F7F7F8] py-16 md:py-24 px-6">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-semibold text-black mb-12">
+        <h2 className="text-3xl md:text-4xl font-semibold text-black mb-12 text-center">
           Serviço de confiança em que você pode confiar
         </h2>
         <div className="flex flex-col lg:flex-row gap-12 items-start">

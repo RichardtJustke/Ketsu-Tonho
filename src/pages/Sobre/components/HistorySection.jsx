@@ -14,7 +14,7 @@ const HistorySection = () => {
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row gap-12 items-center">
           <div className="lg:w-1/2">
-            <h2 className="text-3xl md:text-4xl font-semibold text-black mb-6">Nossa História</h2>
+            <h2 className="text-3xl md:text-4xl font-semibold text-black mb-6 text-center">Nossa História</h2>
             <div className="text-[#333333] opacity-80 space-y-4 mb-8">
               <p>Fundada em 2013, a Tonho Locação & Eventos nasceu do desejo de facilitar a realização de eventos, oferecendo soluções completas e de qualidade. O que começou como uma pequena empresa familiar se transformou em uma das principais referências do mercado de locação para eventos.</p>
               <p>Ao longo de mais de 10 anos, construímos uma reputação sólida baseada em pontualidade, compromisso e atendimento próximo. Começamos atendendo pequenas festas familiares e hoje somos parceiros de empresas, produtores de eventos e instituições que confiam na nossa estrutura para realizar desde pequenas comemorações até grandes eventos corporativos.</p>

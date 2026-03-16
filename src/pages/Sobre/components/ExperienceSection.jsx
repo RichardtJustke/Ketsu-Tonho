@@ -38,7 +38,7 @@ const ExperienceSection = () => {
           </div>
 
           <div className="lg:w-1/2 order-1 lg:order-2">
-            <h2 className="text-3xl md:text-4xl font-semibold text-black mb-4">
+            <h2 className="text-3xl md:text-4xl font-semibold text-black mb-4 text-center">
               Experiência que entrega resultados
             </h2>
             <p className="text-[#333333] opacity-80 mb-8">

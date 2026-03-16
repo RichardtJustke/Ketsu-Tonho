@@ -23,8 +23,8 @@ const MetricsSection = () => {
         <div className="bg-[#F7F7F8] rounded-3xl p-8 md:p-12">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
             {metrics.map((metric, index) => (
-              <div key={index} className="text-center md:text-left">
-                <div className="flex items-baseline justify-center md:justify-start gap-1 mb-2">
+              <div key={index} className="text-center">
+                <div className="flex items-baseline justify-center gap-1 mb-2">
                   <span className="text-4xl md:text-5xl lg:text-6xl font-semibold text-black">
                     {metric.value}
                   </span>

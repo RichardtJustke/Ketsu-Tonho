@@ -24,7 +24,7 @@ const SolutionsSection = () => {
         <div className="flex flex-col lg:flex-row gap-12 items-center">
           {/* Left Content */}
           <div className="lg:w-1/2">
-            <h2 className="text-3xl md:text-4xl font-semibold text-black mb-4">
+            <h2 className="text-3xl md:text-4xl font-semibold text-black mb-4 text-center">
               Soluções inteligentes para eventos duradouros
             </h2>
 
