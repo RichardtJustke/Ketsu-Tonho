@@ -30,13 +30,13 @@ UPDATE public.equipment SET is_active = false WHERE product_key = 'tenda_9x6_lon
 -- 4. Tenda 10x10 Branca Image Update
 -- Ensure the primary image is replaced
 UPDATE public.equipment_images SET 
-  image_url = 'https://lirp.cdn-website.com/520c497a/dms3rep/multi/opt/Tenda+10x10+branca-2880w.jpeg'
+  image_url = 'https://res.cloudinary.com/dqvldq2ku/image/upload/v1772155047/Tenda_10x10_branca_2_ogdhq0.jpg'
 WHERE equipment_id = (SELECT id FROM public.equipment WHERE product_key = 'tenda_branca_10x10')
 AND is_primary = true;
 
 -- If no primary image exists, insert one
 INSERT INTO public.equipment_images (equipment_id, image_url, is_primary, display_order)
-SELECT id, 'https://lirp.cdn-website.com/520c497a/dms3rep/multi/opt/Tenda+10x10+branca-2880w.jpeg', true, 0
+SELECT id, 'https://res.cloudinary.com/dqvldq2ku/image/upload/v1772155047/Tenda_10x10_branca_2_ogdhq0.jpg', true, 0
 FROM public.equipment 
 WHERE product_key = 'tenda_branca_10x10'
 AND NOT EXISTS (

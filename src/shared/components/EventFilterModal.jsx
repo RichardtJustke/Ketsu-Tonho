@@ -138,7 +138,7 @@ const EventFilterModal = ({ isOpen, onClose, onComplete }) => {
       image: climatizadorImage
     },
     {
-      title: 'Estruturas em box 3',
+      title: 'Estruturas e box struss',
       link: '/box',
       image: boxImage
     }
