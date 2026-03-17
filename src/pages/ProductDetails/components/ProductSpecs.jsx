@@ -22,7 +22,7 @@ const ProductSpecs = ({ specs }) => {
       } else if (keyLower.includes('estrutura') || keyLower.includes('cobertura') || 
                  keyLower.includes('parede') || keyLower.includes('material') || keyLower.includes('lona')) {
         categories['Materiais'].push({ key, value })
-      } else if (keyLower.includes('pessoa') || keyLower.includes('capacidade') || keyLower.includes('coquetel')) {
+      } else if (keyLower.includes('pessoa') || keyLower.includes('capacidade') || keyLower.includes('coquetel') || keyLower.includes('cadeira') || keyLower.includes('mesa') || keyLower === 'mesas' || keyLower.includes('buffet')) {
         categories['Capacidade'].push({ key, value })
       } else {
         categories['Outros'].push({ key, value })
