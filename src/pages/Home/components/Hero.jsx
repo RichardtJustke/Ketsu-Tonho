@@ -77,7 +77,7 @@ const Hero = ({ onOpenFilterModal }) => {
                 <div className="flex items-center gap-4">
                   <div className="hidden sm:block w-0.5 h-16 bg-white/20" />
                   <p className="text-white text-sm max-w-xs">
-                    locação, tendas, mobiliário, equipamentos e serviços para todos os tipos de evento
+                    Locação de tendas, mobiliário, equipamentos e serviços para todos os tipos de evento
                   </p>
                 </div>
               </div>

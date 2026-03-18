@@ -23,7 +23,7 @@ const RelatedProducts = ({ currentCategory }) => {
     {
       id: 'box',
       aliases: ['box', 'portico', 'truss'],
-      title: 'Estruturas e box struss',
+      title: 'Estruturas em box struss',
       image: 'https://res.cloudinary.com/dqvldq2ku/image/upload/v1772152426/Tenda_Cristal-2-1920w_wxvz7l.jpg',
       href: '/box'
     },
