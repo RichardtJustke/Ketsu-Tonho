@@ -3,6 +3,7 @@ import { useParams, Navigate } from 'react-router-dom'
 import Navbar from '../../shared/components/Navbar'
 import Footer from '../../shared/components/Footer'
 import AnimateIn from '../../shared/components/AnimateIn'
+import EventFilterModal from '../../shared/components/EventFilterModal'
 import ProductHero from './components/ProductHero'
 import ProductImage from './components/ProductImage'
 import ProductAbout from './components/ProductAbout'
@@ -23,6 +24,7 @@ const ProductDetails = () => {
   const [hasAnsweredForm, setHasAnsweredForm] = useState(getHasAnsweredForm)
   const [dbProduct, setDbProduct] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
   const { images: cloudImages } = useCloudinaryImages(productId)
   const { addItem } = useCartContext()
 
@@ -83,7 +85,12 @@ const ProductDetails = () => {
     : cloudImages || []
 
   const handleCheckAvailability = () => {
-    console.log('Verificando disponibilidade para:', productId)
+    setIsFilterModalOpen(true)
+  }
+
+  const handleFilterComplete = (filters) => {
+    console.log('Filtros do evento:', filters)
+    setIsFilterModalOpen(false)
   }
 
   const handleAddToCart = (id, selectedSize) => {
@@ -102,6 +109,14 @@ const ProductDetails = () => {
   return (
     <main className="min-h-screen">
       <Navbar />
+      
+      {/* Modal de filtro de eventos */}
+      <EventFilterModal
+        isOpen={isFilterModalOpen}
+        onClose={() => setIsFilterModalOpen(false)}
+        onComplete={handleFilterComplete}
+      />
+
       <ProductHero
         product={product}
         hasAnsweredForm={hasAnsweredForm}
