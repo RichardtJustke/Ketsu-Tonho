@@ -12,7 +12,14 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency } from "../data/utils.ts";
 import { StatusBadge } from "../components/StatusBagde.tsx";
-import { Search, Loader2, Pencil, Plus, Upload, X, Trash2, ImageIcon } from "lucide-react";
+import { Search, Loader2, Pencil, Plus, Upload, X, Trash2, ImageIcon, AlertTriangle, PlusCircle, MinusCircle } from "lucide-react";
+
+const generateProductKey = (name: string) =>
+  name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
+
+interface SpecRow { key: string; value: string }
+interface BenefitRow { title: string; description: string }
+import { toast } from "sonner";
 
 const PAGE_SIZE = 12;
 
@@ -45,6 +52,10 @@ export default function TonhoProdutos() {
   const [uploading, setUploading] = useState(false);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Specs & Benefits editors
+  const [specRows, setSpecRows] = useState<SpecRow[]>([]);
+  const [benefitRows, setBenefitRows] = useState<BenefitRow[]>([]);
 
   // Delete state
   const [deleting, setDeleting] = useState(false);
@@ -90,25 +101,42 @@ export default function TonhoProdutos() {
     setIsNew(false);
     setPendingFiles([]);
     fetchEditImages(item.id);
+    // Parse specs JSONB object into rows
+    const specs = item.specs && typeof item.specs === "object" && !Array.isArray(item.specs)
+      ? Object.entries(item.specs).map(([key, value]) => ({ key, value: String(value) }))
+      : [];
+    setSpecRows(specs);
+    // Parse benefits JSONB array into rows
+    const benefits = Array.isArray(item.benefits)
+      ? item.benefits.map((b: any) => ({ title: b.title || "", description: b.description || "" }))
+      : [];
+    setBenefitRows(benefits);
   };
 
   const openNew = () => {
     setEditItem({
       name: "", daily_price: 0, deposit_amount: 0,
       stock_total: 0, stock_available: 0, category_id: "", is_active: true,
-      product_key: "", dimension: "", short_description: "", full_description: "",
+      dimension: "", short_description: "", full_description: "", description: "",
     });
     setIsNew(true);
     setEditImages([]);
     setPendingFiles([]);
+    setSpecRows([]);
+    setBenefitRows([]);
   };
 
   const uploadFiles = async (equipmentId: string, files: File[]) => {
+    const errors: string[] = [];
     for (const file of files) {
       const ext = file.name.split(".").pop();
-      const path = `${equipmentId}/${Date.now()}.${ext}`;
+      const path = `${equipmentId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
       const { error: uploadErr } = await supabase.storage.from("equipment-images").upload(path, file);
-      if (uploadErr) { console.error("Upload error:", uploadErr); continue; }
+      if (uploadErr) {
+        console.error("Upload error:", uploadErr);
+        errors.push(file.name);
+        continue;
+      }
       const { data: urlData } = supabase.storage.from("equipment-images").getPublicUrl(path);
       const hasPrimary = editImages.length > 0 || files.indexOf(file) > 0;
       await supabase.from("equipment_images").insert({
@@ -118,11 +146,18 @@ export default function TonhoProdutos() {
         display_order: editImages.length + files.indexOf(file),
       });
     }
+    return errors;
   };
 
   const handleSave = async () => {
     if (!editItem) return;
     setSaving(true);
+    // Build specs object from rows
+    const specsObj: Record<string, string> = {};
+    specRows.filter(r => r.key.trim()).forEach(r => { specsObj[r.key.trim()] = r.value; });
+    // Build benefits array from rows
+    const benefitsArr = benefitRows.filter(r => r.title.trim()).map(r => ({ title: r.title.trim(), description: r.description.trim() }));
+
     const payload: any = {
       name: editItem.name,
       daily_price: Number(editItem.daily_price),
@@ -134,43 +169,67 @@ export default function TonhoProdutos() {
       dimension: editItem.dimension || null,
       short_description: editItem.short_description || null,
       full_description: editItem.full_description || null,
+      description: editItem.description || null,
+      specs: Object.keys(specsObj).length > 0 ? specsObj : null,
+      benefits: benefitsArr.length > 0 ? benefitsArr : null,
     };
-    if (isNew && editItem.product_key) {
-      payload.product_key = editItem.product_key;
+    if (isNew) {
+      payload.product_key = generateProductKey(editItem.name);
     }
 
     let equipmentId = editItem.id;
+    const wasNew = isNew;
 
     if (isNew) {
-      const { data } = await supabase.from("equipment").insert(payload).select("id").single();
+      const { data, error } = await supabase.from("equipment").insert(payload).select("id").single();
+      if (error) {
+        toast.error("Erro ao criar produto: " + error.message);
+        setSaving(false);
+        return;
+      }
       equipmentId = data?.id;
     } else {
-      await supabase.from("equipment").update(payload).eq("id", editItem.id);
+      const { error } = await supabase.from("equipment").update(payload).eq("id", editItem.id);
+      if (error) {
+        toast.error("Erro ao salvar produto: " + error.message);
+        setSaving(false);
+        return;
+      }
     }
 
+    let uploadErrors: string[] = [];
     if (equipmentId && pendingFiles.length > 0) {
       setUploading(true);
-      await uploadFiles(equipmentId, pendingFiles);
+      uploadErrors = await uploadFiles(equipmentId, pendingFiles);
       setUploading(false);
     }
 
     setSaving(false);
     setEditItem(null);
     fetchData();
+
+    if (uploadErrors.length > 0) {
+      toast.warning(`Produto salvo, mas ${uploadErrors.length} imagem(ns) falharam: ${uploadErrors.join(", ")}`);
+    } else {
+      toast.success(wasNew ? "Produto criado com sucesso!" : "Produto atualizado com sucesso!");
+    }
   };
 
   const handleDeleteImage = async (img: EquipmentImage) => {
-    // Extract path from URL for storage deletion
     const urlParts = img.image_url.split("/equipment-images/");
     if (urlParts[1]) {
       await supabase.storage.from("equipment-images").remove([decodeURIComponent(urlParts[1])]);
     }
-    await supabase.from("equipment_images").delete().eq("id", img.id);
+    const { error } = await supabase.from("equipment_images").delete().eq("id", img.id);
+    if (error) {
+      toast.error("Erro ao remover imagem");
+      return;
+    }
     setEditImages((prev) => prev.filter((i) => i.id !== img.id));
+    toast.success("Imagem removida");
   };
 
   const handleSetPrimary = async (img: EquipmentImage) => {
-    // Unset all, then set this one
     await supabase.from("equipment_images").update({ is_primary: false }).eq("equipment_id", img.equipment_id);
     await supabase.from("equipment_images").update({ is_primary: true }).eq("id", img.id);
     setEditImages((prev) => prev.map((i) => ({ ...i, is_primary: i.id === img.id })));
@@ -179,7 +238,7 @@ export default function TonhoProdutos() {
   const handleDeleteProduct = async () => {
     if (!editItem?.id) return;
     setDeleting(true);
-    // Delete images from storage
+    const productName = editItem.name;
     const { data: imgs } = await supabase.from("equipment_images").select("image_url").eq("equipment_id", editItem.id);
     if (imgs && imgs.length > 0) {
       const paths = imgs.map((i: any) => {
@@ -189,10 +248,15 @@ export default function TonhoProdutos() {
       if (paths.length > 0) await supabase.storage.from("equipment-images").remove(paths);
     }
     await supabase.from("equipment_images").delete().eq("equipment_id", editItem.id);
-    await supabase.from("equipment").delete().eq("id", editItem.id);
+    const { error } = await supabase.from("equipment").delete().eq("id", editItem.id);
     setDeleting(false);
+    if (error) {
+      toast.error("Erro ao excluir produto: " + error.message);
+      return;
+    }
     setEditItem(null);
     fetchData();
+    toast.success(`Produto "${productName}" excluído com sucesso`);
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -366,15 +430,25 @@ export default function TonhoProdutos() {
                 <Label>Nome</Label>
                 <Input value={editItem.name} onChange={(e) => setEditItem({ ...editItem, name: e.target.value })} />
               </div>
-              {isNew && (
+              {/* Auto-generated product_key: shown read-only on edit */}
+              {!isNew && editItem.product_key && (
                 <div className="space-y-1.5">
-                  <Label>Chave do produto (product_key)</Label>
-                  <Input value={editItem.product_key ?? ""} onChange={(e) => setEditItem({ ...editItem, product_key: e.target.value })} placeholder="ex: tenda_branca_5x5" />
+                  <Label className="text-muted-foreground text-xs">Chave do produto (automática)</Label>
+                  <Input value={editItem.product_key} disabled className="bg-muted text-muted-foreground text-xs" />
                 </div>
+              )}
+              {isNew && editItem.name && (
+                <p className="text-xs text-muted-foreground">
+                  Chave gerada: <code className="rounded bg-muted px-1 py-0.5">{generateProductKey(editItem.name)}</code>
+                </p>
               )}
               <div className="space-y-1.5">
                 <Label>Dimensão</Label>
                 <Input value={editItem.dimension ?? ""} onChange={(e) => setEditItem({ ...editItem, dimension: e.target.value })} placeholder="ex: 5x5m" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Descrição (geral)</Label>
+                <Textarea value={editItem.description ?? ""} onChange={(e) => setEditItem({ ...editItem, description: e.target.value })} rows={2} placeholder="Descrição geral do produto" />
               </div>
               <div className="space-y-1.5">
                 <Label>Descrição curta (exibida nos cards)</Label>
@@ -383,6 +457,50 @@ export default function TonhoProdutos() {
               <div className="space-y-1.5">
                 <Label>Descrição completa (página do produto)</Label>
                 <Textarea value={editItem.full_description ?? ""} onChange={(e) => setEditItem({ ...editItem, full_description: e.target.value })} rows={4} />
+              </div>
+
+              {/* Specs editor */}
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold">Especificações</Label>
+                {specRows.map((row, idx) => (
+                  <div key={idx} className="flex items-center gap-2">
+                    <Input placeholder="Chave (ex: Comprimento)" value={row.key} onChange={(e) => {
+                      const next = [...specRows]; next[idx] = { ...next[idx], key: e.target.value }; setSpecRows(next);
+                    }} className="flex-1" />
+                    <Input placeholder="Valor (ex: 5 metros)" value={row.value} onChange={(e) => {
+                      const next = [...specRows]; next[idx] = { ...next[idx], value: e.target.value }; setSpecRows(next);
+                    }} className="flex-1" />
+                    <button type="button" onClick={() => setSpecRows(specRows.filter((_, i) => i !== idx))} className="text-destructive hover:text-destructive/80">
+                      <MinusCircle className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+                <button type="button" onClick={() => setSpecRows([...specRows, { key: "", value: "" }])} className="inline-flex items-center gap-1 text-xs text-primary hover:underline">
+                  <PlusCircle className="h-3.5 w-3.5" /> Adicionar especificação
+                </button>
+              </div>
+
+              {/* Benefits editor */}
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold">Benefícios</Label>
+                {benefitRows.map((row, idx) => (
+                  <div key={idx} className="space-y-1 rounded-md border p-2">
+                    <div className="flex items-center gap-2">
+                      <Input placeholder="Título" value={row.title} onChange={(e) => {
+                        const next = [...benefitRows]; next[idx] = { ...next[idx], title: e.target.value }; setBenefitRows(next);
+                      }} className="flex-1" />
+                      <button type="button" onClick={() => setBenefitRows(benefitRows.filter((_, i) => i !== idx))} className="text-destructive hover:text-destructive/80">
+                        <MinusCircle className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <Textarea placeholder="Descrição do benefício" value={row.description} onChange={(e) => {
+                      const next = [...benefitRows]; next[idx] = { ...next[idx], description: e.target.value }; setBenefitRows(next);
+                    }} rows={2} />
+                  </div>
+                ))}
+                <button type="button" onClick={() => setBenefitRows([...benefitRows, { title: "", description: "" }])} className="inline-flex items-center gap-1 text-xs text-primary hover:underline">
+                  <PlusCircle className="h-3.5 w-3.5" /> Adicionar benefício
+                </button>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
@@ -449,7 +567,8 @@ export default function TonhoProdutos() {
             <div className="flex gap-2">
               <button onClick={() => setEditItem(null)} className="rounded-md border px-4 py-2 text-sm hover:bg-muted">Cancelar</button>
               <button onClick={handleSave} disabled={saving || uploading || !editItem?.name} className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
-                {(saving || uploading) && <Loader2 className="h-4 w-4 animate-spin" />} Salvar
+                {(saving || uploading) && <Loader2 className="h-4 w-4 animate-spin" />}
+                {uploading ? "Enviando imagens…" : "Salvar"}
               </button>
             </div>
           </DialogFooter>
