@@ -127,6 +127,36 @@ export type Database = {
           },
         ]
       }
+      buffet_menu_items: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          is_active: boolean
+          name: string
+          subcategory: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          name: string
+          subcategory: string
+          type: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          name?: string
+          subcategory?: string
+          type?: string
+        }
+        Relationships: []
+      }
       buffet_order_items: {
         Row: {
           id: string
@@ -168,6 +198,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      buffet_packages: {
+        Row: {
+          base_price: number
+          created_at: string
+          description: string | null
+          display_order: number
+          id: string
+          is_active: boolean
+          item_limit: number | null
+          slug: string
+          tier: string
+          type: string
+        }
+        Insert: {
+          base_price?: number
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          item_limit?: number | null
+          slug: string
+          tier: string
+          type: string
+        }
+        Update: {
+          base_price?: number
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          item_limit?: number | null
+          slug?: string
+          tier?: string
+          type?: string
+        }
+        Relationships: []
       }
       cart_items: {
         Row: {

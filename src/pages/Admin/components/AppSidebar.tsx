@@ -18,6 +18,7 @@ import {
   X,
   LogOut,
   Ticket,
+  UtensilsCrossed,
 } from "lucide-react";
 import { NavLink } from "./NavLink.tsx";
 import { cn } from "../lib/utils.ts";
@@ -41,6 +42,7 @@ const tonhoItems: NavItem[] = [
 
 const chicasItems: NavItem[] = [
   { title: "Dashboard", url: "/admin/chicas", icon: LayoutDashboard },
+  { title: "Cardápio", url: "/admin/chicas/cardapio", icon: UtensilsCrossed },
   { title: "Serviços", url: "/admin/chicas/servicos", icon: Wrench },
   { title: "Disponibilidade", url: "/admin/chicas/disponibilidade", icon: Clock },
   { title: "Eventos Fechados", url: "/admin/chicas/eventos", icon: CalendarDays },
