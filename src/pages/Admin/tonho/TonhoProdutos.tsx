@@ -1,6 +1,5 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import { Card, CardContent } from "../components/ui/card.tsx";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table.tsx";
 import { Input } from "../components/ui/input.tsx";
 import { Label } from "../components/ui/label.tsx";
 import { Switch } from "../components/ui/switch.tsx";
@@ -305,56 +304,88 @@ export default function TonhoProdutos() {
         </Select>
       </div>
 
-      {/* Table */}
-      <Card>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Produto</TableHead>
-                <TableHead>Categoria</TableHead>
-                <TableHead className="text-right">Preço/dia</TableHead>
-                <TableHead className="text-center">Estoque</TableHead>
-                <TableHead className="text-center">Status</TableHead>
-                <TableHead className="text-center">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paged.map((item) => {
-                const st = getStatus(item);
-                const thumb = imageMap[item.id];
-                return (
-                  <TableRow key={item.id} className={!item.is_active ? "opacity-50" : ""}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-md border bg-muted">
-                          {thumb ? (
-                            <img src={thumb} alt={item.name} className="h-full w-full object-cover" />
-                          ) : (
-                            <div className="flex h-full w-full items-center justify-center">
-                              <ImageIcon className="h-4 w-4 text-muted-foreground" />
-                            </div>
-                          )}
-                        </div>
-                        <span className="font-medium max-w-[200px] truncate">{item.name}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">{(item.equipment_categories as any)?.name ?? "—"}</TableCell>
-                    <TableCell className="text-right font-semibold text-primary">{formatCurrency(Number(item.daily_price))}</TableCell>
-                    <TableCell className="text-center">{item.stock_available}/{item.stock_total}</TableCell>
-                    <TableCell className="text-center"><StatusBadge status={st.status} label={st.label} /></TableCell>
-                    <TableCell className="text-center">
-                      <button onClick={() => openEdit(item)} className="inline-flex items-center gap-1 rounded px-2 py-1 text-xs text-muted-foreground hover:bg-muted hover:text-foreground">
-                        <Pencil className="h-3.5 w-3.5" /> Editar
-                      </button>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+      {/* Cards Grid */}
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {paged.map((item) => {
+          const st = getStatus(item);
+          const thumb = imageMap[item.id];
+          return (
+            <Card 
+              key={item.id} 
+              className={`overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group ${!item.is_active ? "opacity-50" : ""}`}
+              onClick={() => openEdit(item)}
+            >
+              {/* Image Container */}
+              <div className="relative h-48 overflow-hidden bg-muted">
+                {thumb ? (
+                  <img 
+                    src={thumb} 
+                    alt={item.name} 
+                    className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300" 
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center">
+                    <ImageIcon className="h-12 w-12 text-muted-foreground/30" />
+                  </div>
+                )}
+                {/* Status Badge */}
+                <div className="absolute top-2 right-2">
+                  <StatusBadge status={st.status} label={st.label} />
+                </div>
+              </div>
+
+              {/* Content */}
+              <CardContent className="p-4 space-y-3">
+                {/* Category */}
+                {(item.equipment_categories as any)?.name && (
+                  <div className="text-xs text-muted-foreground uppercase tracking-wide font-medium">
+                    {(item.equipment_categories as any).name}
+                  </div>
+                )}
+                
+                {/* Product Name */}
+                <div className="min-h-[2.5rem]">
+                  <h3 className="font-semibold text-sm line-clamp-2 group-hover:text-primary transition-colors">
+                    {item.name}
+                  </h3>
+                </div>
+
+                {/* Price */}
+                <div className="flex items-baseline gap-1">
+                  <span className="text-xs text-muted-foreground">Diária:</span>
+                  <span className="text-lg font-bold text-primary">
+                    {formatCurrency(Number(item.daily_price))}
+                  </span>
+                </div>
+
+                {/* Stock */}
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">Estoque:</span>
+                  <span className={`font-semibold ${
+                    item.stock_available === 0 ? 'text-red-500' :
+                    item.stock_available < 5 ? 'text-yellow-500' :
+                    'text-green-500'
+                  }`}>
+                    {item.stock_available}/{item.stock_total}
+                  </span>
+                </div>
+
+                {/* Edit Button */}
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openEdit(item);
+                  }} 
+                  className="w-full mt-3 inline-flex items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+                >
+                  <Pencil className="h-3.5 w-3.5" /> 
+                  Editar
+                </button>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
 
       {/* Pagination */}
       {totalPages > 1 && (
