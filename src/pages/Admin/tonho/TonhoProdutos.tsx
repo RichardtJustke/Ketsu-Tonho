@@ -11,7 +11,7 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency } from "../data/utils.ts";
 import { StatusBadge } from "../components/StatusBagde.tsx";
-import { Search, Loader2, Pencil, Plus, Upload, X, Trash2, ImageIcon, AlertTriangle, PlusCircle, MinusCircle } from "lucide-react";
+import { Search, Loader2, Pencil, Plus, Upload, X, Trash2, AlertTriangle, PlusCircle, MinusCircle } from "lucide-react";
 
 const generateProductKey = (name: string) =>
   name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
@@ -308,34 +308,19 @@ export default function TonhoProdutos() {
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {paged.map((item) => {
           const st = getStatus(item);
-          const thumb = imageMap[item.id];
           return (
             <Card 
               key={item.id} 
-              className={`overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group ${!item.is_active ? "opacity-50" : ""}`}
+              className={`hover:shadow-lg transition-shadow cursor-pointer group ${!item.is_active ? "opacity-50" : ""}`}
               onClick={() => openEdit(item)}
             >
-              {/* Image Container */}
-              <div className="relative h-48 overflow-hidden bg-muted">
-                {thumb ? (
-                  <img 
-                    src={thumb} 
-                    alt={item.name} 
-                    className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300" 
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center">
-                    <ImageIcon className="h-12 w-12 text-muted-foreground/30" />
-                  </div>
-                )}
-                {/* Status Badge */}
-                <div className="absolute top-2 right-2">
-                  <StatusBadge status={st.status} label={st.label} />
-                </div>
+              {/* Status Badge */}
+              <div className="absolute top-3 right-3 z-10">
+                <StatusBadge status={st.status} label={st.label} />
               </div>
 
               {/* Content */}
-              <CardContent className="p-4 space-y-3">
+              <CardContent className="p-4 space-y-3 relative">
                 {/* Category */}
                 {(item.equipment_categories as any)?.name && (
                   <div className="text-xs text-muted-foreground uppercase tracking-wide font-medium">

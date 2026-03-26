@@ -32,7 +32,7 @@ interface NavItem {
 
 const tonhoItems: NavItem[] = [
   { title: "Dashboard", url: "/admin/tonho", icon: LayoutDashboard },
-  { title: "Estoque", url: "/admin/tonho/estoque", icon: Warehouse },
+  // { title: "Estoque", url: "/admin/tonho/estoque", icon: Warehouse },
   { title: "Produtos", url: "/admin/tonho/produtos", icon: Package },
   { title: "Vendas", url: "/admin/tonho/vendas", icon: ShoppingCart },
   { title: "Eventos Fechados", url: "/admin/tonho/eventos", icon: CalendarDays },

@@ -19,7 +19,7 @@ import { AppLayout } from './pages/Admin/components/AppLayout.tsx'
 import AdminGuard from './pages/Admin/components/AdminGuard.tsx'
 import AdminLogin from './pages/Admin/AdminLogin.tsx'
 import TonhoDashboard from './pages/Admin/tonho/TonhoDashboard.tsx'
-import TonhoEstoque from './pages/Admin/tonho/TonhoEstoque.tsx'
+// import TonhoEstoque from './pages/Admin/tonho/TonhoEstoque.tsx'
 import TonhoProdutos from './pages/Admin/tonho/TonhoProdutos.tsx'
 import TonhoVendas from './pages/Admin/tonho/TonhoVendas.tsx'
 import TonhoEventos from './pages/Admin/tonho/TonhoEventos.tsx'
@@ -63,7 +63,7 @@ function App() {
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminGuard><AppLayout><Admin /></AppLayout></AdminGuard>} />
           <Route path="/admin/tonho" element={<AdminGuard><AppLayout><TonhoDashboard /></AppLayout></AdminGuard>} />
-          <Route path="/admin/tonho/estoque" element={<AdminGuard><AppLayout><TonhoEstoque /></AppLayout></AdminGuard>} />
+          {/* <Route path="/admin/tonho/estoque" element={<AdminGuard><AppLayout><TonhoEstoque /></AppLayout></AdminGuard>} /> */}
           <Route path="/admin/tonho/produtos" element={<AdminGuard><AppLayout><TonhoProdutos /></AppLayout></AdminGuard>} />
           <Route path="/admin/tonho/vendas" element={<AdminGuard><AppLayout><TonhoVendas /></AppLayout></AdminGuard>} />
           <Route path="/admin/tonho/eventos" element={<AdminGuard><AppLayout><TonhoEventos /></AppLayout></AdminGuard>} />
