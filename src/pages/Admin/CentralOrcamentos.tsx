@@ -1,9 +1,9 @@
-import { Fragment, useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Card, CardContent } from "./components/ui/card.tsx";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./components/ui/table.tsx";
 import { Button } from "./components/ui/button.tsx";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./components/ui/select.tsx";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "./components/ui/pagination.tsx";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./components/ui/dialog.tsx";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,7 +13,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency, formatDate, orderStatusLabel } from "./data/utils.ts";
 import { StatusBadge } from "./components/StatusBagde.tsx";
-import { ArrowRight, ChevronDown, ChevronUp, Loader2, MoreVertical, Check, Pencil, DollarSign, XCircle } from "lucide-react";
+import { ArrowRight, Loader2, MoreVertical, Check, Pencil, DollarSign, XCircle, Eye } from "lucide-react";
 import { OrderModifyModal } from "./components/OrderModifyModal.tsx";
 
 const PAGE_SIZE = 12;
@@ -25,10 +25,10 @@ export default function CentralOrcamentos() {
   const [loading, setLoading] = useState(true);
   const [filterPlatform, setFilterPlatform] = useState("todas");
   const [filterStatus, setFilterStatus] = useState("todos");
-  const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   
-  // Modal state
+  // Modal states
+  const [detailOrder, setDetailOrder] = useState<any | null>(null);
   const [editingOrder, setEditingOrder] = useState<any | null>(null);
 
   const loadOrders = async () => {
@@ -132,120 +132,116 @@ export default function CentralOrcamentos() {
 
       <Card>
         <CardContent className="p-0 overflow-x-auto">
-          <Table className="min-w-[700px]">
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-8"></TableHead>
-                <TableHead>Data</TableHead>
-                <TableHead>Plataforma</TableHead>
-                <TableHead>Cliente</TableHead>
-                <TableHead className="text-right">Valor</TableHead>
-                <TableHead className="text-center">Status</TableHead>
-                <TableHead className="text-center">Ação</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paged.map((o) => (
-                <Fragment key={o.id}>
-                  <TableRow className="cursor-pointer" onClick={() => setExpandedOrder(expandedOrder === o.id ? null : o.id)}>
-                    <TableCell className="px-2">
-                      {orderItems[o.id]?.length ? (
-                        expandedOrder === o.id ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                      ) : null}
-                    </TableCell>
-                    <TableCell>{formatDate(o.created_at)}</TableCell>
-                    <TableCell><span className="text-xs font-medium uppercase text-muted-foreground">{o.platform}</span></TableCell>
-                    <TableCell className="font-medium">{(o.profiles as any)?.name ?? "Cliente desconhecido"}</TableCell>
-                    <TableCell className="text-right font-medium">{formatCurrency(Number(o.total_amount))}</TableCell>
-                    <TableCell className="text-center">{statusBadge(o.status, o.was_modified)}</TableCell>
-                    <TableCell className="text-center" onClick={(e) => e.stopPropagation()}>
-                      {(o.status === "pending" || o.status === "confirmed" || o.status === "paid") && (
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            {o.status === "pending" && (
-                              <>
-                                <DropdownMenuItem onClick={() => handleApproveOrder(o)}>
-                                  <Check className="mr-2 h-4 w-4 text-green-600" />
-                                  Aprovar Pedido
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleModifyOrder(o)}>
-                                  <Pencil className="mr-2 h-4 w-4 text-amber-600" />
-                                  Modificar Pedido
-                                </DropdownMenuItem>
-                              </>
-                            )}
-                            {o.status === "confirmed" && (
-                              <DropdownMenuItem onClick={() => advanceStatus(o.id, o.status)}>
-                                <DollarSign className="mr-2 h-4 w-4 text-green-600" />
-                                Confirmar Pagamento
-                              </DropdownMenuItem>
-                            )}
-                            {o.status === "paid" && (
-                              <DropdownMenuItem onClick={() => advanceStatus(o.id, o.status)}>
-                                <Check className="mr-2 h-4 w-4 text-green-600" />
-                                Marcar como Concluído
-                              </DropdownMenuItem>
-                            )}
-                            {(o.status === "pending" || o.status === "confirmed") && (
-                              <DropdownMenuItem onClick={() => cancelOrder(o.id)} className="text-destructive focus:text-destructive">
-                                <XCircle className="mr-2 h-4 w-4" />
-                                Cancelar Pedido
-                              </DropdownMenuItem>
-                            )}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                  {expandedOrder === o.id && orderItems[o.id] && (
-                    <TableRow key={`${o.id}-items`}>
-                      <TableCell colSpan={7} className="bg-muted/50 p-4">
-                        <div className="space-y-2">
-                          <div className="flex flex-wrap gap-4 mb-3">
-                            {o.event_date && (
-                              <p className="text-xs text-muted-foreground">📅 Data do evento: <span className="font-semibold text-foreground">{formatDate(o.event_date)}</span></p>
-                            )}
-                            {(o.profiles as any)?.phone && (
-                              <p className="text-xs text-muted-foreground">📞 Telefone: <span className="font-semibold text-foreground">{(o.profiles as any).phone}</span></p>
-                            )}
-                            {Number(o.discount_amount) > 0 && (
-                              <p className="text-xs text-muted-foreground">🏷️ Cupom: <span className="font-semibold text-foreground">{o.coupon_code}</span> — Desconto: <span className="font-semibold text-green-600">-{formatCurrency(Number(o.discount_amount))}</span></p>
-                            )}
-                            {o.was_modified && (
-                              <p className="text-xs text-amber-600 font-medium">✏️ Pedido modificado pelo admin</p>
-                            )}
-                          </div>
-                          <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">Itens do pedido</p>
-                          {o.notes && <p className="text-xs text-muted-foreground mb-2">📝 {o.notes}</p>}
-                          <div className="divide-y divide-border rounded-md border bg-background">
-                            {orderItems[o.id].map((item: any) => (
-                              <div key={item.id} className="flex items-center gap-3 p-3">
-                                {item.image && <img src={item.image} alt={item.name} className="h-10 w-10 rounded object-cover" />}
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium truncate">{item.name}</p>
-                                  <p className="text-xs text-muted-foreground">{item.product_key}</p>
-                                </div>
-                                <span className="text-xs text-muted-foreground">x{item.quantity}</span>
-                                <span className="text-sm font-medium">{formatCurrency(Number(item.unit_price) * item.quantity)}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </TableCell>
-                    </TableRow>
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 p-6">
+            {paged.map((o) => (
+              <div key={o.id} className="border rounded-lg p-4 hover:shadow-lg transition-shadow bg-background space-y-3">
+                {/* Header: Status Badge */}
+                <div className="flex items-start justify-between">
+                  <div className="space-y-1 flex-1">
+                    <p className="text-xs text-muted-foreground uppercase font-medium">{formatDate(o.created_at)}</p>
+                    <p className="font-bold text-base text-foreground">{(o.profiles as any)?.name ?? "Cliente desconhecido"}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold uppercase text-muted-foreground bg-muted px-2 py-1 rounded">
+                      {o.platform}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Status */}
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Status:</span>
+                  <div>{statusBadge(o.status, o.was_modified)}</div>
+                </div>
+
+                {/* Amount */}
+                <div className="border-t pt-3">
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-xs text-muted-foreground">Valor total:</span>
+                    <span className="text-xl font-bold text-primary">{formatCurrency(Number(o.total_amount))}</span>
+                  </div>
+                </div>
+
+                {/* Extra info */}
+                <div className="text-xs space-y-1 border-t pt-3">
+                  {o.event_date && (
+                    <p className="text-muted-foreground">📅 Evento: <span className="font-semibold text-foreground">{formatDate(o.event_date)}</span></p>
                   )}
-                </Fragment>
-              ))}
-              {filtered.length === 0 && (
-                <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-8">Nenhum pedido encontrado.</TableCell></TableRow>
-              )}
-            </TableBody>
-          </Table>
+                  {(o.profiles as any)?.phone && (
+                    <p className="text-muted-foreground">📞 <span className="font-semibold text-foreground">{(o.profiles as any).phone}</span></p>
+                  )}
+                  {Number(o.discount_amount) > 0 && (
+                    <p className="text-green-600">🏷️ Desconto: <span className="font-semibold">-{formatCurrency(Number(o.discount_amount))}</span></p>
+                  )}
+                </div>
+
+                {/* Items count + Action buttons */}
+                <div className="pt-2 space-y-2 border-t">
+                  {orderItems[o.id]?.length > 0 && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="w-full text-xs"
+                      onClick={() => setDetailOrder(o)}
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      Ver Detalhes ({orderItems[o.id].length} itens)
+                    </Button>
+                  )}
+
+                  {/* Actions Menu */}
+                  {(o.status === "pending" || o.status === "confirmed" || o.status === "paid") && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm" className="w-full">
+                          <MoreVertical className="h-4 w-4 mr-2" />
+                          Ações
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-56">
+                        {o.status === "pending" && (
+                          <>
+                            <DropdownMenuItem onClick={() => handleApproveOrder(o)} className="text-green-600">
+                              <Check className="mr-2 h-4 w-4" />
+                              Aprovar Pedido
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleModifyOrder(o)} className="text-amber-600">
+                              <Pencil className="mr-2 h-4 w-4" />
+                              Modificar Pedido
+                            </DropdownMenuItem>
+                          </>
+                        )}
+                        {o.status === "confirmed" && (
+                          <DropdownMenuItem onClick={() => advanceStatus(o.id, o.status)} className="text-green-600">
+                            <DollarSign className="mr-2 h-4 w-4" />
+                            Confirmar Pagamento
+                          </DropdownMenuItem>
+                        )}
+                        {o.status === "paid" && (
+                          <DropdownMenuItem onClick={() => advanceStatus(o.id, o.status)} className="text-green-600">
+                            <Check className="mr-2 h-4 w-4" />
+                            Marcar Concluído
+                          </DropdownMenuItem>
+                        )}
+                        {(o.status === "pending" || o.status === "confirmed") && (
+                          <DropdownMenuItem onClick={() => cancelOrder(o.id)} className="text-destructive">
+                            <XCircle className="mr-2 h-4 w-4" />
+                            Cancelar Pedido
+                          </DropdownMenuItem>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {filtered.length === 0 && (
+            <div className="text-center text-muted-foreground py-12 px-6">
+              Nenhum pedido encontrado.
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -268,6 +264,97 @@ export default function CentralOrcamentos() {
           </PaginationContent>
         </Pagination>
       )}
+
+      {/* Order Details Modal */}
+      <Dialog open={!!detailOrder} onOpenChange={(open) => { if (!open) setDetailOrder(null); }}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Detalhes do Pedido</DialogTitle>
+          </DialogHeader>
+          {detailOrder && (
+            <div className="space-y-6 py-4">
+              {/* Header Info */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs text-muted-foreground">Cliente</p>
+                  <p className="font-semibold text-foreground">{(detailOrder.profiles as any)?.name ?? "Cliente desconhecido"}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Data do Pedido</p>
+                  <p className="font-semibold text-foreground">{formatDate(detailOrder.created_at)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Plataforma</p>
+                  <p className="font-semibold uppercase text-sm text-foreground">{detailOrder.platform}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Status</p>
+                  <div className="mt-1">{statusBadge(detailOrder.status, detailOrder.was_modified)}</div>
+                </div>
+              </div>
+
+              {/* Contact & Event Info */}
+              <div className="border-t pt-4 space-y-3">
+                {(detailOrder.profiles as any)?.phone && (
+                  <div>
+                    <p className="text-xs text-muted-foreground">📞 Telefone</p>
+                    <p className="font-semibold text-foreground">{(detailOrder.profiles as any).phone}</p>
+                  </div>
+                )}
+                {detailOrder.event_date && (
+                  <div>
+                    <p className="text-xs text-muted-foreground">📅 Data do Evento</p>
+                    <p className="font-semibold text-foreground">{formatDate(detailOrder.event_date)}</p>
+                  </div>
+                )}
+                {detailOrder.notes && (
+                  <div>
+                    <p className="text-xs text-muted-foreground">📝 Notas</p>
+                    <p className="font-semibold text-foreground">{detailOrder.notes}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Items Section */}
+              <div className="border-t pt-4 space-y-3">
+                <p className="text-sm font-semibold uppercase text-muted-foreground">Itens do Pedido</p>
+                <div className="space-y-2">
+                  {orderItems[detailOrder.id]?.map((item: any) => (
+                    <div key={item.id} className="flex items-center gap-3 p-3 border rounded-lg bg-muted/30">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-foreground truncate">{item.name}</p>
+                        <p className="text-xs text-muted-foreground">{item.product_key}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-muted-foreground">Qtd: <span className="font-semibold text-foreground">{item.quantity}</span></p>
+                        <p className="font-semibold text-primary">{formatCurrency(Number(item.unit_price) * item.quantity)}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Pricing Summary */}
+              <div className="border-t pt-4 space-y-2 bg-muted/50 p-4 rounded">
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Subtotal:</span>
+                  <span className="font-semibold">{formatCurrency(Number(detailOrder.subtotal))}</span>
+                </div>
+                {Number(detailOrder.discount_amount) > 0 && (
+                  <div className="flex items-center justify-between text-green-600">
+                    <span>Desconto ({detailOrder.coupon_code}):</span>
+                    <span className="font-semibold">-{formatCurrency(Number(detailOrder.discount_amount))}</span>
+                  </div>
+                )}
+                <div className="flex items-center justify-between border-t pt-2 text-lg">
+                  <span className="font-bold">Total:</span>
+                  <span className="font-bold text-primary">{formatCurrency(Number(detailOrder.total_amount))}</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Order Modify Modal */}
       {editingOrder && (
