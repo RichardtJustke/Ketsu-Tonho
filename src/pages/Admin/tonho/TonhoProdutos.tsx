@@ -329,10 +329,20 @@ export default function TonhoProdutos() {
                 )}
                 
                 {/* Product Name */}
-                <div className="min-h-[2.5rem]">
-                  <h3 className="font-semibold text-sm line-clamp-2 group-hover:text-primary transition-colors">
+                <div>
+                  <h3 className="font-bold text-base leading-tight line-clamp-2 text-foreground group-hover:text-primary transition-colors">
                     {item.name}
                   </h3>
+                  {item.short_description && (
+                    <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
+                      {item.short_description}
+                    </p>
+                  )}
+                  {!item.short_description && item.dimension && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {item.dimension}
+                    </p>
+                  )}
                 </div>
 
                 {/* Price */}
