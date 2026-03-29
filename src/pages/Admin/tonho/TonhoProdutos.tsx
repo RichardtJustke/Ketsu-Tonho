@@ -311,7 +311,7 @@ export default function TonhoProdutos() {
           return (
             <Card 
               key={item.id} 
-              className={`hover:shadow-lg transition-shadow cursor-pointer group ${!item.is_active ? "opacity-50" : ""}`}
+              className={`relative hover:shadow-lg transition-shadow cursor-pointer group ${!item.is_active ? "opacity-50" : ""}`}
               onClick={() => openEdit(item)}
             >
               {/* Status Badge */}
