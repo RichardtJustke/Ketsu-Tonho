@@ -27,7 +27,7 @@ import TonhoOrcamentos from './pages/Admin/tonho/TonhoOrcamentos.tsx'
 import TonhoCalendario from './pages/Admin/tonho/TonhoCalendario.tsx'
 import ChicasDashboard from './pages/Admin/chicas/ChicasDashboard.tsx'
 import ChicasServicos from './pages/Admin/chicas/ChicasServicos.tsx'
-import ChicasDisponibilidade from './pages/Admin/chicas/ChicasDisponibilidade.tsx'
+// import ChicasDisponibilidade from './pages/Admin/chicas/ChicasDisponibilidade.tsx'
 import ChicasEventos from './pages/Admin/chicas/ChicasEventos.tsx'
 import ChicasOrcamentos from './pages/Admin/chicas/ChicasOrcamentos.tsx'
 import ChicasCalendario from './pages/Admin/chicas/ChicasCalendario.tsx'
@@ -72,7 +72,7 @@ function App() {
           <Route path="/admin/chicas" element={<AdminGuard><AppLayout><ChicasDashboard /></AppLayout></AdminGuard>} />
           <Route path="/admin/chicas/cardapio" element={<AdminGuard><AppLayout><ChicasCardapio /></AppLayout></AdminGuard>} />
           <Route path="/admin/chicas/servicos" element={<AdminGuard><AppLayout><ChicasServicos /></AppLayout></AdminGuard>} />
-          <Route path="/admin/chicas/disponibilidade" element={<AdminGuard><AppLayout><ChicasDisponibilidade /></AppLayout></AdminGuard>} />
+          {/* <Route path="/admin/chicas/disponibilidade" element={<AdminGuard><AppLayout><ChicasDisponibilidade /></AppLayout></AdminGuard>} /> */}
           <Route path="/admin/chicas/eventos" element={<AdminGuard><AppLayout><ChicasEventos /></AppLayout></AdminGuard>} />
           <Route path="/admin/chicas/orcamentos" element={<AdminGuard><AppLayout><ChicasOrcamentos /></AppLayout></AdminGuard>} />
           <Route path="/admin/chicas/calendario" element={<AdminGuard><AppLayout><ChicasCalendario /></AppLayout></AdminGuard>} />
