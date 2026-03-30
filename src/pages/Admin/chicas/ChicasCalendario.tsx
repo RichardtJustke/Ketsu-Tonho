@@ -18,10 +18,16 @@ export default function ChicasCalendario() {
     const start = `${year}-${String(month + 1).padStart(2, "0")}-01`;
     const end = `${year}-${String(month + 1).padStart(2, "0")}-${new Date(year, month + 1, 0).getDate()}`;
 
-    supabase.from("buffet_events").select("*, profiles!inner(name)").gte("event_date", start).lte("event_date", end).then(({ data }) => {
-      setEvents(data ?? []);
-      setLoading(false);
-    });
+    supabase
+      .from("orders")
+      .select("id, event_date, customer_name, total_amount, status")
+      .eq("platform", "chicas")
+      .gte("event_date", start)
+      .lte("event_date", end)
+      .then(({ data }) => {
+        setEvents(data ?? []);
+        setLoading(false);
+      });
   }, [year, month]);
 
   const firstDay = new Date(year, month, 1).getDay();
@@ -60,8 +66,8 @@ export default function ChicasCalendario() {
                 <div key={day} className="min-h-[80px] rounded-md border p-1.5">
                   <span className="text-xs font-medium">{day}</span>
                   {dayEvents.map((e) => (
-                    <div key={e.id} className="mt-1 truncate rounded bg-primary/15 px-1 py-0.5 text-[10px] text-primary">
-                      {(e.profiles as any)?.name} ({e.guest_count})
+                    <div key={e.id} className="mt-1 truncate rounded bg-pink-100 px-1 py-0.5 text-[10px] text-pink-700">
+                      {e.customer_name}
                     </div>
                   ))}
                 </div>

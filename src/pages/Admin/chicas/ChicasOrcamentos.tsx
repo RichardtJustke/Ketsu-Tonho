@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency, formatDate, orderStatusLabel } from "../data/utils.ts";
 import { StatusBadge } from "../components/StatusBagde.tsx";
+import { OrderModifyModal } from "../components/OrderModifyModal.tsx";
 import { Search, Loader2, Eye, Calendar, Phone, Clock, FileEdit, Download, Send, Edit } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -20,6 +21,8 @@ export default function ChicasOrcamentos() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [detailOrder, setDetailOrder] = useState<any | null>(null);
+  const [editingOrder, setEditingOrder] = useState<any | null>(null);
+  const [editingOrderItems, setEditingOrderItems] = useState<any[]>([]);
   const { toast } = useToast();
 
   const loadOrders = async () => {
@@ -100,7 +103,7 @@ export default function ChicasOrcamentos() {
                     </p>
                   </div>
                   <StatusBadge 
-                    status={o.status === "paid" ? "success" : o.status === "pending" ? "warning" : o.status === "confirmed" ? "primary" : "secondary"} 
+                    status={o.status === "paid" ? "success" : o.status === "pending" ? "warning" : "primary"} 
                     label={orderStatusLabel(o.status)} 
                   />
                 </div>
@@ -151,13 +154,37 @@ export default function ChicasOrcamentos() {
 
                   <div className="flex gap-2 w-full justify-between items-center">
                     <div className="flex gap-1.5">
-                      <Button variant="outline" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground" onClick={() => toast({ title: "Edição de orçamento", description: "O recurso de edição será implementado em breve." })} title="Editar Orçamento">
+                      <Button 
+                        variant="outline" 
+                        size="icon" 
+                        disabled={o.status !== "pending"} 
+                        className="h-8 w-8 disabled:opacity-40 disabled:cursor-not-allowed" 
+                        onClick={() => {
+                          if (o.status === "pending") {
+                            setEditingOrder(o);
+                            setEditingOrderItems(orderItems[o.id] || []);
+                          }
+                        }} 
+                        title={o.status === "pending" ? "Editar Orçamento" : "Disponível apenas para Propostas"}
+                      >
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button variant="outline" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground" onClick={() => toast({ title: "Baixar Orçamento", description: "Geração de PDF em breve." })} title="Baixar PDF">
+                      <Button 
+                        variant="outline" 
+                        size="icon" 
+                        className="h-8 w-8 text-muted-foreground hover:text-foreground" 
+                        onClick={() => toast({ title: "Baixar Orçamento", description: "Geração de PDF em breve." })} 
+                        title="Baixar PDF"
+                      >
                         <Download className="h-4 w-4" />
                       </Button>
-                      <Button variant="outline" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground" onClick={() => toast({ title: "Enviar Orçamento", description: "Compartilhamento em breve." })} title="Enviar para Cliente">
+                      <Button 
+                        variant="outline" 
+                        size="icon" 
+                        className="h-8 w-8 text-muted-foreground hover:text-foreground" 
+                        onClick={() => toast({ title: "Enviar Orçamento", description: "Compartilhamento em breve." })} 
+                        title="Enviar para Cliente"
+                      >
                         <Send className="h-4 w-4" />
                       </Button>
                     </div>
@@ -202,6 +229,24 @@ export default function ChicasOrcamentos() {
         </Pagination>
       )}
 
+      {/* Order Modify Modal */}
+      {editingOrder && (
+        <OrderModifyModal
+          open={!!editingOrder}
+          onClose={() => setEditingOrder(null)}
+          order={{
+            id: editingOrder.id,
+            platform: editingOrder.platform,
+            discount_amount: Number(editingOrder.discount_amount),
+            subtotal: Number(editingOrder.subtotal),
+            total_amount: Number(editingOrder.total_amount),
+            event_date: editingOrder.event_date,
+          }}
+          items={editingOrderItems}
+          onSave={loadOrders}
+        />
+      )}
+
       {/* Detail Dialog */}
       <Dialog open={!!detailOrder} onOpenChange={(open) => !open && setDetailOrder(null)}>
         <DialogContent className="max-w-xl max-h-[85vh] overflow-y-auto">
@@ -216,7 +261,7 @@ export default function ChicasOrcamentos() {
                   <p className="text-sm text-muted-foreground">ID do Pedido: {detailOrder.id.split('-')[0]}</p>
                 </div>
                 <StatusBadge 
-                  status={detailOrder.status === "paid" ? "success" : detailOrder.status === "pending" ? "warning" : detailOrder.status === "confirmed" ? "primary" : "secondary"} 
+                  status={detailOrder.status === "paid" ? "success" : detailOrder.status === "pending" ? "warning" : "primary"} 
                   label={orderStatusLabel(detailOrder.status)} 
                 />
               </div>

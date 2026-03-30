@@ -8,11 +8,9 @@ import {
 } from "./ui/dialog.tsx";
 import { Button } from "./ui/button.tsx";
 import { Input } from "./ui/input.tsx";
-import { Label } from "./ui/label.tsx";
-import { Badge } from "./ui/badge.tsx";
 import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency } from "../data/utils.ts";
-import { Trash2, Plus, Search, Loader2, Minus, AlertTriangle } from "lucide-react";
+import { Trash2, Plus, Search, Loader2, Minus } from "lucide-react";
 
 interface OrderItem {
   id?: string;
@@ -30,6 +28,9 @@ interface Order {
   subtotal: number;
   total_amount: number;
   event_date?: string | null;
+  customer_name?: string;
+  notes?: string;
+  coupon_code?: string;
 }
 
 interface CatalogItem {
@@ -55,127 +56,67 @@ export function OrderModifyModal({ open, onClose, order, items, onSave }: Props)
   const [searchResults, setSearchResults] = useState<CatalogItem[]>([]);
   const [searching, setSearching] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [stockMap, setStockMap] = useState<Record<string, number>>({});
-  const [stockLoading, setStockLoading] = useState(false);
 
-  // Load availability when modal opens
   useEffect(() => {
     if (open) {
       setEditItems(items.map((i) => ({ ...i })));
       setSearchQuery("");
       setSearchResults([]);
-
-      if (order.event_date && order.platform === "tonho") {
-        setStockLoading(true);
-        supabase
-          .rpc("get_available_stock_for_date", { target_date: order.event_date })
-          .then(({ data }) => {
-            const map: Record<string, number> = {};
-            (data ?? []).forEach((row: any) => {
-              map[row.product_key] = row.available;
-            });
-            setStockMap(map);
-            setStockLoading(false);
-          });
-      } else {
-        setStockMap({});
-      }
     }
-  }, [open, items, order.event_date, order.platform]);
+  }, [open, items]);
 
+  const originalSubtotal = items.reduce((sum, i) => sum + i.unit_price * i.quantity, 0);
   const newSubtotal = editItems.reduce((sum, i) => sum + i.unit_price * i.quantity, 0);
-  const newTotal = Math.max(0, newSubtotal - Number(order.discount_amount));
-
-  // Get available stock for a product, accounting for items already in the current order
-  const getAvailableForProduct = (productKey: string): number | null => {
-    if (!order.event_date || order.platform !== "tonho") return null;
-    const base = stockMap[productKey];
-    if (base === undefined) return null; // not tracked
-    // Add back qty from original order items (they're already counted in the RPC result)
-    const originalQty = items.find((i) => i.product_key === productKey)?.quantity ?? 0;
-    return base + originalQty;
-  };
-
-  const getCurrentQtyInEdit = (productKey: string): number => {
-    return editItems.find((i) => i.product_key === productKey)?.quantity ?? 0;
-  };
-
-  const canAddMore = (productKey: string, additionalQty: number = 1): boolean => {
-    const available = getAvailableForProduct(productKey);
-    if (available === null) return true; // not tracked or no date
-    return getCurrentQtyInEdit(productKey) + additionalQty <= available;
-  };
+  const discount = Number(order.discount_amount) || 0;
+  const newTotal = Math.max(0, newSubtotal - discount);
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
     setSearching(true);
 
-    if (order.platform === "tonho") {
-      const { data } = await supabase
-        .from("equipment")
-        .select("id, name, product_key, daily_price")
-        .ilike("name", `%${searchQuery}%`)
-        .eq("is_active", true)
-        .limit(10);
+    try {
+      if (order.platform === "tonho") {
+        const { data } = await supabase
+          .from("equipment")
+          .select("id, name, product_key, daily_price")
+          .ilike("name", `%${searchQuery}%`)
+          .eq("is_active", true)
+          .limit(10);
 
-      const { data: images } = await supabase
-        .from("equipment_images")
-        .select("equipment_id, image_url")
-        .eq("is_primary", true)
-        .in("equipment_id", (data ?? []).map((e) => e.id));
+        setSearchResults(
+          (data ?? []).map((e) => ({
+            id: e.id,
+            name: e.name,
+            product_key: e.product_key ?? e.id,
+            daily_price: e.daily_price,
+          }))
+        );
+      } else {
+        const { data } = await supabase
+          .from("menu_items")
+          .select("id, name, price_per_serving")
+          .ilike("name", `%${searchQuery}%`)
+          .eq("is_active", true)
+          .limit(10);
 
-      const imageMap: Record<string, string> = {};
-      (images ?? []).forEach((img) => {
-        imageMap[img.equipment_id] = img.image_url;
-      });
-
-      setSearchResults(
-        (data ?? []).map((e) => ({
-          id: e.id,
-          name: e.name,
-          product_key: e.product_key ?? e.id,
-          daily_price: e.daily_price,
-          image_url: imageMap[e.id],
-        }))
-      );
-    } else {
-      const { data } = await supabase
-        .from("menu_items")
-        .select("id, name, price_per_serving")
-        .ilike("name", `%${searchQuery}%`)
-        .eq("is_active", true)
-        .limit(10);
-
-      const { data: images } = await supabase
-        .from("menu_item_images")
-        .select("menu_item_id, image_url")
-        .eq("is_primary", true)
-        .in("menu_item_id", (data ?? []).map((e) => e.id));
-
-      const imageMap: Record<string, string> = {};
-      (images ?? []).forEach((img) => {
-        imageMap[img.menu_item_id] = img.image_url;
-      });
-
-      setSearchResults(
-        (data ?? []).map((m) => ({
-          id: m.id,
-          name: m.name,
-          product_key: m.id,
-          price_per_serving: m.price_per_serving,
-          image_url: imageMap[m.id],
-        }))
-      );
+        setSearchResults(
+          (data ?? []).map((m) => ({
+            id: m.id,
+            name: m.name,
+            product_key: m.id,
+            price_per_serving: m.price_per_serving,
+          }))
+        );
+      }
+    } finally {
+      setSearching(false);
     }
-
-    setSearching(false);
   };
 
   const addItem = (item: CatalogItem) => {
     const key = item.product_key ?? item.id;
-    if (!canAddMore(key)) return;
-
     const price = item.daily_price ?? item.price_per_serving ?? 0;
+    
     const existing = editItems.find((i) => i.product_key === key);
     if (existing) {
       setEditItems(
@@ -191,7 +132,6 @@ export function OrderModifyModal({ open, onClose, order, items, onSave }: Props)
           product_key: key,
           quantity: 1,
           unit_price: price,
-          image: item.image_url ?? null,
         },
       ]);
     }
@@ -200,14 +140,8 @@ export function OrderModifyModal({ open, onClose, order, items, onSave }: Props)
   };
 
   const updateQuantity = (idx: number, delta: number) => {
-    const item = editItems[idx];
-    const newQty = item.quantity + delta;
+    const newQty = editItems[idx].quantity + delta;
     if (newQty < 1) return;
-    if (delta > 0 && !canAddMore(item.product_key, 0)) {
-      // Check if new total would exceed available
-      const available = getAvailableForProduct(item.product_key);
-      if (available !== null && newQty > available) return;
-    }
     setEditItems(
       editItems.map((it, i) =>
         i === idx ? { ...it, quantity: newQty } : it
@@ -223,209 +157,173 @@ export function OrderModifyModal({ open, onClose, order, items, onSave }: Props)
     if (editItems.length === 0) return;
     setSaving(true);
 
-    await supabase.from("order_items").delete().eq("order_id", order.id);
+    try {
+      await supabase.from("order_items").delete().eq("order_id", order.id);
 
-    const insertItems = editItems.map((i) => ({
-      order_id: order.id,
-      name: i.name,
-      product_key: i.product_key,
-      quantity: i.quantity,
-      unit_price: i.unit_price,
-      image: i.image,
-    }));
-    await supabase.from("order_items").insert(insertItems);
+      const insertItems = editItems.map((i) => ({
+        order_id: order.id,
+        name: i.name,
+        product_key: i.product_key,
+        quantity: i.quantity,
+        unit_price: i.unit_price,
+      }));
+      await supabase.from("order_items").insert(insertItems);
 
-    await supabase
-      .from("orders")
-      .update({
-        subtotal: newSubtotal,
-        total_amount: newTotal,
-        was_modified: true,
-      })
-      .eq("id", order.id);
+      await supabase
+        .from("orders")
+        .update({
+          subtotal: newSubtotal,
+          total_amount: newTotal,
+          was_modified: true,
+        })
+        .eq("id", order.id);
 
-    setSaving(false);
-    onSave();
-    onClose();
+      onSave();
+      onClose();
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Modificar Pedido</DialogTitle>
         </DialogHeader>
 
-        {stockLoading && (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Carregando disponibilidade...
+        <div className="space-y-4">
+          {/* Cliente Info */}
+          <div className="bg-muted/50 p-3 rounded-lg text-sm space-y-1">
+            {order.customer_name && (
+              <p><span className="font-medium">Cliente:</span> {order.customer_name}</p>
+            )}
+            {order.coupon_code && (
+              <p className="text-green-600"><span className="font-medium">Cupom:</span> {order.coupon_code}</p>
+            )}
           </div>
-        )}
 
-        <div className="space-y-6">
-          {/* Current Items */}
-          <div>
-            <Label className="text-sm font-medium text-muted-foreground uppercase">
-              Itens do Pedido
-            </Label>
-            <div className="mt-2 divide-y divide-border rounded-md border bg-background">
-              {editItems.map((item, idx) => {
-                const available = getAvailableForProduct(item.product_key);
-                const overLimit = available !== null && item.quantity > available;
-                return (
-                  <div key={idx} className={`flex items-center gap-3 p-3 ${overLimit ? "bg-destructive/5" : ""}`}>
-                    {item.image && (
-                      <img src={item.image} alt={item.name} className="h-10 w-10 rounded object-cover" />
-                    )}
+          {/* Items Lista */}
+          <div className="space-y-2">
+            <p className="text-xs font-semibold uppercase text-muted-foreground">Itens ({editItems.length})</p>
+            <div className="space-y-1 max-h-40 overflow-y-auto border rounded-lg bg-background p-2">
+              {editItems.length === 0 ? (
+                <p className="text-xs text-muted-foreground text-center py-2">Nenhum item</p>
+              ) : (
+                editItems.map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-2 p-2 bg-muted/30 rounded text-sm">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{item.name}</p>
-                      <div className="flex items-center gap-2">
-                        <p className="text-xs text-muted-foreground">
-                          {formatCurrency(item.unit_price)} / un
-                        </p>
-                        {available !== null && (
-                          <span className="text-xs text-muted-foreground">
-                            (disp: {available})
-                          </span>
-                        )}
-                      </div>
-                      {overLimit && (
-                        <p className="text-xs text-destructive flex items-center gap-1 mt-0.5">
-                          <AlertTriangle className="h-3 w-3" />
-                          Excede estoque disponível
-                        </p>
-                      )}
+                      <p className="font-medium truncate">{item.name}</p>
+                      <p className="text-xs text-muted-foreground">{formatCurrency(item.unit_price)}/un</p>
                     </div>
                     <div className="flex items-center gap-1">
                       <Button
                         variant="outline"
                         size="icon"
-                        className="h-7 w-7"
+                        className="h-6 w-6"
                         onClick={() => updateQuantity(idx, -1)}
-                        disabled={item.quantity <= 1}
                       >
                         <Minus className="h-3 w-3" />
                       </Button>
-                      <span className="w-8 text-center text-sm">{item.quantity}</span>
+                      <span className="w-6 text-center text-xs font-medium">{item.quantity}</span>
                       <Button
                         variant="outline"
                         size="icon"
-                        className="h-7 w-7"
+                        className="h-6 w-6"
                         onClick={() => updateQuantity(idx, 1)}
-                        disabled={available !== null && item.quantity >= available}
                       >
                         <Plus className="h-3 w-3" />
                       </Button>
                     </div>
-                    <span className="text-sm font-medium w-20 text-right">
-                      {formatCurrency(item.unit_price * item.quantity)}
-                    </span>
+                    <span className="text-xs font-semibold min-w-fit">{formatCurrency(item.unit_price * item.quantity)}</span>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-destructive hover:text-destructive"
+                      className="h-6 w-6 text-destructive"
                       onClick={() => removeItem(idx)}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-3 w-3" />
                     </Button>
                   </div>
-                );
-              })}
-              {editItems.length === 0 && (
-                <p className="p-4 text-sm text-muted-foreground text-center">
-                  Nenhum item no pedido
-                </p>
+                ))
               )}
             </div>
           </div>
 
-          {/* Add Item Search */}
-          <div>
-            <Label className="text-sm font-medium text-muted-foreground uppercase">
-              Adicionar Item
-            </Label>
-            <div className="mt-2 flex gap-2">
+          {/* Buscar e Adicionar Item */}
+          <div className="space-y-2">
+            <p className="text-xs font-semibold uppercase text-muted-foreground">Adicionar Item</p>
+            <div className="flex gap-2">
               <Input
-                placeholder="Buscar produto..."
+                placeholder="Buscar..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                className="text-sm"
               />
-              <Button variant="secondary" onClick={handleSearch} disabled={searching}>
-                {searching ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Search className="h-4 w-4" />
-                )}
+              <Button 
+                size="sm" 
+                onClick={handleSearch} 
+                disabled={searching}
+                variant="secondary"
+              >
+                {searching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
               </Button>
             </div>
             {searchResults.length > 0 && (
-              <div className="mt-2 divide-y divide-border rounded-md border bg-background max-h-48 overflow-y-auto">
-                {searchResults.map((item) => {
-                  const key = item.product_key ?? item.id;
-                  const available = getAvailableForProduct(key);
-                  const currentInEdit = getCurrentQtyInEdit(key);
-                  const isUnavailable = available !== null && currentInEdit >= available;
-
-                  return (
-                    <div
-                      key={item.id}
-                      className={`flex items-center gap-3 p-3 ${
-                        isUnavailable
-                          ? "opacity-50 cursor-not-allowed"
-                          : "hover:bg-accent cursor-pointer"
-                      }`}
-                      onClick={() => !isUnavailable && addItem(item)}
-                    >
-                      {item.image_url && (
-                        <img src={item.image_url} alt={item.name} className="h-8 w-8 rounded object-cover" />
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{item.name}</p>
-                      </div>
-                      {available !== null && (
-                        <Badge variant={isUnavailable ? "destructive" : "secondary"} className="text-xs">
-                          {isUnavailable ? "Indisponível" : `${available - currentInEdit} disp.`}
-                        </Badge>
-                      )}
-                      <span className="text-sm text-muted-foreground">
-                        {formatCurrency(item.daily_price ?? item.price_per_serving ?? 0)}
-                      </span>
-                      {!isUnavailable && <Plus className="h-4 w-4 text-primary" />}
-                    </div>
-                  );
-                })}
+              <div className="border rounded-lg bg-background max-h-32 overflow-y-auto">
+                {searchResults.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => addItem(item)}
+                    className="w-full text-left p-2 hover:bg-muted/50 text-sm border-b last:border-b-0 flex items-center justify-between"
+                  >
+                    <span className="font-medium">{item.name}</span>
+                    <span className="text-xs text-muted-foreground">{formatCurrency(item.daily_price ?? item.price_per_serving ?? 0)}</span>
+                  </button>
+                ))}
               </div>
             )}
           </div>
 
-          {/* Totals */}
-          <div className="rounded-md bg-muted/50 p-4 space-y-1">
-            <div className="flex justify-between text-sm">
-              <span>Subtotal</span>
-              <span>{formatCurrency(newSubtotal)}</span>
+          {/* Notas */}
+          {order.notes && (
+            <div className="bg-muted/50 p-3 rounded-lg text-sm space-y-1">
+              <p className="text-xs font-semibold uppercase text-muted-foreground">Notas do Cliente</p>
+              <p>{order.notes}</p>
             </div>
-            {Number(order.discount_amount) > 0 && (
-              <div className="flex justify-between text-sm text-green-600">
-                <span>Desconto</span>
-                <span>-{formatCurrency(Number(order.discount_amount))}</span>
+          )}
+
+          {/* Valores */}
+          <div className="bg-muted/50 p-3 rounded-lg space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Original:</span>
+              <span className="line-through text-xs">{formatCurrency(originalSubtotal)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Subtotal:</span>
+              <span className="font-medium">{formatCurrency(newSubtotal)}</span>
+            </div>
+            {discount > 0 && (
+              <div className="flex justify-between text-green-600">
+                <span>Desconto:</span>
+                <span className="font-medium">-{formatCurrency(discount)}</span>
               </div>
             )}
-            <div className="flex justify-between text-base font-semibold pt-2 border-t border-border">
-              <span>Total</span>
+            <div className="border-t pt-2 flex justify-between text-base font-bold">
+              <span>Total:</span>
               <span className="text-primary">{formatCurrency(newTotal)}</span>
             </div>
           </div>
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="gap-2">
           <Button variant="outline" onClick={onClose}>
             Cancelar
           </Button>
           <Button onClick={handleSave} disabled={saving || editItems.length === 0}>
             {saving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-            Salvar Modificações
+            Salvar Mudanças
           </Button>
         </DialogFooter>
       </DialogContent>
