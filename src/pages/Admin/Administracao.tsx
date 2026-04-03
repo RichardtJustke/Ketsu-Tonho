@@ -5,17 +5,48 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { Button } from "./components/ui/button.tsx";
 import { Input } from "./components/ui/input.tsx";
 import { Label } from "./components/ui/label.tsx";
+import { Switch } from "./components/ui/switch.tsx";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "./components/ui/badge.tsx";
-import { Users, Plus, Trash2, Loader2 } from "lucide-react";
+import { Users, Plus, Trash2, Loader2, KeyRound } from "lucide-react";
 import { toast } from "./components/ui/use-toast.ts";
+
+const emptyForm = () => ({
+  name: "", email: "", password: "",
+  can_manage_users: false,
+  can_manage_orders: true,
+  can_edit_supply: false,
+  can_gen_email: false,
+});
 
 export default function Administracao() {
   const [members, setMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [creating, setCreating] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [form, setForm] = useState(emptyForm());
+
+  // Current user state
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [canManageUsers, setCanManageUsers] = useState(false);
+
+  // Password change state
+  const [pwdDialogOpen, setPwdDialogOpen] = useState(false);
+  const [pwdTarget, setPwdTarget] = useState<any | null>(null);
+  const [pwdForm, setPwdForm] = useState({ password: "", confirm: "" });
+  const [changingPwd, setChangingPwd] = useState(false);
+
+  const loadCurrentUserPermissions = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    setCurrentUserId(user.id);
+    const { data: perms } = await supabase
+      .from("admin_permissions")
+      .select("can_manage_users")
+      .eq("user_id", user.id)
+      .single();
+    setCanManageUsers(perms?.can_manage_users ?? false);
+  };
 
   const loadMembers = async () => {
     const { data: adminRoles } = await supabase.from("user_roles").select("user_id").eq("role", "admin");
@@ -36,7 +67,10 @@ export default function Administracao() {
     setLoading(false);
   };
 
-  useEffect(() => { loadMembers(); }, []);
+  useEffect(() => {
+    loadCurrentUserPermissions();
+    loadMembers();
+  }, []);
 
   const handleCreate = async () => {
     if (!form.email || !form.password) {
@@ -45,16 +79,25 @@ export default function Administracao() {
     }
     setCreating(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
       const res = await supabase.functions.invoke("create-admin-user", {
-        body: { email: form.email, password: form.password, name: form.name },
+        body: {
+          email: form.email,
+          password: form.password,
+          name: form.name,
+          permissions: {
+            can_manage_users: form.can_manage_users,
+            can_manage_orders: form.can_manage_orders,
+            can_edit_supply: form.can_edit_supply,
+            can_gen_email: form.can_gen_email,
+          },
+        },
       });
       if (res.error || res.data?.error) {
         toast({ title: "Erro ao criar admin", description: res.data?.error || res.error?.message, variant: "destructive" });
       } else {
         toast({ title: "Administrador criado com sucesso" });
         setDialogOpen(false);
-        setForm({ name: "", email: "", password: "" });
+        setForm(emptyForm());
         setLoading(true);
         await loadMembers();
       }
@@ -76,6 +119,39 @@ export default function Administracao() {
     }
   };
 
+  const openPwdDialog = (member: any) => {
+    setPwdTarget(member);
+    setPwdForm({ password: "", confirm: "" });
+    setPwdDialogOpen(true);
+  };
+
+  const handleChangePassword = async () => {
+    if (!pwdTarget) return;
+    if (!pwdForm.password || pwdForm.password.length < 6) {
+      toast({ title: "A senha deve ter no mínimo 6 caracteres", variant: "destructive" });
+      return;
+    }
+    if (pwdForm.password !== pwdForm.confirm) {
+      toast({ title: "As senhas não coincidem", variant: "destructive" });
+      return;
+    }
+    setChangingPwd(true);
+    try {
+      const res = await supabase.functions.invoke("change-admin-password", {
+        body: { target_user_id: pwdTarget.id, new_password: pwdForm.password },
+      });
+      if (res.error || res.data?.error) {
+        toast({ title: "Erro ao alterar senha", description: res.data?.error || res.error?.message, variant: "destructive" });
+      } else {
+        toast({ title: `Senha de ${pwdTarget.name || pwdTarget.email || "admin"} alterada com sucesso` });
+        setPwdDialogOpen(false);
+      }
+    } catch (err: any) {
+      toast({ title: "Erro", description: err.message, variant: "destructive" });
+    }
+    setChangingPwd(false);
+  };
+
   if (loading) return <div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 
   return (
@@ -85,9 +161,11 @@ export default function Administracao() {
           <h1 className="text-2xl font-bold">Administração</h1>
           <p className="text-muted-foreground">Gestores do sistema</p>
         </div>
-        <Button onClick={() => setDialogOpen(true)} className="gap-2">
-          <Plus className="h-4 w-4" /> Novo Administrador
-        </Button>
+        {canManageUsers && (
+          <Button onClick={() => setDialogOpen(true)} className="gap-2">
+            <Plus className="h-4 w-4" /> Novo Administrador
+          </Button>
+        )}
       </div>
 
       <Card>
@@ -101,7 +179,7 @@ export default function Administracao() {
                 <TableHead>Nome</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Permissões</TableHead>
-                <TableHead className="w-[60px]" />
+                {canManageUsers && <TableHead className="w-[100px]" />}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -118,21 +196,31 @@ export default function Administracao() {
                       {!m.permissions && <span className="text-xs text-muted-foreground">Sem permissões definidas</span>}
                     </div>
                   </TableCell>
-                  <TableCell>
-                    <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleRemove(m.id, m.name)}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
+                  {canManageUsers && (
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        {m.id !== currentUserId && (
+                          <Button variant="ghost" size="icon" title="Alterar senha" onClick={() => openPwdDialog(m)}>
+                            <KeyRound className="h-4 w-4" />
+                          </Button>
+                        )}
+                        <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleRemove(m.id, m.name)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
               {members.length === 0 && (
-                <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">Nenhum administrador encontrado.</TableCell></TableRow>
+                <TableRow><TableCell colSpan={canManageUsers ? 4 : 3} className="text-center text-muted-foreground py-8">Nenhum administrador encontrado.</TableCell></TableRow>
               )}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
 
+      {/* Create Admin Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -152,12 +240,72 @@ export default function Administracao() {
               <Label htmlFor="password">Senha</Label>
               <Input id="password" type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder="Mínimo 6 caracteres" />
             </div>
+            <div className="space-y-3 rounded-md border p-3">
+              <Label className="text-sm font-semibold">Permissões</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="perm-orders" className="text-sm font-normal">Gerenciar Pedidos</Label>
+                <Switch id="perm-orders" checked={form.can_manage_orders} onCheckedChange={(v) => setForm({ ...form, can_manage_orders: v })} />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="perm-supply" className="text-sm font-normal">Editar Estoque</Label>
+                <Switch id="perm-supply" checked={form.can_edit_supply} onCheckedChange={(v) => setForm({ ...form, can_edit_supply: v })} />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="perm-email" className="text-sm font-normal">Gerar Emails</Label>
+                <Switch id="perm-email" checked={form.can_gen_email} onCheckedChange={(v) => setForm({ ...form, can_gen_email: v })} />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="perm-users" className="text-sm font-normal">Gerenciar Usuários</Label>
+                <Switch id="perm-users" checked={form.can_manage_users} onCheckedChange={(v) => setForm({ ...form, can_manage_users: v })} />
+              </div>
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
             <Button onClick={handleCreate} disabled={creating}>
               {creating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               Criar Administrador
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Change Password Dialog */}
+      <Dialog open={pwdDialogOpen} onOpenChange={setPwdDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Alterar Senha</DialogTitle>
+            <DialogDescription>
+              Definir nova senha para {pwdTarget?.name || pwdTarget?.email || "administrador"}.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="new-password">Nova Senha</Label>
+              <Input
+                id="new-password"
+                type="password"
+                value={pwdForm.password}
+                onChange={(e) => setPwdForm({ ...pwdForm, password: e.target.value })}
+                placeholder="Mínimo 6 caracteres"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirm-password">Confirmar Senha</Label>
+              <Input
+                id="confirm-password"
+                type="password"
+                value={pwdForm.confirm}
+                onChange={(e) => setPwdForm({ ...pwdForm, confirm: e.target.value })}
+                placeholder="Repita a senha"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPwdDialogOpen(false)}>Cancelar</Button>
+            <Button onClick={handleChangePassword} disabled={changingPwd}>
+              {changingPwd ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Alterar Senha
             </Button>
           </DialogFooter>
         </DialogContent>

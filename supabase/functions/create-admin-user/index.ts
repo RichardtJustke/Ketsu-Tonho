@@ -37,7 +37,7 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: corsHeaders });
     }
 
-    const { email, password, name } = await req.json();
+    const { email, password, name, permissions } = await req.json();
     if (!email || !password) {
       return new Response(JSON.stringify({ error: "Email e senha são obrigatórios" }), { status: 400, headers: corsHeaders });
     }
@@ -62,9 +62,15 @@ Deno.serve(async (req) => {
     const userId = newUser.user.id;
 
     // The handle_new_user trigger creates profile + customer role automatically.
-    // We need to insert the admin role.
+    // We need to insert the admin role + permissions.
     await adminClient.from("user_roles").insert({ user_id: userId, role: "admin" });
-    await adminClient.from("admin_permissions").insert({ user_id: userId });
+    await adminClient.from("admin_permissions").insert({
+      user_id: userId,
+      can_manage_users: permissions?.can_manage_users ?? false,
+      can_manage_orders: permissions?.can_manage_orders ?? true,
+      can_edit_supply: permissions?.can_edit_supply ?? false,
+      can_gen_email: permissions?.can_gen_email ?? false,
+    });
 
     return new Response(JSON.stringify({ success: true, user_id: userId }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (err) {
