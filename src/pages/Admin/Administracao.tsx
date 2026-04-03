@@ -8,7 +8,7 @@ import { Label } from "./components/ui/label.tsx";
 import { Switch } from "./components/ui/switch.tsx";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "./components/ui/badge.tsx";
-import { Users, Plus, Trash2, Loader2, KeyRound } from "lucide-react";
+import { Users, Plus, Trash2, Loader2, KeyRound, Eye, EyeOff } from "lucide-react";
 import { toast } from "./components/ui/use-toast.ts";
 
 const emptyForm = () => ({
@@ -35,6 +35,7 @@ export default function Administracao() {
   const [pwdTarget, setPwdTarget] = useState<any | null>(null);
   const [pwdForm, setPwdForm] = useState({ password: "", confirm: "" });
   const [changingPwd, setChangingPwd] = useState(false);
+  const [showPwd, setShowPwd] = useState(false);
 
   const loadCurrentUserPermissions = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -120,13 +121,16 @@ export default function Administracao() {
   };
 
   const openPwdDialog = (member: any) => {
+    console.log("openPwdDialog called for:", member.name, member.id);
     setPwdTarget(member);
     setPwdForm({ password: "", confirm: "" });
+    setShowPwd(false);
     setPwdDialogOpen(true);
   };
 
   const handleChangePassword = async () => {
-    if (!pwdTarget) return;
+    console.log("[PWD] handleChangePassword called");
+    if (!pwdTarget) { console.log("[PWD] ABORT: no pwdTarget"); return; }
     if (!pwdForm.password || pwdForm.password.length < 6) {
       toast({ title: "A senha deve ter no mínimo 6 caracteres", variant: "destructive" });
       return;
@@ -137,16 +141,31 @@ export default function Administracao() {
     }
     setChangingPwd(true);
     try {
+      // Force token refresh to ensure valid JWT
+      const { data: { session }, error: sessionErr } = await supabase.auth.refreshSession();
+      console.log("[PWD] Session refreshed:", !!session, sessionErr?.message);
+      if (!session) {
+        toast({ title: "Sessão expirada", description: "Faça login novamente.", variant: "destructive" });
+        setChangingPwd(false);
+        return;
+      }
+
       const res = await supabase.functions.invoke("change-admin-password", {
         body: { target_user_id: pwdTarget.id, new_password: pwdForm.password },
+        headers: { Authorization: `Bearer ${session.access_token}` },
       });
-      if (res.error || res.data?.error) {
-        toast({ title: "Erro ao alterar senha", description: res.data?.error || res.error?.message, variant: "destructive" });
+      console.log("[PWD] Edge function response:", res);
+      if (res.error) {
+        const msg = res.data?.error || res.error?.message || "Erro desconhecido";
+        toast({ title: "Erro ao alterar senha", description: msg, variant: "destructive" });
+      } else if (res.data?.error) {
+        toast({ title: "Erro ao alterar senha", description: res.data.error, variant: "destructive" });
       } else {
         toast({ title: `Senha de ${pwdTarget.name || pwdTarget.email || "admin"} alterada com sucesso` });
         setPwdDialogOpen(false);
       }
     } catch (err: any) {
+      console.error("[PWD] Exception:", err);
       toast({ title: "Erro", description: err.message, variant: "destructive" });
     }
     setChangingPwd(false);
@@ -161,11 +180,9 @@ export default function Administracao() {
           <h1 className="text-2xl font-bold">Administração</h1>
           <p className="text-muted-foreground">Gestores do sistema</p>
         </div>
-        {canManageUsers && (
-          <Button onClick={() => setDialogOpen(true)} className="gap-2">
-            <Plus className="h-4 w-4" /> Novo Administrador
-          </Button>
-        )}
+        <Button onClick={() => setDialogOpen(true)} className="gap-2">
+          <Plus className="h-4 w-4" /> Novo Administrador
+        </Button>
       </div>
 
       <Card>
@@ -179,7 +196,7 @@ export default function Administracao() {
                 <TableHead>Nome</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Permissões</TableHead>
-                {canManageUsers && <TableHead className="w-[100px]" />}
+                <TableHead className="w-[100px]" />
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -196,24 +213,22 @@ export default function Administracao() {
                       {!m.permissions && <span className="text-xs text-muted-foreground">Sem permissões definidas</span>}
                     </div>
                   </TableCell>
-                  {canManageUsers && (
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        {m.id !== currentUserId && (
-                          <Button variant="ghost" size="icon" title="Alterar senha" onClick={() => openPwdDialog(m)}>
-                            <KeyRound className="h-4 w-4" />
-                          </Button>
-                        )}
-                        <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleRemove(m.id, m.name)}>
-                          <Trash2 className="h-4 w-4" />
+                  <TableCell>
+                    <div className="flex items-center gap-1">
+                      {canManageUsers && m.id !== currentUserId && (
+                        <Button variant="ghost" size="icon" title="Alterar senha" onClick={() => openPwdDialog(m)}>
+                          <KeyRound className="h-4 w-4" />
                         </Button>
-                      </div>
-                    </TableCell>
-                  )}
+                      )}
+                      <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleRemove(m.id, m.name)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
                 </TableRow>
               ))}
               {members.length === 0 && (
-                <TableRow><TableCell colSpan={canManageUsers ? 4 : 3} className="text-center text-muted-foreground py-8">Nenhum administrador encontrado.</TableCell></TableRow>
+                <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">Nenhum administrador encontrado.</TableCell></TableRow>
               )}
             </TableBody>
           </Table>
@@ -282,28 +297,52 @@ export default function Administracao() {
           <div className="space-y-4 py-2">
             <div className="space-y-2">
               <Label htmlFor="new-password">Nova Senha</Label>
-              <Input
-                id="new-password"
-                type="password"
-                value={pwdForm.password}
-                onChange={(e) => setPwdForm({ ...pwdForm, password: e.target.value })}
-                placeholder="Mínimo 6 caracteres"
-              />
+              <div className="relative">
+                <Input
+                  id="new-password"
+                  type={showPwd ? "text" : "password"}
+                  value={pwdForm.password}
+                  onChange={(e) => setPwdForm({ ...pwdForm, password: e.target.value })}
+                  placeholder="Mínimo 6 caracteres"
+                  className="pr-10"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                  onClick={() => setShowPwd(!showPwd)}
+                >
+                  {showPwd ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+                </Button>
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirm-password">Confirmar Senha</Label>
-              <Input
-                id="confirm-password"
-                type="password"
-                value={pwdForm.confirm}
-                onChange={(e) => setPwdForm({ ...pwdForm, confirm: e.target.value })}
-                placeholder="Repita a senha"
-              />
+              <div className="relative">
+                <Input
+                  id="confirm-password"
+                  type={showPwd ? "text" : "password"}
+                  value={pwdForm.confirm}
+                  onChange={(e) => setPwdForm({ ...pwdForm, confirm: e.target.value })}
+                  placeholder="Repita a senha"
+                  className="pr-10"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                  onClick={() => setShowPwd(!showPwd)}
+                >
+                  {showPwd ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+                </Button>
+              </div>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setPwdDialogOpen(false)}>Cancelar</Button>
-            <Button onClick={handleChangePassword} disabled={changingPwd}>
+            <Button type="button" onClick={() => { console.log("[PWD] Button clicked!"); handleChangePassword(); }} disabled={changingPwd}>
               {changingPwd ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               Alterar Senha
             </Button>

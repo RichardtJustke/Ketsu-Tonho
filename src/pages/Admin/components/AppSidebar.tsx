@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -23,40 +23,44 @@ import {
 import { NavLink } from "./NavLink.tsx";
 import { cn } from "../lib/utils.ts";
 import { useAuth } from "../../../shared/contexts/AuthContext.jsx";
+import { useAdminPermissions } from "../hooks/useAdminPermissions.ts";
 
 interface NavItem {
   title: string;
   url: string;
   icon: React.ElementType;
+  permission?: "can_manage_orders" | "can_edit_supply" | "can_manage_users" | "can_gen_email";
 }
 
 const tonhoItems: NavItem[] = [
   { title: "Dashboard", url: "/admin/tonho", icon: LayoutDashboard },
-  // { title: "Estoque", url: "/admin/tonho/estoque", icon: Warehouse },
-  { title: "Produtos", url: "/admin/tonho/produtos", icon: Package },
-  { title: "Vendas", url: "/admin/tonho/vendas", icon: ShoppingCart },
-  { title: "Eventos Fechados", url: "/admin/tonho/eventos", icon: CalendarDays },
-  { title: "Orçamentos", url: "/admin/tonho/orcamentos", icon: FileText },
-  { title: "Calendário", url: "/admin/tonho/calendario", icon: CalendarDays },
+  { title: "Produtos", url: "/admin/tonho/produtos", icon: Package, permission: "can_edit_supply" },
+  { title: "Vendas", url: "/admin/tonho/vendas", icon: ShoppingCart, permission: "can_manage_orders" },
+  { title: "Eventos Fechados", url: "/admin/tonho/eventos", icon: CalendarDays, permission: "can_manage_orders" },
+  { title: "Orçamentos", url: "/admin/tonho/orcamentos", icon: FileText, permission: "can_manage_orders" },
+  { title: "Calendário", url: "/admin/tonho/calendario", icon: CalendarDays, permission: "can_manage_orders" },
 ];
 
 const chicasItems: NavItem[] = [
   { title: "Dashboard", url: "/admin/chicas", icon: LayoutDashboard },
-  { title: "Cardápio", url: "/admin/chicas/cardapio", icon: UtensilsCrossed },
-  { title: "Serviços", url: "/admin/chicas/servicos", icon: Wrench },
-  // { title: "Disponibilidade", url: "/admin/chicas/disponibilidade", icon: Clock },
-  { title: "Eventos Fechados", url: "/admin/chicas/eventos", icon: CalendarDays },
-  { title: "Orçamentos", url: "/admin/chicas/orcamentos", icon: FileText },
-  { title: "Calendário", url: "/admin/chicas/calendario", icon: CalendarDays },
+  { title: "Cardápio", url: "/admin/chicas/cardapio", icon: UtensilsCrossed, permission: "can_edit_supply" },
+  { title: "Serviços", url: "/admin/chicas/servicos", icon: Wrench, permission: "can_edit_supply" },
+  { title: "Eventos Fechados", url: "/admin/chicas/eventos", icon: CalendarDays, permission: "can_manage_orders" },
+  { title: "Orçamentos", url: "/admin/chicas/orcamentos", icon: FileText, permission: "can_manage_orders" },
+  { title: "Calendário", url: "/admin/chicas/calendario", icon: CalendarDays, permission: "can_manage_orders" },
 ];
 
 export function AppSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut } = useAuth();
+  const { permissions } = useAdminPermissions();
   const [tonhoOpen, setTonhoOpen] = useState(location.pathname.startsWith("/admin/tonho"));
   const [chicasOpen, setChicasOpen] = useState(location.pathname.startsWith("/admin/chicas"));
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const filterItems = (items: NavItem[]) =>
+    items.filter((i) => !i.permission || permissions[i.permission]);
 
   const isActive = (path: string) => location.pathname === path;
   const isGroupActive = (prefix: string) => location.pathname.startsWith(prefix);
@@ -94,7 +98,7 @@ export function AppSidebar() {
         </button>
         {tonhoOpen && (
           <div className="ml-2 flex flex-col gap-0.5 border-l border-sidebar-border pl-2">
-            {tonhoItems.map((item) => (
+            {filterItems(tonhoItems).map((item) => (
               <NavLink key={item.url} to={item.url} end className={linkClass(item.url)}>
                 <item.icon className="h-4 w-4" />
                 <span>{item.title}</span>
@@ -117,7 +121,7 @@ export function AppSidebar() {
         </button>
         {chicasOpen && (
           <div className="ml-2 flex flex-col gap-0.5 border-l border-sidebar-border pl-2">
-            {chicasItems.map((item) => (
+            {filterItems(chicasItems).map((item) => (
               <NavLink key={item.url} to={item.url} end className={linkClass(item.url)}>
                 <item.icon className="h-4 w-4" />
                 <span>{item.title}</span>
@@ -128,22 +132,30 @@ export function AppSidebar() {
       </div>
 
       <div className="mt-4 flex flex-col gap-0.5">
-        <NavLink to="/admin/orcamentos" end className={linkClass("/admin/orcamentos")}>
-          <BarChart3 className="h-4 w-4" />
-          <span>Central de Orçamentos</span>
-        </NavLink>
-        <NavLink to="/admin/clientes" end className={linkClass("/admin/clientes")}>
-          <Users className="h-4 w-4" />
-          <span>Clientes</span>
-        </NavLink>
-        <NavLink to="/admin/cupons" end className={linkClass("/admin/cupons")}>
-          <Ticket className="h-4 w-4" />
-          <span>Cupons</span>
-        </NavLink>
-        <NavLink to="/admin/administracao" end className={linkClass("/admin/administracao")}>
-          <Settings className="h-4 w-4" />
-          <span>Administração</span>
-        </NavLink>
+        {permissions.can_manage_orders && (
+          <NavLink to="/admin/orcamentos" end className={linkClass("/admin/orcamentos")}>
+            <BarChart3 className="h-4 w-4" />
+            <span>Central de Orçamentos</span>
+          </NavLink>
+        )}
+        {permissions.can_manage_users && (
+          <NavLink to="/admin/clientes" end className={linkClass("/admin/clientes")}>
+            <Users className="h-4 w-4" />
+            <span>Clientes</span>
+          </NavLink>
+        )}
+        {permissions.can_manage_orders && (
+          <NavLink to="/admin/cupons" end className={linkClass("/admin/cupons")}>
+            <Ticket className="h-4 w-4" />
+            <span>Cupons</span>
+          </NavLink>
+        )}
+        {permissions.can_manage_users && (
+          <NavLink to="/admin/administracao" end className={linkClass("/admin/administracao")}>
+            <Settings className="h-4 w-4" />
+            <span>Administração</span>
+          </NavLink>
+        )}
       </div>
 
       <div className="mt-auto border-t border-sidebar-border pt-4">

@@ -103,7 +103,7 @@ export default function TonhoOrcamentos() {
                     </p>
                   </div>
                   <StatusBadge 
-                    status={o.status === "paid" ? "success" : o.status === "pending" ? "warning" : o.status === "confirmed" ? "primary" : "secondary"} 
+                    status={o.status === "paid" ? "success" : o.status === "pending" ? "warning" : o.status === "confirmed" ? "primary" : "neutral"} 
                     label={orderStatusLabel(o.status)} 
                   />
                 </div>
@@ -261,7 +261,7 @@ export default function TonhoOrcamentos() {
                   <p className="text-sm text-muted-foreground">ID do Pedido: {detailOrder.id.split('-')[0]}</p>
                 </div>
                 <StatusBadge 
-                  status={detailOrder.status === "paid" ? "success" : detailOrder.status === "pending" ? "warning" : detailOrder.status === "confirmed" ? "primary" : "secondary"} 
+                  status={detailOrder.status === "paid" ? "success" : detailOrder.status === "pending" ? "warning" : detailOrder.status === "confirmed" ? "primary" : "neutral"} 
                   label={orderStatusLabel(detailOrder.status)} 
                 />
               </div>

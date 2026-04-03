@@ -36,6 +36,7 @@ import Clientes from './pages/Admin/Clientes.tsx'
 import CentralOrcamentos from './pages/Admin/CentralOrcamentos.tsx'
 import Administracao from './pages/Admin/Administracao.tsx'
 import Cupons from './pages/Admin/Cupons.tsx'
+import { RequirePermission } from './pages/Admin/components/RequirePermission.tsx'
 
 function App() {
   const location = useLocation()
@@ -64,22 +65,22 @@ function App() {
           <Route path="/admin" element={<AdminGuard><AppLayout><Admin /></AppLayout></AdminGuard>} />
           <Route path="/admin/tonho" element={<AdminGuard><AppLayout><TonhoDashboard /></AppLayout></AdminGuard>} />
           {/* <Route path="/admin/tonho/estoque" element={<AdminGuard><AppLayout><TonhoEstoque /></AppLayout></AdminGuard>} /> */}
-          <Route path="/admin/tonho/produtos" element={<AdminGuard><AppLayout><TonhoProdutos /></AppLayout></AdminGuard>} />
-          <Route path="/admin/tonho/vendas" element={<AdminGuard><AppLayout><TonhoVendas /></AppLayout></AdminGuard>} />
-          <Route path="/admin/tonho/eventos" element={<AdminGuard><AppLayout><TonhoEventos /></AppLayout></AdminGuard>} />
-          <Route path="/admin/tonho/orcamentos" element={<AdminGuard><AppLayout><TonhoOrcamentos /></AppLayout></AdminGuard>} />
-          <Route path="/admin/tonho/calendario" element={<AdminGuard><AppLayout><TonhoCalendario /></AppLayout></AdminGuard>} />
+          <Route path="/admin/tonho/produtos" element={<AdminGuard><AppLayout><RequirePermission permission="can_edit_supply"><TonhoProdutos /></RequirePermission></AppLayout></AdminGuard>} />
+          <Route path="/admin/tonho/vendas" element={<AdminGuard><AppLayout><RequirePermission permission="can_manage_orders"><TonhoVendas /></RequirePermission></AppLayout></AdminGuard>} />
+          <Route path="/admin/tonho/eventos" element={<AdminGuard><AppLayout><RequirePermission permission="can_manage_orders"><TonhoEventos /></RequirePermission></AppLayout></AdminGuard>} />
+          <Route path="/admin/tonho/orcamentos" element={<AdminGuard><AppLayout><RequirePermission permission="can_manage_orders"><TonhoOrcamentos /></RequirePermission></AppLayout></AdminGuard>} />
+          <Route path="/admin/tonho/calendario" element={<AdminGuard><AppLayout><RequirePermission permission="can_manage_orders"><TonhoCalendario /></RequirePermission></AppLayout></AdminGuard>} />
           <Route path="/admin/chicas" element={<AdminGuard><AppLayout><ChicasDashboard /></AppLayout></AdminGuard>} />
-          <Route path="/admin/chicas/cardapio" element={<AdminGuard><AppLayout><ChicasCardapio /></AppLayout></AdminGuard>} />
-          <Route path="/admin/chicas/servicos" element={<AdminGuard><AppLayout><ChicasServicos /></AppLayout></AdminGuard>} />
+          <Route path="/admin/chicas/cardapio" element={<AdminGuard><AppLayout><RequirePermission permission="can_edit_supply"><ChicasCardapio /></RequirePermission></AppLayout></AdminGuard>} />
+          <Route path="/admin/chicas/servicos" element={<AdminGuard><AppLayout><RequirePermission permission="can_edit_supply"><ChicasServicos /></RequirePermission></AppLayout></AdminGuard>} />
           {/* <Route path="/admin/chicas/disponibilidade" element={<AdminGuard><AppLayout><ChicasDisponibilidade /></AppLayout></AdminGuard>} /> */}
-          <Route path="/admin/chicas/eventos" element={<AdminGuard><AppLayout><ChicasEventos /></AppLayout></AdminGuard>} />
-          <Route path="/admin/chicas/orcamentos" element={<AdminGuard><AppLayout><ChicasOrcamentos /></AppLayout></AdminGuard>} />
-          <Route path="/admin/chicas/calendario" element={<AdminGuard><AppLayout><ChicasCalendario /></AppLayout></AdminGuard>} />
-          <Route path="/admin/clientes" element={<AdminGuard><AppLayout><Clientes /></AppLayout></AdminGuard>} />
-          <Route path="/admin/orcamentos" element={<AdminGuard><AppLayout><CentralOrcamentos /></AppLayout></AdminGuard>} />
-          <Route path="/admin/cupons" element={<AdminGuard><AppLayout><Cupons /></AppLayout></AdminGuard>} />
-          <Route path="/admin/administracao" element={<AdminGuard><AppLayout><Administracao /></AppLayout></AdminGuard>} />
+          <Route path="/admin/chicas/eventos" element={<AdminGuard><AppLayout><RequirePermission permission="can_manage_orders"><ChicasEventos /></RequirePermission></AppLayout></AdminGuard>} />
+          <Route path="/admin/chicas/orcamentos" element={<AdminGuard><AppLayout><RequirePermission permission="can_manage_orders"><ChicasOrcamentos /></RequirePermission></AppLayout></AdminGuard>} />
+          <Route path="/admin/chicas/calendario" element={<AdminGuard><AppLayout><RequirePermission permission="can_manage_orders"><ChicasCalendario /></RequirePermission></AppLayout></AdminGuard>} />
+          <Route path="/admin/clientes" element={<AdminGuard><AppLayout><RequirePermission permission="can_manage_users"><Clientes /></RequirePermission></AppLayout></AdminGuard>} />
+          <Route path="/admin/orcamentos" element={<AdminGuard><AppLayout><RequirePermission permission="can_manage_orders"><CentralOrcamentos /></RequirePermission></AppLayout></AdminGuard>} />
+          <Route path="/admin/cupons" element={<AdminGuard><AppLayout><RequirePermission permission="can_manage_orders"><Cupons /></RequirePermission></AppLayout></AdminGuard>} />
+          <Route path="/admin/administracao" element={<AdminGuard><AppLayout><RequirePermission permission="can_manage_users"><Administracao /></RequirePermission></AppLayout></AdminGuard>} />
         </Routes>
       </PageTransition>
       <WhatsAppButton />
