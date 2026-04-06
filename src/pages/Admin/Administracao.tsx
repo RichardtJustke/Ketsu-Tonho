@@ -8,11 +8,20 @@ import { Label } from "./components/ui/label.tsx";
 import { Switch } from "./components/ui/switch.tsx";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "./components/ui/badge.tsx";
-import { Users, Plus, Trash2, Loader2, KeyRound, Eye, EyeOff } from "lucide-react";
+import { Users, Plus, Trash2, Loader2, Pencil, Eye, EyeOff } from "lucide-react";
 import { toast } from "./components/ui/use-toast.ts";
 
-const emptyForm = () => ({
+const emptyCreateForm = () => ({
   name: "", email: "", password: "",
+  can_manage_users: false,
+  can_manage_orders: true,
+  can_edit_supply: false,
+  can_gen_email: false,
+});
+
+const emptyEditForm = () => ({
+  name: "", email: "",
+  password: "", confirm: "",
   can_manage_users: false,
   can_manage_orders: true,
   can_edit_supply: false,
@@ -24,17 +33,16 @@ export default function Administracao() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [creating, setCreating] = useState(false);
-  const [form, setForm] = useState(emptyForm());
+  const [form, setForm] = useState(emptyCreateForm());
 
-  // Current user state
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [canManageUsers, setCanManageUsers] = useState(false);
 
-  // Password change state
-  const [pwdDialogOpen, setPwdDialogOpen] = useState(false);
-  const [pwdTarget, setPwdTarget] = useState<any | null>(null);
-  const [pwdForm, setPwdForm] = useState({ password: "", confirm: "" });
-  const [changingPwd, setChangingPwd] = useState(false);
+  // Edit dialog state
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editTarget, setEditTarget] = useState<any | null>(null);
+  const [editForm, setEditForm] = useState(emptyEditForm());
+  const [saving, setSaving] = useState(false);
   const [showPwd, setShowPwd] = useState(false);
 
   const loadCurrentUserPermissions = async () => {
@@ -98,7 +106,7 @@ export default function Administracao() {
       } else {
         toast({ title: "Administrador criado com sucesso" });
         setDialogOpen(false);
-        setForm(emptyForm());
+        setForm(emptyCreateForm());
         setLoading(true);
         await loadMembers();
       }
@@ -120,55 +128,97 @@ export default function Administracao() {
     }
   };
 
-  const openPwdDialog = (member: any) => {
-    console.log("openPwdDialog called for:", member.name, member.id);
-    setPwdTarget(member);
-    setPwdForm({ password: "", confirm: "" });
+  const openEditDialog = (member: any) => {
+    setEditTarget(member);
+    setEditForm({
+      name: member.name ?? "",
+      email: member.email ?? "",
+      password: "",
+      confirm: "",
+      can_manage_orders: member.permissions?.can_manage_orders ?? true,
+      can_edit_supply: member.permissions?.can_edit_supply ?? false,
+      can_manage_users: member.permissions?.can_manage_users ?? false,
+      can_gen_email: member.permissions?.can_gen_email ?? false,
+    });
     setShowPwd(false);
-    setPwdDialogOpen(true);
+    setEditDialogOpen(true);
   };
 
-  const handleChangePassword = async () => {
-    console.log("[PWD] handleChangePassword called");
-    if (!pwdTarget) { console.log("[PWD] ABORT: no pwdTarget"); return; }
-    if (!pwdForm.password || pwdForm.password.length < 6) {
-      toast({ title: "A senha deve ter no mínimo 6 caracteres", variant: "destructive" });
-      return;
+  const handleSaveEdit = async () => {
+    if (!editTarget) return;
+
+    // Validate password if provided
+    if (editForm.password) {
+      if (editForm.password.length < 6) {
+        toast({ title: "A senha deve ter no mínimo 6 caracteres", variant: "destructive" });
+        return;
+      }
+      if (editForm.password !== editForm.confirm) {
+        toast({ title: "As senhas não coincidem", variant: "destructive" });
+        return;
+      }
     }
-    if (pwdForm.password !== pwdForm.confirm) {
-      toast({ title: "As senhas não coincidem", variant: "destructive" });
-      return;
-    }
-    setChangingPwd(true);
+
+    setSaving(true);
     try {
-      // Force token refresh to ensure valid JWT
-      const { data: { session }, error: sessionErr } = await supabase.auth.refreshSession();
-      console.log("[PWD] Session refreshed:", !!session, sessionErr?.message);
-      if (!session) {
-        toast({ title: "Sessão expirada", description: "Faça login novamente.", variant: "destructive" });
-        setChangingPwd(false);
+      // 1. Update profile (name, email)
+      const { error: profileErr } = await supabase
+        .from("profiles")
+        .update({ name: editForm.name, email: editForm.email })
+        .eq("id", editTarget.id);
+
+      if (profileErr) {
+        toast({ title: "Erro ao atualizar perfil", description: profileErr.message, variant: "destructive" });
+        setSaving(false);
         return;
       }
 
-      const res = await supabase.functions.invoke("change-admin-password", {
-        body: { target_user_id: pwdTarget.id, new_password: pwdForm.password },
-        headers: { Authorization: `Bearer ${session.access_token}` },
-      });
-      console.log("[PWD] Edge function response:", res);
-      if (res.error) {
-        const msg = res.data?.error || res.error?.message || "Erro desconhecido";
-        toast({ title: "Erro ao alterar senha", description: msg, variant: "destructive" });
-      } else if (res.data?.error) {
-        toast({ title: "Erro ao alterar senha", description: res.data.error, variant: "destructive" });
-      } else {
-        toast({ title: `Senha de ${pwdTarget.name || pwdTarget.email || "admin"} alterada com sucesso` });
-        setPwdDialogOpen(false);
+      // 2. Update permissions
+      const { error: permErr } = await supabase
+        .from("admin_permissions")
+        .update({
+          can_manage_orders: editForm.can_manage_orders,
+          can_edit_supply: editForm.can_edit_supply,
+          can_manage_users: editForm.can_manage_users,
+          can_gen_email: editForm.can_gen_email,
+        })
+        .eq("user_id", editTarget.id);
+
+      if (permErr) {
+        toast({ title: "Erro ao atualizar permissões", description: permErr.message, variant: "destructive" });
+        setSaving(false);
+        return;
       }
+
+      // 3. Change password if provided
+      if (editForm.password) {
+        const { data: { session }, error: sessionErr } = await supabase.auth.refreshSession();
+        if (!session) {
+          toast({ title: "Sessão expirada", description: "Faça login novamente.", variant: "destructive" });
+          setSaving(false);
+          return;
+        }
+
+        const res = await supabase.functions.invoke("change-admin-password", {
+          body: { target_user_id: editTarget.id, new_password: editForm.password },
+          headers: { Authorization: `Bearer ${session.access_token}` },
+        });
+
+        if (res.error || res.data?.error) {
+          toast({ title: "Erro ao alterar senha", description: res.data?.error || res.error?.message, variant: "destructive" });
+          setSaving(false);
+          return;
+        }
+      }
+
+      toast({ title: `${editTarget.name || "Administrador"} atualizado com sucesso` });
+      setEditDialogOpen(false);
+      setLoading(true);
+      await loadMembers();
     } catch (err: any) {
-      console.error("[PWD] Exception:", err);
       toast({ title: "Erro", description: err.message, variant: "destructive" });
     }
-    setChangingPwd(false);
+    setSaving(false);
   };
 
   if (loading) return <div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
@@ -216,8 +266,8 @@ export default function Administracao() {
                   <TableCell>
                     <div className="flex items-center gap-1">
                       {canManageUsers && m.id !== currentUserId && (
-                        <Button variant="ghost" size="icon" title="Alterar senha" onClick={() => openPwdDialog(m)}>
-                          <KeyRound className="h-4 w-4" />
+                        <Button variant="ghost" size="icon" title="Editar administrador" onClick={() => openEditDialog(m)}>
+                          <Pencil className="h-4 w-4" />
                         </Button>
                       )}
                       <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleRemove(m.id, m.name)}>
@@ -285,66 +335,110 @@ export default function Administracao() {
         </DialogContent>
       </Dialog>
 
-      {/* Change Password Dialog */}
-      <Dialog open={pwdDialogOpen} onOpenChange={setPwdDialogOpen}>
-        <DialogContent>
+      {/* Edit Admin Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Alterar Senha</DialogTitle>
+            <DialogTitle>Editar Administrador</DialogTitle>
             <DialogDescription>
-              Definir nova senha para {pwdTarget?.name || pwdTarget?.email || "administrador"}.
+              Atualize os dados de {editTarget?.name || editTarget?.email || "administrador"}.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-2">
-              <Label htmlFor="new-password">Nova Senha</Label>
-              <div className="relative">
-                <Input
-                  id="new-password"
-                  type={showPwd ? "text" : "password"}
-                  value={pwdForm.password}
-                  onChange={(e) => setPwdForm({ ...pwdForm, password: e.target.value })}
-                  placeholder="Mínimo 6 caracteres"
-                  className="pr-10"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
-                  onClick={() => setShowPwd(!showPwd)}
-                >
-                  {showPwd ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
-                </Button>
-              </div>
+              <Label htmlFor="edit-name">Nome</Label>
+              <Input
+                id="edit-name"
+                value={editForm.name}
+                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                placeholder="Nome completo"
+              />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirm-password">Confirmar Senha</Label>
-              <div className="relative">
-                <Input
-                  id="confirm-password"
-                  type={showPwd ? "text" : "password"}
-                  value={pwdForm.confirm}
-                  onChange={(e) => setPwdForm({ ...pwdForm, confirm: e.target.value })}
-                  placeholder="Repita a senha"
-                  className="pr-10"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
-                  onClick={() => setShowPwd(!showPwd)}
-                >
-                  {showPwd ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
-                </Button>
+              <Label htmlFor="edit-email">Email</Label>
+              <Input
+                id="edit-email"
+                type="email"
+                value={editForm.email}
+                onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                placeholder="admin@exemplo.com"
+              />
+            </div>
+
+            <div className="space-y-3 rounded-md border p-3">
+              <Label className="text-sm font-semibold">Alterar Senha</Label>
+              <p className="text-xs text-muted-foreground">Deixe em branco para manter a senha atual.</p>
+              <div className="space-y-2">
+                <Label htmlFor="edit-password" className="text-sm font-normal">Nova Senha</Label>
+                <div className="relative">
+                  <Input
+                    id="edit-password"
+                    type={showPwd ? "text" : "password"}
+                    value={editForm.password}
+                    onChange={(e) => setEditForm({ ...editForm, password: e.target.value })}
+                    placeholder="Mínimo 6 caracteres"
+                    className="pr-10"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                    onClick={() => setShowPwd(!showPwd)}
+                  >
+                    {showPwd ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+                  </Button>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-confirm" className="text-sm font-normal">Confirmar Senha</Label>
+                <div className="relative">
+                  <Input
+                    id="edit-confirm"
+                    type={showPwd ? "text" : "password"}
+                    value={editForm.confirm}
+                    onChange={(e) => setEditForm({ ...editForm, confirm: e.target.value })}
+                    placeholder="Repita a senha"
+                    className="pr-10"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                    onClick={() => setShowPwd(!showPwd)}
+                  >
+                    {showPwd ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3 rounded-md border p-3">
+              <Label className="text-sm font-semibold">Permissões</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="edit-perm-orders" className="text-sm font-normal">Gerenciar Pedidos</Label>
+                <Switch id="edit-perm-orders" checked={editForm.can_manage_orders} onCheckedChange={(v) => setEditForm({ ...editForm, can_manage_orders: v })} />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="edit-perm-supply" className="text-sm font-normal">Editar Estoque</Label>
+                <Switch id="edit-perm-supply" checked={editForm.can_edit_supply} onCheckedChange={(v) => setEditForm({ ...editForm, can_edit_supply: v })} />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="edit-perm-email" className="text-sm font-normal">Gerar Emails</Label>
+                <Switch id="edit-perm-email" checked={editForm.can_gen_email} onCheckedChange={(v) => setEditForm({ ...editForm, can_gen_email: v })} />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="edit-perm-users" className="text-sm font-normal">Gerenciar Usuários</Label>
+                <Switch id="edit-perm-users" checked={editForm.can_manage_users} onCheckedChange={(v) => setEditForm({ ...editForm, can_manage_users: v })} />
               </div>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setPwdDialogOpen(false)}>Cancelar</Button>
-            <Button type="button" onClick={() => { console.log("[PWD] Button clicked!"); handleChangePassword(); }} disabled={changingPwd}>
-              {changingPwd ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-              Alterar Senha
+            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>Cancelar</Button>
+            <Button onClick={handleSaveEdit} disabled={saving}>
+              {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Salvar Alterações
             </Button>
           </DialogFooter>
         </DialogContent>

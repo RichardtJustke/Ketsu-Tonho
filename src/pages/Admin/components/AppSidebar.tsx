@@ -44,7 +44,7 @@ const tonhoItems: NavItem[] = [
 const chicasItems: NavItem[] = [
   { title: "Dashboard", url: "/admin/chicas", icon: LayoutDashboard },
   { title: "Cardápio", url: "/admin/chicas/cardapio", icon: UtensilsCrossed, permission: "can_edit_supply" },
-  { title: "Serviços", url: "/admin/chicas/servicos", icon: Wrench, permission: "can_edit_supply" },
+  { title: "Pacotes", url: "/admin/chicas/servicos", icon: Package, permission: "can_edit_supply" },
   { title: "Eventos Fechados", url: "/admin/chicas/eventos", icon: CalendarDays, permission: "can_manage_orders" },
   { title: "Orçamentos", url: "/admin/chicas/orcamentos", icon: FileText, permission: "can_manage_orders" },
   { title: "Calendário", url: "/admin/chicas/calendario", icon: CalendarDays, permission: "can_manage_orders" },

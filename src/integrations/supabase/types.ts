@@ -202,6 +202,7 @@ export type Database = {
       buffet_packages: {
         Row: {
           base_price: number
+          category_limits: Json | null
           created_at: string
           description: string | null
           display_order: number
@@ -214,6 +215,7 @@ export type Database = {
         }
         Insert: {
           base_price?: number
+          category_limits?: Json | null
           created_at?: string
           description?: string | null
           display_order?: number
@@ -226,6 +228,7 @@ export type Database = {
         }
         Update: {
           base_price?: number
+          category_limits?: Json | null
           created_at?: string
           description?: string | null
           display_order?: number
