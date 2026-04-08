@@ -56,7 +56,7 @@ const BoxGrid = ({ hasAnsweredForm, onOpenFilterModal }) => {
                 hasAnsweredForm={hasAnsweredForm}
                 onAction={handleAction}
                 availableStock={getStock(item.product_key)}
-                isItemAvailable={isAvailable(item.product_key)}
+                isItemAvailable={item.stock_total > 0 && isAvailable(item.product_key)}
               />
             </AnimateIn>
           ))}

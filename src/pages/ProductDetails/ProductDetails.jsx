@@ -30,7 +30,7 @@ const ProductDetails = () => {
 
   const eventDate = hasAnsweredForm ? getEventDate() : null
   const { isAvailable } = useAvailability(eventDate)
-  const itemAvailable = isAvailable(productId)
+  const itemAvailable = dbProduct ? dbProduct.stock_total > 0 && isAvailable(productId) : isAvailable(productId)
 
   useEffect(() => subscribeAnsweredForm(setHasAnsweredForm), [])
 
