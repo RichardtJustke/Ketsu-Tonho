@@ -20,10 +20,18 @@ export default function Clientes() {
   const [clientOrders, setClientOrders] = useState<any[]>([]);
 
   useEffect(() => {
-    supabase.from("profiles").select("*").order("name").then(({ data }) => {
-      setProfiles(data ?? []);
+    const load = async () => {
+      const { data: adminRoles } = await supabase
+        .from("user_roles")
+        .select("user_id")
+        .eq("role", "admin");
+      const adminIds = new Set((adminRoles ?? []).map((r: any) => r.user_id));
+
+      const { data } = await supabase.from("profiles").select("*").order("name");
+      setProfiles((data ?? []).filter((p: any) => !adminIds.has(p.id)));
       setLoading(false);
-    });
+    };
+    load();
   }, []);
 
   useEffect(() => { setPage(1); }, [search]);
