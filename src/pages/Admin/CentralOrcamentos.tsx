@@ -13,8 +13,9 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency, formatDate, orderStatusLabel } from "./data/utils.ts";
 import { StatusBadge } from "./components/StatusBagde.tsx";
-import { ArrowRight, Loader2, MoreVertical, Check, Pencil, DollarSign, XCircle, Eye } from "lucide-react";
+import { ArrowRight, Loader2, MoreVertical, Check, Pencil, DollarSign, XCircle, Eye, Plus } from "lucide-react";
 import { OrderModifyModal } from "./components/OrderModifyModal.tsx";
+import { CreateOrderModal } from "./components/CreateOrderModal.tsx";
 
 const PAGE_SIZE = 12;
 const statusFlow = ["pending", "confirmed", "paid", "completed"];
@@ -30,6 +31,7 @@ export default function CentralOrcamentos() {
   // Modal states
   const [detailOrder, setDetailOrder] = useState<any | null>(null);
   const [editingOrder, setEditingOrder] = useState<any | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const loadOrders = async () => {
     const { data } = await supabase.from("orders").select("*, profiles!orders_user_id_profiles_fkey(name, phone)").order("created_at", { ascending: false });
@@ -112,7 +114,7 @@ export default function CentralOrcamentos() {
         <p className="text-muted-foreground">Todos os pedidos — Tonho & Chicas</p>
       </div>
 
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-3 items-center">
         <Select value={filterPlatform} onValueChange={setFilterPlatform}>
           <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
           <SelectContent>
@@ -128,6 +130,10 @@ export default function CentralOrcamentos() {
             {statusFlow.map((s) => <SelectItem key={s} value={s}>{orderStatusLabel(s)}</SelectItem>)}
           </SelectContent>
         </Select>
+        <Button onClick={() => setShowCreateModal(true)} className="ml-auto">
+          <Plus className="h-4 w-4 mr-2" />
+          Novo Pedido
+        </Button>
       </div>
 
       <Card>
@@ -373,6 +379,12 @@ export default function CentralOrcamentos() {
           onSave={loadOrders}
         />
       )}
+      {/* Create Order Modal */}
+      <CreateOrderModal
+        open={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onSave={() => { setShowCreateModal(false); loadOrders(); }}
+      />
     </div>
   );
 }

@@ -27,9 +27,9 @@ const formatCurrency = (value: number) =>
 
 const formatDate = (d: string) => new Date(d).toLocaleDateString("pt-BR");
 
-// ─── Contract PDF Generator ─────────────────────────────────────────
+// ─── Order Summary PDF Generator ────────────────────────────────────
 
-function generateContractPdf(
+function generateOrderSummaryPdf(
   profile: { name: string | null; email: string; phone?: string | null; cpf?: string | null },
   address: { street?: string | null; number?: string | null; neighborhood?: string | null; city?: string | null; state?: string | null; zip_code?: string | null } | null,
   order: any,
@@ -75,7 +75,7 @@ function generateContractPdf(
   doc.setFontSize(16);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(...BLACK);
-  doc.text("CONTRATO DE LOCAÇÃO DE EQUIPAMENTOS", pw / 2, y, { align: "center" });
+  doc.text("RESUMO DO PEDIDO", pw / 2, y, { align: "center" });
 
   y += 6;
   doc.setFontSize(9);
@@ -109,18 +109,18 @@ function generateContractPdf(
     y += 6;
   };
 
-  // ── 1. CONTRATADO ──
-  sectionTitle("1. CONTRATADO (LOCADOR)");
-  fieldLine("Razão Social", COMPANY.razao);
-  fieldLine("Nome Fantasia", COMPANY.fantasia);
-  fieldLine("CNPJ", COMPANY.cnpj);
-  fieldLine("Endereço", COMPANY.endereco);
-  fieldLine("Representante", COMPANY.representante);
+  // ── Dados do Pedido ──
+  sectionTitle("DADOS DO PEDIDO");
+  fieldLine("Pedido", `#${order.id.slice(0, 8).toUpperCase()}`);
+  fieldLine("Data Emissão", formatDate(order.created_at));
+  if (order.event_date) fieldLine("Data Evento", formatDate(order.event_date));
+  fieldLine("Status", order.status.charAt(0).toUpperCase() + order.status.slice(1));
+  fieldLine("Plataforma", order.platform === "tonho" ? "Tonho Locações" : "Chicas Eventos");
 
   y += 4;
 
-  // ── 2. CONTRATANTE ──
-  sectionTitle("2. CONTRATANTE (LOCATÁRIO)");
+  // ── Dados do Cliente ──
+  sectionTitle("DADOS DO CLIENTE");
   fieldLine("Nome", profile.name || "Não informado");
   fieldLine("E-mail", profile.email);
   if (profile.phone) fieldLine("Telefone", profile.phone);
@@ -134,8 +134,8 @@ function generateContractPdf(
 
   y += 4;
 
-  // ── 3. OBJETO DO CONTRATO ──
-  sectionTitle("3. OBJETO DO CONTRATO — ITENS LOCADOS");
+  // ── Itens do Pedido ──
+  sectionTitle("ITENS DO PEDIDO");
 
   // Table header
   checkPage(14);
@@ -207,73 +207,11 @@ function generateContractPdf(
 
   doc.setTextColor(...BLACK);
 
-  // Event date
-  if (order.event_date) {
-    y += 4;
-    checkPage(10);
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "bold");
-    doc.text(`📅 Data do Evento: ${formatDate(order.event_date)}`, margin, y);
-    y += 10;
-  }
-
-  // ── 4. CLÁUSULAS ──
-  sectionTitle("4. CLÁUSULAS E CONDIÇÕES");
-
-  const clauses = [
-    {
-      title: "4.1. Objeto",
-      text: "O presente contrato tem por objeto a locação dos equipamentos descritos na cláusula 3, pelo LOCADOR ao LOCATÁRIO, para uso exclusivo no evento especificado.",
-    },
-    {
-      title: "4.2. Prazo",
-      text: "A locação tem início na data de entrega dos equipamentos e término na data de devolução, conforme acordado entre as partes. Atrasos na devolução poderão acarretar cobrança proporcional de diárias adicionais.",
-    },
-    {
-      title: "4.3. Responsabilidade do Locatário",
-      text: "O LOCATÁRIO se compromete a: (a) utilizar os equipamentos conforme suas finalidades; (b) zelar pela conservação dos bens; (c) restituir os equipamentos nas mesmas condições em que foram recebidos, salvo desgaste natural de uso.",
-    },
-    {
-      title: "4.4. Danos e Perdas",
-      text: "Em caso de dano, perda ou extravio, o LOCATÁRIO será responsável pelo reparo ou reposição, conforme valor de mercado vigente. O valor do caução poderá ser utilizado para cobrir parcial ou integralmente tais custos.",
-    },
-    {
-      title: "4.5. Cancelamento",
-      text: "O LOCATÁRIO poderá cancelar a locação com até 7 (sete) dias de antecedência da data do evento, sem ônus. Cancelamentos fora deste prazo poderão acarretar cobrança de 50% do valor total.",
-    },
-    {
-      title: "4.6. Entrega e Retirada",
-      text: "A entrega e retirada dos equipamentos serão realizadas pelo LOCADOR no endereço informado pelo LOCATÁRIO. Os custos de transporte, quando aplicáveis, estão inclusos no valor total do contrato.",
-    },
-    {
-      title: "4.7. Força Maior",
-      text: "Nenhuma das partes será responsabilizada por descumprimento do contrato em casos de força maior ou caso fortuito, nos termos do Código Civil.",
-    },
-  ];
-
-  clauses.forEach((clause) => {
-    checkPage(22);
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor(...BLACK);
-    doc.text(clause.title, margin + 4, y);
-    y += 5;
-
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(...GRAY);
-    const lines = doc.splitTextToSize(clause.text, contentW - 8);
-    lines.forEach((line: string) => {
-      checkPage(6);
-      doc.text(line, margin + 4, y);
-      y += 4.5;
-    });
-    y += 4;
-  });
-
   // Notes
   if (order.notes) {
+    y += 4;
     checkPage(16);
-    sectionTitle("5. OBSERVAÇÕES");
+    sectionTitle("OBSERVAÇÕES");
     doc.setFontSize(9);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(...GRAY);
@@ -285,39 +223,6 @@ function generateContractPdf(
     });
     y += 4;
   }
-
-  // ── Signatures ──
-  checkPage(40);
-  y += 10;
-  doc.setDrawColor(...BLACK);
-  doc.setLineWidth(0.4);
-
-  const sigW = (contentW - 20) / 2;
-  // Left: Locador
-  doc.line(margin, y, margin + sigW, y);
-  doc.setFontSize(9);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(...BLACK);
-  doc.text(COMPANY.fantasia, margin + sigW / 2, y + 5, { align: "center" });
-  doc.setFont("helvetica", "normal");
-  doc.setTextColor(...GRAY);
-  doc.text("LOCADOR", margin + sigW / 2, y + 10, { align: "center" });
-
-  // Right: Locatário
-  const rx = margin + sigW + 20;
-  doc.setDrawColor(...BLACK);
-  doc.line(rx, y, rx + sigW, y);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(...BLACK);
-  doc.text(profile.name || profile.email, rx + sigW / 2, y + 5, { align: "center" });
-  doc.setFont("helvetica", "normal");
-  doc.setTextColor(...GRAY);
-  doc.text("LOCATÁRIO", rx + sigW / 2, y + 10, { align: "center" });
-
-  y += 18;
-  doc.setFontSize(8);
-  doc.setTextColor(...GRAY);
-  doc.text(`Belém - PA, ${formatDate(new Date().toISOString())}`, pw / 2, y, { align: "center" });
 
   // ── Footer bar ──
   const pageCount = doc.getNumberOfPages();
@@ -384,7 +289,7 @@ function buildOrderEmailHtml(
     : "";
 
   const pdfNote = !isReceived
-    ? `<p style="font-size:13px;color:#666;margin:16px 0 0;">📎 Em anexo, você encontra o contrato de locação do seu pedido.</p>`
+    ? `<p style="font-size:13px;color:#666;margin:16px 0 0;">📎 Em anexo, você encontra o resumo do seu pedido com todos os detalhes.</p>`
     : "";
 
   return `<!DOCTYPE html>
@@ -522,9 +427,9 @@ Deno.serve(async (req) => {
     let pdfBase64: string | null = null;
     if (type === "order_confirmed" || type === "order_confirmed_modified") {
       try {
-        pdfBase64 = generateContractPdf(profile, address, order, items ?? []);
+        pdfBase64 = generateOrderSummaryPdf(profile, address, order, items ?? []);
       } catch (pdfErr) {
-        console.error("Contract PDF generation failed:", pdfErr);
+        console.error("Order summary PDF generation failed:", pdfErr);
       }
     }
 
@@ -543,7 +448,7 @@ Deno.serve(async (req) => {
     if (pdfBase64) {
       emailPayload.attachments = [
         {
-          filename: `contrato-locacao-${order.id.slice(0, 8).toUpperCase()}.pdf`,
+          filename: `resumo-pedido-${order.id.slice(0, 8).toUpperCase()}.pdf`,
           content: pdfBase64,
         },
       ];
