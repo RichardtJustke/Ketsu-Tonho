@@ -144,6 +144,8 @@ export default function Administracao() {
     setEditDialogOpen(true);
   };
 
+  const isSelfEdit = editTarget?.id === currentUserId;
+
   const handleSaveEdit = async () => {
     if (!editTarget) return;
 
@@ -173,41 +175,54 @@ export default function Administracao() {
         return;
       }
 
-      // 2. Update permissions
-      const { error: permErr } = await supabase
-        .from("admin_permissions")
-        .update({
-          can_manage_orders: editForm.can_manage_orders,
-          can_edit_supply: editForm.can_edit_supply,
-          can_manage_users: editForm.can_manage_users,
-          can_gen_email: editForm.can_gen_email,
-        })
-        .eq("user_id", editTarget.id);
+      // 2. Update permissions (skip when editing self — can't change own permissions)
+      if (!isSelfEdit) {
+        const { error: permErr } = await supabase
+          .from("admin_permissions")
+          .update({
+            can_manage_orders: editForm.can_manage_orders,
+            can_edit_supply: editForm.can_edit_supply,
+            can_manage_users: editForm.can_manage_users,
+            can_gen_email: editForm.can_gen_email,
+          })
+          .eq("user_id", editTarget.id);
 
-      if (permErr) {
-        toast({ title: "Erro ao atualizar permissões", description: permErr.message, variant: "destructive" });
-        setSaving(false);
-        return;
+        if (permErr) {
+          toast({ title: "Erro ao atualizar permissões", description: permErr.message, variant: "destructive" });
+          setSaving(false);
+          return;
+        }
       }
 
       // 3. Change password if provided
       if (editForm.password) {
-        const { data: { session }, error: sessionErr } = await supabase.auth.refreshSession();
-        if (!session) {
-          toast({ title: "Sessão expirada", description: "Faça login novamente.", variant: "destructive" });
-          setSaving(false);
-          return;
-        }
+        if (isSelfEdit) {
+          // Self-edit: use supabase.auth.updateUser directly
+          const { error: pwdErr } = await supabase.auth.updateUser({ password: editForm.password });
+          if (pwdErr) {
+            toast({ title: "Erro ao alterar senha", description: pwdErr.message, variant: "destructive" });
+            setSaving(false);
+            return;
+          }
+        } else {
+          // Editing another admin: use edge function
+          const { data: { session } } = await supabase.auth.refreshSession();
+          if (!session) {
+            toast({ title: "Sessão expirada", description: "Faça login novamente.", variant: "destructive" });
+            setSaving(false);
+            return;
+          }
 
-        const res = await supabase.functions.invoke("change-admin-password", {
-          body: { target_user_id: editTarget.id, new_password: editForm.password },
-          headers: { Authorization: `Bearer ${session.access_token}` },
-        });
+          const res = await supabase.functions.invoke("change-admin-password", {
+            body: { target_user_id: editTarget.id, new_password: editForm.password },
+            headers: { Authorization: `Bearer ${session.access_token}` },
+          });
 
-        if (res.error || res.data?.error) {
-          toast({ title: "Erro ao alterar senha", description: res.data?.error || res.error?.message, variant: "destructive" });
-          setSaving(false);
-          return;
+          if (res.error || res.data?.error) {
+            toast({ title: "Erro ao alterar senha", description: res.data?.error || res.error?.message, variant: "destructive" });
+            setSaving(false);
+            return;
+          }
         }
       }
 
@@ -265,14 +280,16 @@ export default function Administracao() {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
-                      {canManageUsers && m.id !== currentUserId && (
+                      {(m.id === currentUserId || canManageUsers) && (
                         <Button variant="ghost" size="icon" title="Editar administrador" onClick={() => openEditDialog(m)}>
                           <Pencil className="h-4 w-4" />
                         </Button>
                       )}
-                      <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleRemove(m.id, m.name)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      {canManageUsers && m.id !== currentUserId && (
+                        <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleRemove(m.id, m.name)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
@@ -414,25 +431,27 @@ export default function Administracao() {
               </div>
             </div>
 
-            <div className="space-y-3 rounded-md border p-3">
-              <Label className="text-sm font-semibold">Permissões</Label>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="edit-perm-orders" className="text-sm font-normal">Gerenciar Pedidos</Label>
-                <Switch id="edit-perm-orders" checked={editForm.can_manage_orders} onCheckedChange={(v) => setEditForm({ ...editForm, can_manage_orders: v })} />
+            {!isSelfEdit && (
+              <div className="space-y-3 rounded-md border p-3">
+                <Label className="text-sm font-semibold">Permissões</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="edit-perm-orders" className="text-sm font-normal">Gerenciar Pedidos</Label>
+                  <Switch id="edit-perm-orders" checked={editForm.can_manage_orders} onCheckedChange={(v) => setEditForm({ ...editForm, can_manage_orders: v })} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="edit-perm-supply" className="text-sm font-normal">Editar Estoque</Label>
+                  <Switch id="edit-perm-supply" checked={editForm.can_edit_supply} onCheckedChange={(v) => setEditForm({ ...editForm, can_edit_supply: v })} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="edit-perm-email" className="text-sm font-normal">Gerar Emails</Label>
+                  <Switch id="edit-perm-email" checked={editForm.can_gen_email} onCheckedChange={(v) => setEditForm({ ...editForm, can_gen_email: v })} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="edit-perm-users" className="text-sm font-normal">Gerenciar Usuários</Label>
+                  <Switch id="edit-perm-users" checked={editForm.can_manage_users} onCheckedChange={(v) => setEditForm({ ...editForm, can_manage_users: v })} />
+                </div>
               </div>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="edit-perm-supply" className="text-sm font-normal">Editar Estoque</Label>
-                <Switch id="edit-perm-supply" checked={editForm.can_edit_supply} onCheckedChange={(v) => setEditForm({ ...editForm, can_edit_supply: v })} />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="edit-perm-email" className="text-sm font-normal">Gerar Emails</Label>
-                <Switch id="edit-perm-email" checked={editForm.can_gen_email} onCheckedChange={(v) => setEditForm({ ...editForm, can_gen_email: v })} />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="edit-perm-users" className="text-sm font-normal">Gerenciar Usuários</Label>
-                <Switch id="edit-perm-users" checked={editForm.can_manage_users} onCheckedChange={(v) => setEditForm({ ...editForm, can_manage_users: v })} />
-              </div>
-            </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditDialogOpen(false)}>Cancelar</Button>

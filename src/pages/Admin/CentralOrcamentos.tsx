@@ -13,9 +13,10 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency, formatDate, orderStatusLabel } from "./data/utils.ts";
 import { StatusBadge } from "./components/StatusBagde.tsx";
-import { ArrowRight, Loader2, MoreVertical, Check, Pencil, DollarSign, XCircle, Eye, Plus } from "lucide-react";
+import { ArrowRight, Loader2, MoreVertical, Check, Pencil, DollarSign, XCircle, Eye, Plus, Download } from "lucide-react";
 import { OrderModifyModal } from "./components/OrderModifyModal.tsx";
 import { CreateOrderModal } from "./components/CreateOrderModal.tsx";
+import { generateOrderPdf } from "./utils/generateOrderPdf.ts";
 
 const PAGE_SIZE = 12;
 const statusFlow = ["pending", "confirmed", "paid", "completed"];
@@ -183,17 +184,47 @@ export default function CentralOrcamentos() {
 
                 {/* Items count + Action buttons */}
                 <div className="pt-2 space-y-2 border-t">
-                  {orderItems[o.id]?.length > 0 && (
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="w-full text-xs"
-                      onClick={() => setDetailOrder(o)}
+                  <div className="flex gap-2">
+                    {orderItems[o.id]?.length > 0 && (
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="flex-1 text-xs"
+                        onClick={() => setDetailOrder(o)}
+                      >
+                        <Eye className="h-4 w-4 mr-2" />
+                        Detalhes ({orderItems[o.id].length})
+                      </Button>
+                    )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs"
+                      onClick={() => generateOrderPdf(
+                        {
+                          name: (o.profiles as any)?.name,
+                          email: (o.profiles as any)?.email,
+                          phone: (o.profiles as any)?.phone,
+                          cpf: (o.profiles as any)?.cpf,
+                        },
+                        {
+                          id: o.id,
+                          created_at: o.created_at,
+                          event_date: o.event_date,
+                          status: o.status,
+                          platform: o.platform,
+                          subtotal: Number(o.subtotal),
+                          discount_amount: Number(o.discount_amount),
+                          total_amount: Number(o.total_amount),
+                          coupon_code: o.coupon_code,
+                          notes: o.notes,
+                        },
+                        orderItems[o.id] ?? []
+                      )}
                     >
-                      <Eye className="h-4 w-4 mr-2" />
-                      Ver Detalhes ({orderItems[o.id].length} itens)
+                      <Download className="h-4 w-4" />
                     </Button>
-                  )}
+                  </div>
 
                   {/* Actions Menu */}
                   {(o.status === "pending" || o.status === "confirmed" || o.status === "paid") && (
